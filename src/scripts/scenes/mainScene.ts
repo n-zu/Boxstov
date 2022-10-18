@@ -1,8 +1,49 @@
 import PhaserLogo from "../objects/phaserLogo";
 import FpsText from "../objects/fpsText";
+import { Peer } from "peerjs";
 
 type ExtendedGameType = Phaser.Game & {
   network_mode: "host" | "guest";
+  network_host: Peer;
+  network_guest: Peer;
+};
+const conn_id = "efoppiano";
+const setupHost = (game: ExtendedGameType) => {
+  console.log("Setting up host");
+  const peer = new Peer(conn_id);
+  peer.on("connection", (conn) => {
+    conn.on("open", () => {
+      console.log("connection open");
+      conn.send("I am the host");
+    });
+    conn.on("data", (data) => {
+      console.log("Received data", data);
+    });
+  });
+  game.network_host = peer;
+};
+const setupGuest = (game: ExtendedGameType) => {
+  console.log("Setting up guest");
+  const peer = new Peer();
+  peer.on("open", (id) => {
+    console.log("Opened connection with id: " + id);
+    const conn = peer.connect(conn_id);
+    conn.on("open", () => {
+      conn.send("I am the guest");
+    });
+    conn.on("data", (data) => {
+      console.log("Received data", data);
+    });
+  });
+
+  game.network_guest = peer;
+};
+const setup = (game: ExtendedGameType) => {
+  if (game.network_mode === "host") {
+    setupHost(game);
+  } else if (game.network_mode === "guest") {
+    setupGuest(game);
+  }
 };
 
 export default class MainScene extends Phaser.Scene {
@@ -24,8 +65,7 @@ export default class MainScene extends Phaser.Scene {
       })
       .setOrigin(1, 0);
 
-    const game = this.game as ExtendedGameType;
-    console.log("I am the", game.network_mode);
+    setup(this.game as ExtendedGameType);
   }
 
   update() {
