@@ -1,4 +1,3 @@
-/* eslint-disable @typescript-eslint/ban-ts-comment */
 import "phaser";
 import MainScene from "./scenes/mainScene";
 import PreloadScene from "./scenes/preloadScene";

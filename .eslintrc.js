@@ -10,7 +10,9 @@ module.exports = {
     sourceType: "module",
   },
   plugins: ["@typescript-eslint"],
+  ignorePatterns: [".eslintrc.js"],
   rules: {
     "@typescript-eslint/ban-ts-ignore": "off",
+    "@typescript-eslint/ban-ts-comment": "off",
   },
 };
