@@ -1,14 +1,12 @@
 import MainScene from "./mainScene";
-import { DataConnection, Peer } from "peerjs";
+import { DataConnection } from "peerjs";
 import { WorldState } from "../objects/world";
 
 export class GuestMainScene extends MainScene {
   conn: DataConnection | undefined;
-  peer: Peer;
 
   constructor() {
     super();
-    this.peer = new Peer();
   }
 
   preload() {
@@ -19,7 +17,7 @@ export class GuestMainScene extends MainScene {
     super.update();
     if (this.conn) {
       console.log("Sending player state");
-      let msg = {
+      const msg = {
         playerId: this.game.getPlayerId(),
         playerState: this.world.getPlayerState(this.game.getPlayerId()),
       };
@@ -29,11 +27,12 @@ export class GuestMainScene extends MainScene {
 
   create() {
     super.create();
-    this.peer.on("open", () => {
-      console.log("Guest peer id: " + this.peer.id);
+    this.game.peer.on("open", () => {
+      console.log("Guest peer id: " + this.game.peer.id);
       console.log("Connecting with host: " + this.game.hostId);
-      this.conn = this.peer.connect(this.game.hostId);
-      this.conn.on("open", () => {
+
+      this.conn = this.game.peer.connect(this.game.hostId);
+      this.conn?.on("open", () => {
         console.log("Connection opened");
         if (this.conn) {
           this.conn.on("data", (data) => {
@@ -46,7 +45,6 @@ export class GuestMainScene extends MainScene {
   }
 
   private openConnection(): DataConnection {
-    const peer = new Peer();
-    return peer.connect(this.game.hostId);
+    return this.game.peer.connect(this.game.hostId);
   }
 }

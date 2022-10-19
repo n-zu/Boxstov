@@ -1,9 +1,13 @@
+/* eslint-disable */
 const path = require("path");
 const CopyWebpackPlugin = require("copy-webpack-plugin");
 const HtmlWebpackPlugin = require("html-webpack-plugin");
 
 module.exports = {
-  entry: ["./src/scripts/game.ts", "./webpack/credits.js"],
+  entry: {
+    play: ["./src/scripts/game.ts", "./webpack/credits.js"],
+    index: ["./src/scripts/index.ts", "./webpack/credits.js"],
+  },
   output: {
     path: path.resolve(__dirname, "../docs"),
     filename: "[name].bundle.js",
@@ -35,8 +39,16 @@ module.exports = {
   },
   plugins: [
     new HtmlWebpackPlugin({
-      gameName: "My Phaser Game",
+      gameName: "Boxstov",
       template: "src/index.html",
+      filename: "index.html",
+      chunks: ["index"],
+    }),
+    new HtmlWebpackPlugin({
+      gameName: "Boxstov",
+      filename: "play/index.html",
+      template: "src/play/index.html",
+      chunks: ["play"],
     }),
     new CopyWebpackPlugin({
       patterns: [

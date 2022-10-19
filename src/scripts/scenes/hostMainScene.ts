@@ -1,5 +1,5 @@
 import MainScene from "./mainScene";
-import { DataConnection, Peer } from "peerjs";
+import { DataConnection } from "peerjs";
 import { PlayerState } from "../objects/player";
 
 export type PlayerUpdateMsg = {
@@ -33,11 +33,10 @@ export class HostMainScene extends MainScene {
 
   private connect() {
     console.log("Setting up host");
-    const peer = new Peer(this.game.hostId);
-    peer.on("connection", (conn) => {
+    this.game.peer.on("connection", (conn) => {
       console.log("Opened connection with id: " + conn.peer);
       this.conn = conn;
-      this.conn.on("open", () => {
+      this.conn?.on("open", () => {
         console.log("Connection opened");
         if (this.conn) {
           this.conn.on("data", (data) => {
