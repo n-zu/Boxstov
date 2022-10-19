@@ -10,12 +10,7 @@ function getInputValue(id: string): string {
 }
 
 function getQueryString(params?: Record<string, string>): string {
-  const name = getInputValue("inputName");
-  console.log("Name: ", name);
   const query = params ?? {};
-  if (name) {
-    query.name = name;
-  }
   return new URLSearchParams(query).toString();
 }
 
@@ -31,10 +26,4 @@ document.getElementById("btnJoin")?.addEventListener("click", () => {
 
 document.getElementById("btnPlay")?.addEventListener("click", () => {
   window.location.href = "/play?" + getQueryString();
-});
-
-document.getElementById("inputName")?.addEventListener("keyup", (event) => {
-  if (event.key === "Enter") {
-    document.getElementById("btnPlay")?.click();
-  }
 });

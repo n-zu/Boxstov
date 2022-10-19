@@ -1,3 +1,4 @@
+import "../styles/menu.css";
 import "phaser";
 import { HostMainScene } from "./scenes/hostMainScene";
 import { GuestMainScene } from "./scenes/guestMainScene";
@@ -6,6 +7,7 @@ import Peer from "peerjs";
 
 const DEFAULT_WIDTH = 300;
 const DEFAULT_HEIGHT = 200;
+const URL_PREFIX = "http://localhost:8080";
 
 const hostConfig = {
   type: Phaser.AUTO,
@@ -45,6 +47,18 @@ const guestConfig = {
   },
 };
 
+function addUrl(id: string) {
+  const url = `${URL_PREFIX}/play?id=${id}`;
+  const anchor = document.getElementById("joinLink");
+  if (anchor instanceof HTMLAnchorElement) {
+    anchor.href = url;
+  }
+  const text = document.getElementById("joinText");
+  if (text instanceof HTMLHeadingElement) {
+    text.innerText = `Join with URL: ${url}`;
+  }
+}
+
 window.addEventListener("load", () => {
   const params = new URL(document.location.toString()).searchParams;
   const join_id = params.get("id");
@@ -55,6 +69,7 @@ window.addEventListener("load", () => {
   if (join_id) {
     console.log(`Joining game id: ${join_id}`);
     new MultiplayerGame(guestConfig, 1, join_id, peer);
+    addUrl(join_id);
     return;
   }
 
@@ -62,5 +77,6 @@ window.addEventListener("load", () => {
   peer.on("open", (id) => {
     console.log(`Hosting game id: ${id}`);
     new MultiplayerGame(hostConfig, 0, id, peer);
+    addUrl(id);
   });
 });

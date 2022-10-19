@@ -89,3 +89,8 @@ input:focus {
 input:hover {
     border-color: var(--main-color);
 }
+
+.joinText {
+    text-align: center;
+    color: white;
+}
