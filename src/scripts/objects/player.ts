@@ -1,7 +1,15 @@
 import Sprite = Phaser.Physics.Arcade.Sprite;
 import CursorKeys = Phaser.Types.Input.Keyboard.CursorKeys;
+import MainScene from "../scenes/mainScene";
 
 const SPEED = 10;
+
+export type BulletState = {
+  id: number;
+  x: number;
+  y: number;
+  rotation: number;
+};
 
 export type PlayerState = {
   position: {
@@ -13,16 +21,20 @@ export type PlayerState = {
     y: number;
   };
   rotation: number;
+  bullets: BulletState[];
 };
 
 export class Player extends Sprite {
   cursorKeys: CursorKeys;
+  bullets: BulletState[];
+  scene: MainScene;
 
-  constructor(scene: Phaser.Scene, x: number, y: number) {
+  constructor(scene: MainScene, x: number, y: number) {
     super(scene, x, y, "player");
     scene.add.existing(this);
     scene.physics.add.existing(this);
     this.cursorKeys = scene.input.keyboard.createCursorKeys();
+    this.bullets = [];
   }
 
   public update() {
@@ -79,7 +91,19 @@ export class Player extends Sprite {
         y: this.body.velocity.y,
       },
       rotation: this.rotation,
+      bullets: this.bullets,
     };
+  }
+
+  public shoot(x: number, y: number, scene: MainScene) {
+    const angle = Phaser.Math.Angle.Between(this.x, this.y, x, y);
+    scene.bulletGroup.shootBullet(this.x, this.y, angle);
+    this.bullets.push({
+      id: Math.random() * 1000,
+      x: this.x,
+      y: this.y,
+      rotation: angle,
+    });
   }
 
   public updateWith(playerState: PlayerState) {
@@ -88,5 +112,14 @@ export class Player extends Sprite {
     }
     this.setVelocity(playerState.velocity.x, playerState.velocity.y);
     this.setRotation(playerState.rotation);
+    playerState.bullets.forEach((bulletState) => {
+      if (!this.bullets.find((bullet) => bullet.id === bulletState.id)) {
+        this.bullets.push(bulletState);
+        const bullet = this.scene.bulletGroup.getFirstDead(false);
+        if (bullet) {
+          bullet.fire(bulletState.x, bulletState.y, bulletState.rotation);
+        }
+      }
+    });
   }
 }

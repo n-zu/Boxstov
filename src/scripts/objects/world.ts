@@ -1,4 +1,5 @@
 import { Player, PlayerState } from "./player";
+import MainScene from "../scenes/mainScene";
 
 export type WorldState = {
   players: PlayerState[];
@@ -23,6 +24,8 @@ export class World {
 
   public updateFor(playerId: number, worldState: WorldState) {
     this.players.forEach((player, index) => {
+      // we may want to update the player after some time,
+      // but not every frame
       if (index !== playerId) {
         player.updateWith(worldState.players[index]);
       }
@@ -35,5 +38,9 @@ export class World {
 
   public getPlayerState(playerId: number): PlayerState {
     return this.players[playerId].getState();
+  }
+
+  public shoot(playerId: number, x: number, y: number, scene: MainScene) {
+    this.players[playerId].shoot(x, y, scene);
   }
 }
