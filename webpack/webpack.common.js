@@ -2,11 +2,12 @@
 const path = require("path");
 const CopyWebpackPlugin = require("copy-webpack-plugin");
 const HtmlWebpackPlugin = require("html-webpack-plugin");
+const MiniCssExtractPlugin = require("mini-css-extract-plugin");
 
 module.exports = {
   entry: {
-    play: ["./src/scripts/game.ts", "./webpack/credits.js"],
-    index: ["./src/scripts/index.ts", "./webpack/credits.js"],
+    play: ["./src/scripts/play.ts", "./webpack/credits.js"],
+    index: ["./src/scripts/index.ts"],
   },
   output: {
     path: path.resolve(__dirname, "../docs"),
@@ -22,6 +23,10 @@ module.exports = {
         test: /\.tsx?$|\.jsx?$/,
         include: path.join(__dirname, "../src"),
         loader: "ts-loader",
+      },
+      {
+        test: /\.css$/,
+        use: [MiniCssExtractPlugin.loader, "css-loader"],
       },
     ],
   },
@@ -57,5 +62,6 @@ module.exports = {
         { from: "src/favicon.ico", to: "" },
       ],
     }),
+    new MiniCssExtractPlugin(),
   ],
 };

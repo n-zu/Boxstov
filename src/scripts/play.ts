@@ -47,17 +47,18 @@ const guestConfig = {
 
 window.addEventListener("load", () => {
   const params = new URL(document.location.toString()).searchParams;
-  const host_id = params.get("id");
-  const peer = new Peer();
+  const join_id = params.get("id");
+  const host_with = params.get("host_with");
+  const peer = host_with ? new Peer(host_with) : new Peer();
 
-  // If there's a host_id, we're joining.
-  if (host_id) {
-    console.log(`Joining game id: ${host_id}`);
-    new MultiplayerGame(guestConfig, 1, host_id, peer);
+  // If there's a join_id, we're joining.
+  if (join_id) {
+    console.log(`Joining game id: ${join_id}`);
+    new MultiplayerGame(guestConfig, 1, join_id, peer);
     return;
   }
 
-  // No host_id: we're hosting.
+  // No join_id: we're hosting.
   peer.on("open", (id) => {
     console.log(`Hosting game id: ${id}`);
     new MultiplayerGame(hostConfig, 0, id, peer);
