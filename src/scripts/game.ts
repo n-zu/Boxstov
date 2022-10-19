@@ -1,11 +1,13 @@
 import "phaser";
-import MainScene from "./scenes/mainScene";
-import PreloadScene from "./scenes/preloadScene";
+import { HostMainScene } from "./scenes/hostMainScene";
+import { GuestMainScene } from "./scenes/guestMainScene";
+import { MultiplayerGame } from "./game/multiplayerGame";
 
-const DEFAULT_WIDTH = 1280;
-const DEFAULT_HEIGHT = 720;
+const DEFAULT_WIDTH = 300;
+const DEFAULT_HEIGHT = 200;
+const host_id = "efoppiano2";
 
-const config = {
+const hostConfig = {
   type: Phaser.AUTO,
   backgroundColor: "#ffffff",
   scale: {
@@ -15,12 +17,30 @@ const config = {
     width: DEFAULT_WIDTH,
     height: DEFAULT_HEIGHT,
   },
-  scene: [PreloadScene, MainScene],
+  scene: [HostMainScene],
   physics: {
     default: "arcade",
     arcade: {
       debug: false,
-      gravity: { y: 400 },
+    },
+  },
+};
+
+const guestConfig = {
+  type: Phaser.AUTO,
+  backgroundColor: "#ffffff",
+  scale: {
+    parent: "phaser-game",
+    mode: Phaser.Scale.FIT,
+    autoCenter: Phaser.Scale.CENTER_BOTH,
+    width: DEFAULT_WIDTH,
+    height: DEFAULT_HEIGHT,
+  },
+  scene: [GuestMainScene],
+  physics: {
+    default: "arcade",
+    arcade: {
+      debug: false,
     },
   },
 };
@@ -33,16 +53,12 @@ window.addEventListener("load", () => {
     hostBtn.disabled = true;
     guestBtn.disabled = true;
 
-    const game = new Phaser.Game(config);
-    //@ts-ignore
-    game.network_mode = "host";
+    let game = new MultiplayerGame(hostConfig, 0, host_id);
   });
   guestBtn.addEventListener("click", () => {
     hostBtn.disabled = true;
     guestBtn.disabled = true;
 
-    const game = new Phaser.Game(config);
-    //@ts-ignore
-    game.network_mode = "guest";
+    let game = new MultiplayerGame(guestConfig, 1, host_id);
   });
 });
