@@ -16,14 +16,17 @@ function getQueryString(params?: Record<string, string>): string {
 
 document.getElementById("btnHost")?.addEventListener("click", () => {
   const params = getQueryString({ host_with: getInputValue("inputID") });
-  window.location.href = "/play?" + params;
+  const path = window.location.pathname.split("/").slice(0, -1).join("/");
+  window.location.href = path + "/play?" + params;
 });
 
 document.getElementById("btnJoin")?.addEventListener("click", () => {
   const params = getQueryString({ id: getInputValue("inputID") });
-  window.location.href = "/play?" + params;
+  const path = window.location.pathname.split("/").slice(0, -1).join("/");
+  window.location.href = path + "/play?" + params;
 });
 
 document.getElementById("btnPlay")?.addEventListener("click", () => {
-  window.location.href = "/play?" + getQueryString();
+  const path = window.location.pathname.split("/").slice(0, -1).join("/");
+  window.location.href = path + "/play?" + getQueryString();
 });
