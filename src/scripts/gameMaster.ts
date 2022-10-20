@@ -5,7 +5,7 @@ export type Direction = "up" | "down" | "left" | "right";
 
 export class GameMaster {
   peer: Peer;
-  socket: DataConnection;
+  socket: DataConnection | undefined;
   scene: MainScene;
 
   constructor(scene: MainScene, socketId?: string, idToConnect?: string) {
@@ -16,6 +16,16 @@ export class GameMaster {
       this.connectTo(idToConnect);
     } else {
       this.waitForConnection();
+    }
+
+    if (idToConnect === undefined) {
+      setInterval(() => {
+        this.socket?.send({
+          type: "sync",
+          time: Date.now(),
+          state: this.scene.getState(),
+        });
+      }, 500);
     }
   }
 
@@ -29,16 +39,20 @@ export class GameMaster {
 
   connectTo(id: string) {
     this.peer.on("open", () => {
+      console.log("Connecting to id: " + id);
       this.socket = this.peer.connect(id);
-      this.socket.on("open", () => {
+
+      this.socket?.on("open", () => {
         console.log("Connection established with id: " + id);
-        this.socket.send("Hello from " + this.peer.id);
+        this.socket?.send("Hello from " + this.peer.id);
         console.log("Socket? " + this.socket);
-        this.socket?.on("data", (data) => {
-          console.log("Data received");
-          console.log(data);
-          this.handleMessage(data);
-        });
+        if (this.socket) {
+          this.socket.on("data", (data) => {
+            console.log("Data received");
+            console.log(data);
+            this.handleMessage(data);
+          });
+        }
       });
     });
   }
@@ -60,6 +74,15 @@ export class GameMaster {
           this.scene.movePlayerRight(data.playerId);
           break;
       }
+    } else if (data.type == "shoot") {
+      console.log("Shoot message received");
+      this.scene.shoot(data.playerId, data.x, data.y);
+    } else if (data.type == "stop") {
+      console.log("Stop message received");
+      this.scene.stop(data.playerId);
+    } else if (data.type == "sync") {
+      console.log("Sync message received");
+      this.scene.sync(data.state);
     }
   }
 
@@ -67,7 +90,8 @@ export class GameMaster {
     console.log("Waiting for connection (HostId: " + this.peer.id + ")");
     this.peer.on("connection", (conn) => {
       console.log("Opened connection with id: " + conn.peer);
-      this.socket.on("open", () => {
+      this.socket = conn;
+      this.socket?.on("open", () => {
         this.socket?.on("data", (data) => {
           console.log("Data received");
           console.log(data);
@@ -85,12 +109,20 @@ export class GameMaster {
     });
   }
 
-  public shoot(playerId: number, angle: number) {
+  public shoot(playerId: number, x: number, y: number) {
     console.log("Sending shoot message");
     this.socket?.send({
       type: "shoot",
       playerId: playerId,
-      angle: angle,
+      x: x,
+      y: y,
+    });
+  }
+
+  public stop(playerId: number) {
+    this.socket?.send({
+      type: "stop",
+      playerId: playerId,
     });
   }
 }

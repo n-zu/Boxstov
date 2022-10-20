@@ -6,6 +6,19 @@ import CursorKeys = Phaser.Types.Input.Keyboard.CursorKeys;
 
 const SPEED = 30;
 
+export type PlayerState = {
+  id: number;
+  position: {
+    x: number;
+    y: number;
+  };
+  velocity: {
+    x: number;
+    y: number;
+  };
+  rotation: number;
+};
+
 export class Player extends Sprite {
   gameMaster: GameMaster;
   id: number;
@@ -17,6 +30,12 @@ export class Player extends Sprite {
 
     this.id = id;
     this.gameMaster = scene.gameMaster;
+  }
+
+  public sync(state: PlayerState) {
+    this.setPosition(state.position.x, state.position.y);
+    this.setVelocity(state.velocity.x, state.velocity.y);
+    this.setRotation(state.rotation);
   }
 
   public update(cursorKeys: CursorKeys) {
@@ -43,6 +62,21 @@ export class Player extends Sprite {
     this.setVelocityX(SPEED);
   }
 
+  public getState(): PlayerState {
+    return {
+      id: this.id,
+      position: {
+        x: this.x,
+        y: this.y,
+      },
+      velocity: {
+        x: this.body.velocity.x,
+        y: this.body.velocity.y,
+      },
+      rotation: this.rotation,
+    };
+  }
+
   updateStop(cursorKeys: CursorKeys) {
     if (
       !cursorKeys.up.isDown &&
@@ -50,7 +84,10 @@ export class Player extends Sprite {
       !cursorKeys.left.isDown &&
       !cursorKeys.right.isDown
     ) {
-      this.setVelocity(0, 0);
+      if (this.body.velocity.x !== 0 || this.body.velocity.y !== 0) {
+        this.gameMaster.stop(this.id);
+        this.stopMovement();
+      }
     }
   }
 
@@ -58,6 +95,9 @@ export class Player extends Sprite {
     if (cursorKeys.up.isDown) {
       this.gameMaster.move(this.id, "up");
       this.moveUp();
+    } else {
+      // TODO: if moving up, stop and send message to gameMaster
+      // the same with the other directions
     }
   }
 
@@ -94,7 +134,11 @@ export class Player extends Sprite {
 
   public shootInWorld(x: number, y: number, world: World) {
     const angle = Phaser.Math.Angle.Between(this.x, this.y, x, y);
-    this.gameMaster.shoot(this.id, angle);
+    this.gameMaster.shoot(this.id, x, y);
     world.spawnBullet(this.x, this.y, angle);
+  }
+
+  public stopMovement() {
+    this.setVelocity(0, 0);
   }
 }

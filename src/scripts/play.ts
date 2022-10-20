@@ -1,7 +1,6 @@
 import "../styles/menu.css";
 import "phaser";
 import { MultiplayerGame } from "./game/multiplayerGame";
-import Peer from "peerjs";
 import MainScene from "./scenes/mainScene";
 
 const DEFAULT_WIDTH = 300;
@@ -62,7 +61,6 @@ window.addEventListener("load", () => {
   const params = new URL(document.location.toString()).searchParams;
   const join_id = params.get("id");
   const host_with = params.get("host_with");
-  const peer = host_with ? new Peer(host_with) : new Peer();
 
   // If there's a join_id, we're joining.
   if (join_id) {
@@ -73,9 +71,7 @@ window.addEventListener("load", () => {
   }
 
   // No join_id: we're hosting.
-  peer.on("open", (id) => {
-    console.log(`Hosting game id: ${id}`);
-    new MultiplayerGame(hostConfig, 0, host_with ?? undefined);
-    addUrl(id);
-  });
+  console.log(`Hosting game id: ${host_with}`);
+  new MultiplayerGame(hostConfig, 0, host_with ?? undefined);
+  addUrl(host_with ?? "");
 });

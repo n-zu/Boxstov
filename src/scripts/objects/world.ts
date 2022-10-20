@@ -1,6 +1,11 @@
-import { Player } from "./player";
-import { BulletGroup } from "./bulletGroup";
+import { Player, PlayerState } from "./player";
+import { BulletGroup, BulletGroupState } from "./bulletGroup";
 import CursorKeys = Phaser.Types.Input.Keyboard.CursorKeys;
+
+export type WorldState = {
+  players: PlayerState[];
+  bullets: BulletGroupState;
+};
 
 export class World {
   players: Player[];
@@ -17,6 +22,30 @@ export class World {
 
   public update() {
     // TODO
+  }
+
+  public sync(worldState: WorldState) {
+    this.players.forEach((player) => {
+      const playerState = worldState.players.find(
+        (playerState) => playerState.id === player.id
+      );
+      if (playerState) {
+        // There is an error here probably
+        player.sync(playerState);
+      }
+    });
+    // TODO: sync bullets
+  }
+
+  public getState(): WorldState {
+    return {
+      players: this.players.map((player) => player.getState()),
+      bullets: this.bulletsGroup.getState(),
+    };
+  }
+
+  public stop(playerId: number) {
+    this.players[playerId].stopMovement();
   }
 
   public shoot(playerId: number, x: number, y: number) {

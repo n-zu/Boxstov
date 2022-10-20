@@ -1,5 +1,7 @@
 import { Bullet } from "./bullet";
 
+export type BulletGroupState = {};
+
 export class BulletGroup extends Phaser.Physics.Arcade.Group {
   constructor(scene: Phaser.Scene) {
     super(scene.physics.world, scene);
@@ -18,5 +20,9 @@ export class BulletGroup extends Phaser.Physics.Arcade.Group {
     if (bullet) {
       bullet.fire(x, y, rotation);
     }
+  }
+
+  public getState(): BulletGroupState {
+    return {};
   }
 }
