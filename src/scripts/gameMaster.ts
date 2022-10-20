@@ -152,8 +152,17 @@ function addUrl(id: string) {
   if (anchor instanceof HTMLAnchorElement) {
     anchor.href = url;
   }
-  const text = document.getElementById("joinText");
-  if (text instanceof HTMLHeadingElement) {
-    text.innerText = `Join with URL: ${url}`;
-  }
+  const text = document.getElementById("joinText") as HTMLHeadingElement;
+  text.innerText = `Join with URL: ${url}`;
+
+  //@ts-ignore
+  anchor.onclick = (e) => {
+    e.preventDefault();
+    navigator.clipboard.writeText(url);
+    text.innerText = "Copied to Clipboard!";
+    // reset after a second
+    setTimeout(() => {
+      text.innerText = `Join with URL: ${url}`;
+    }, 1000);
+  };
 }

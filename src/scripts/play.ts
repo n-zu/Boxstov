@@ -46,15 +46,25 @@ const guestConfig = {
 };
 
 function addUrl(id: string) {
-  const url = `${URL_PREFIX}/play?id=${id}`;
+  const loc = window.location.href;
+  const url = `${loc.split("play")[0]}play?id=${id}`;
   const anchor = document.getElementById("joinLink");
   if (anchor instanceof HTMLAnchorElement) {
     anchor.href = url;
   }
-  const text = document.getElementById("joinText");
-  if (text instanceof HTMLHeadingElement) {
-    text.innerText = `Join with URL: ${url}`;
-  }
+  const text = document.getElementById("joinText") as HTMLHeadingElement;
+  text.innerText = `Join with URL: ${url}`;
+
+  //@ts-ignore
+  anchor.onclick = (e) => {
+    e.preventDefault();
+    navigator.clipboard.writeText(url);
+    text.innerText = "Copied to Clipboard!";
+    // reset after a second
+    setTimeout(() => {
+      text.innerText = `Join with URL: ${url}`;
+    }, 1000);
+  };
 }
 
 window.addEventListener("load", () => {
