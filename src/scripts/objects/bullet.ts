@@ -9,5 +9,13 @@ export class Bullet extends Sprite {
     this.setRotation(rotation);
     this.setVelocityX(Math.cos(rotation) * 200);
     this.setVelocityY(Math.sin(rotation) * 200);
+
+    this.scene.time.addEvent({
+      delay: 1000,
+      callback: () => {
+        this.setActive(false);
+        this.setVisible(false);
+      },
+    });
   }
 }

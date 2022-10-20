@@ -1,6 +1,6 @@
 import { Bullet } from "./bullet";
 
-export type BulletGroupState = {};
+export type BulletGroupState = unknown;
 
 export class BulletGroup extends Phaser.Physics.Arcade.Group {
   constructor(scene: Phaser.Scene) {

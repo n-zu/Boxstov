@@ -16,7 +16,7 @@ export default class MainScene extends Phaser.Scene {
   }
 
   public shoot(playerId: number, x: number, y: number) {
-    let angle = Phaser.Math.Angle.Between(
+    const angle = Phaser.Math.Angle.Between(
       this.world.players[playerId].x,
       this.world.players[playerId].y,
       x,
@@ -42,12 +42,8 @@ export default class MainScene extends Phaser.Scene {
 
     // FIXME: Need a way to get the ids
     const player = new Player(this, 100, 100, this.game.playerId);
-    const anotherPlayer = new Player(
-      this,
-      100,
-      100,
-      this.game.playerId === 0 ? 1 : 0
-    );
+    /// FIXME: No idea why using the same id works, but it does
+    const anotherPlayer = new Player(this, 100, 100, this.game.playerId);
     this.world = new World([player, anotherPlayer], this);
     this.controlKeys = this.input.keyboard.createCursorKeys();
     this.input.on("pointerdown", (pointer: Pointer) => {
