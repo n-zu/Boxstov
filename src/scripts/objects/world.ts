@@ -25,10 +25,24 @@ export class World {
   }
 
   public sync(worldState: WorldState) {
+    if (worldState.players.length != this.players.length) {
+      // Add new ones
+      worldState.players.forEach((player) => {
+        const scene = this.players[0].scene;
+
+        const found = this.players.find((p) => p.id == player.id);
+        if (found == undefined) {
+          this.players.push(
+            new Player(scene, player.position.x, player.position.y, player.id)
+          );
+        }
+      });
+      // TODO: Handle if someone disconnects
+      // TODO: handle same num cuz x left and x joined (odd)
+    }
+
     this.players.forEach((player) => {
-      const playerState = worldState.players.find(
-        (playerState) => playerState.id === player.id
-      );
+      const playerState = worldState.players.find((p) => p.id === player.id);
       if (playerState) {
         // There is an error here probably
         player.sync(playerState);
