@@ -1,9 +1,8 @@
 import "../styles/menu.css";
 import "phaser";
-import { HostMainScene } from "./scenes/hostMainScene";
-import { GuestMainScene } from "./scenes/guestMainScene";
 import { MultiplayerGame } from "./game/multiplayerGame";
 import Peer from "peerjs";
+import MainScene from "./scenes/mainScene";
 
 const DEFAULT_WIDTH = 300;
 const DEFAULT_HEIGHT = 200;
@@ -19,7 +18,7 @@ const hostConfig = {
     width: DEFAULT_WIDTH,
     height: DEFAULT_HEIGHT,
   },
-  scene: [HostMainScene],
+  scene: [MainScene],
   physics: {
     default: "arcade",
     arcade: {
@@ -38,7 +37,7 @@ const guestConfig = {
     width: DEFAULT_WIDTH,
     height: DEFAULT_HEIGHT,
   },
-  scene: [GuestMainScene],
+  scene: [MainScene],
   physics: {
     default: "arcade",
     arcade: {
@@ -68,7 +67,7 @@ window.addEventListener("load", () => {
   // If there's a join_id, we're joining.
   if (join_id) {
     console.log(`Joining game id: ${join_id}`);
-    new MultiplayerGame(guestConfig, 1, join_id, peer);
+    new MultiplayerGame(guestConfig, 1, undefined, join_id);
     addUrl(join_id);
     return;
   }
@@ -76,7 +75,7 @@ window.addEventListener("load", () => {
   // No join_id: we're hosting.
   peer.on("open", (id) => {
     console.log(`Hosting game id: ${id}`);
-    new MultiplayerGame(hostConfig, 0, id, peer);
+    new MultiplayerGame(hostConfig, 0, host_with ?? undefined);
     addUrl(id);
   });
 });

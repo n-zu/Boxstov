@@ -1,125 +1,100 @@
+import MainScene from "../scenes/mainScene";
+import { World } from "./world";
+import { GameMaster } from "../gameMaster";
 import Sprite = Phaser.Physics.Arcade.Sprite;
 import CursorKeys = Phaser.Types.Input.Keyboard.CursorKeys;
-import MainScene from "../scenes/mainScene";
 
-const SPEED = 10;
-
-export type BulletState = {
-  id: number;
-  x: number;
-  y: number;
-  rotation: number;
-};
-
-export type PlayerState = {
-  position: {
-    x: number;
-    y: number;
-  };
-  velocity: {
-    x: number;
-    y: number;
-  };
-  rotation: number;
-  bullets: BulletState[];
-};
+const SPEED = 30;
 
 export class Player extends Sprite {
-  cursorKeys: CursorKeys;
-  bullets: BulletState[];
-  scene: MainScene;
+  gameMaster: GameMaster;
+  id: number;
 
-  constructor(scene: MainScene, x: number, y: number) {
+  constructor(scene: MainScene, x: number, y: number, id: number) {
     super(scene, x, y, "player");
     scene.add.existing(this);
     scene.physics.add.existing(this);
-    this.cursorKeys = scene.input.keyboard.createCursorKeys();
-    this.bullets = [];
+
+    this.id = id;
+    this.gameMaster = scene.gameMaster;
   }
 
-  public update() {
-    this.updateLeft();
-    this.updateRight();
-    this.updateUp();
-    this.updateDown();
-    this.updateStop();
+  public update(cursorKeys: CursorKeys) {
+    this.updateLeft(cursorKeys);
+    this.updateRight(cursorKeys);
+    this.updateUp(cursorKeys);
+    this.updateDown(cursorKeys);
+    this.updateStop(cursorKeys);
   }
 
-  public updateStop() {
+  public moveUp() {
+    this.setVelocityY(-SPEED);
+  }
+
+  public moveDown() {
+    this.setVelocityY(SPEED);
+  }
+
+  public moveLeft() {
+    this.setVelocityX(-SPEED);
+  }
+
+  public moveRight() {
+    this.setVelocityX(SPEED);
+  }
+
+  updateStop(cursorKeys: CursorKeys) {
     if (
-      !this.cursorKeys.up.isDown &&
-      !this.cursorKeys.down.isDown &&
-      !this.cursorKeys.left.isDown &&
-      !this.cursorKeys.right.isDown
+      !cursorKeys.up.isDown &&
+      !cursorKeys.down.isDown &&
+      !cursorKeys.left.isDown &&
+      !cursorKeys.right.isDown
     ) {
       this.setVelocity(0, 0);
     }
   }
 
-  updateUp() {
-    if (this.cursorKeys.up.isDown) {
-      this.setVelocityY(-SPEED);
+  updateUp(cursorKeys: CursorKeys) {
+    if (cursorKeys.up.isDown) {
+      this.gameMaster.move(this.id, "up");
+      this.moveUp();
     }
   }
 
-  updateDown() {
-    if (this.cursorKeys.down.isDown) {
-      this.setVelocityY(SPEED);
+  updateDown(cursorKeys: CursorKeys) {
+    if (cursorKeys.down.isDown) {
+      this.gameMaster.move(this.id, "down");
+      this.moveDown();
     }
   }
 
-  updateLeft() {
-    if (this.cursorKeys.left.isDown) {
-      this.setVelocityX(-SPEED);
+  updateLeft(cursorKeys: CursorKeys) {
+    if (cursorKeys.left.isDown) {
+      this.gameMaster.move(this.id, "left");
+      this.moveLeft();
     }
   }
 
-  updateRight() {
-    if (this.cursorKeys.right.isDown) {
-      this.setVelocityX(SPEED);
+  updateRight(cursorKeys: CursorKeys) {
+    if (cursorKeys.right.isDown) {
+      this.gameMaster.move(this.id, "right");
+      this.moveRight();
     }
   }
 
-  public getState(): PlayerState {
-    return {
-      position: {
-        x: this.x,
-        y: this.y,
-      },
-      velocity: {
-        x: this.body.velocity.x,
-        y: this.body.velocity.y,
-      },
-      rotation: this.rotation,
-      bullets: this.bullets,
-    };
-  }
-
-  public shoot(x: number, y: number, scene: MainScene) {
-    const angle = Phaser.Math.Angle.Between(this.x, this.y, x, y);
-    scene.bulletGroup.shootBullet(this.x, this.y, angle);
-    this.bullets.push({
-      id: Math.random() * 1000,
-      x: this.x,
-      y: this.y,
-      rotation: angle,
-    });
-  }
-
+  /*
   public updateWith(playerState: PlayerState) {
     if (playerState.velocity.x === 0 || playerState.velocity.y === 0) {
       this.setPosition(playerState.position.x, playerState.position.y);
     }
     this.setVelocity(playerState.velocity.x, playerState.velocity.y);
     this.setRotation(playerState.rotation);
-    playerState.bullets.forEach((bulletState) => {
-      if (!this.bullets.find((bullet) => bullet.id === bulletState.id)) {
-        this.bullets.push(bulletState);
-        const bullet = this.scene.bulletGroup.getFirstDead(false);
-        if (bullet) {
-          bullet.fire(bulletState.x, bulletState.y, bulletState.rotation);
-        }
-      }
-    });
+  }
+   */
+
+  public shootInWorld(x: number, y: number, world: World) {
+    const angle = Phaser.Math.Angle.Between(this.x, this.y, x, y);
+    this.gameMaster.shoot(this.id, angle);
+    world.spawnBullet(this.x, this.y, angle);
   }
 }
