@@ -21,7 +21,7 @@ export class World {
   }
 
   public update() {
-    // TODO
+    // TODO: update world
   }
 
   public sync(worldState: WorldState) {
@@ -37,8 +37,9 @@ export class World {
           );
         }
       });
-      // TODO: Handle if someone disconnects
-      // TODO: handle same num cuz x left and x joined (odd)
+      // TODO: sync players
+      // - Handle if someone disconnects
+      // - Handle same num cuz x left and x joined (odd)
     }
 
     this.players.forEach((player) => {
@@ -49,6 +50,8 @@ export class World {
       }
     });
     // TODO: sync bullets
+
+    this.bulletsGroup.sync(worldState.bullets);
   }
 
   public getState(): WorldState {
