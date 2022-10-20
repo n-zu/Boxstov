@@ -29,7 +29,7 @@ export class GameMaster {
             time: Date.now(),
             state: this.scene.getState(),
           });
-        }, 600);
+        }, 500);
       });
     }
   }
