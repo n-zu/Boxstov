@@ -93,10 +93,14 @@ export class GameMaster {
     }
   }
 
-  waitForConnection() {
+  async waitForConnection() {
     console.log("Waiting for connection (HostId: " + this.peer.id + ")");
-    this.scene.world.players[0].id = this.peer.id;
-    this.scene.game.playerId = this.peer.id;
+
+    this.peer.on("open", (peerId) => {
+      this.scene.world.players[0].id = peerId;
+      this.scene.game.playerId = peerId;
+      addUrl(peerId);
+    });
 
     this.peer.on("connection", (conn) => {
       console.log("Opened connection with id: " + conn.peer);
@@ -138,5 +142,18 @@ export class GameMaster {
       type: "stop",
       playerId: playerId,
     });
+  }
+}
+
+function addUrl(id: string) {
+  const loc = window.location.href;
+  const url = `${loc.split("play")[0]}play?id=${id}`;
+  const anchor = document.getElementById("joinLink");
+  if (anchor instanceof HTMLAnchorElement) {
+    anchor.href = url;
+  }
+  const text = document.getElementById("joinText");
+  if (text instanceof HTMLHeadingElement) {
+    text.innerText = `Join with URL: ${url}`;
   }
 }
