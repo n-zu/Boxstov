@@ -57,7 +57,9 @@ module.exports = {
     }),
     new CopyWebpackPlugin({
       patterns: [
-        { from: "src/assets", to: "assets" },
+        // Move assets into the docs/play folder
+        // The game seems to be looking for them there
+        { from: "src/assets", to: "play/assets" },
         { from: "pwa", to: "" },
         { from: "src/favicon.ico", to: "" },
       ],
