@@ -15,39 +15,38 @@ export default class MainScene extends Phaser.Scene {
     super({ key: "MainScene" });
   }
 
-  public shoot(playerId: number, x: number, y: number) {
+  public shoot(playerId: string, x: number, y: number) {
     const angle = Phaser.Math.Angle.Between(
-      this.world.players[playerId].x,
-      this.world.players[playerId].y,
+      this.world.players.find((p) => p.id == playerId)?.x ?? 0,
+      this.world.players.find((p) => p.id == playerId)?.y ?? 0,
       x,
       y
     );
     this.world.spawnBullet(
-      this.world.players[playerId].x,
-      this.world.players[playerId].y,
+      this.world.players.find((p) => p.id == playerId)?.x ?? 0,
+      this.world.players.find((p) => p.id == playerId)?.y ?? 0,
       angle
     );
   }
 
-  public stop(playerId: number) {
+  public stop(playerId: string) {
     this.world.stop(playerId);
   }
 
   create() {
+    // FIXME: Need a way to get the ids
+    const player = new Player(this, 100, 100, "_me");
+    this.world = new World([player], this);
+
     this.gameMaster = new GameMaster(
       this,
       this.game.socketId,
       this.game.idToConnect
     );
 
-    // FIXME: Need a way to get the ids
-    const player = new Player(this, 100, 100, this.game.playerId);
-    /// FIXME: No idea why using the same id works, but it does
-    const anotherPlayer = new Player(this, 100, 100, this.game.playerId);
-    this.world = new World([player, anotherPlayer], this);
     this.controlKeys = this.input.keyboard.createCursorKeys();
     this.input.on("pointerdown", (pointer: Pointer) => {
-      this.world.shoot(this.game.playerId, pointer.x, pointer.y);
+      this.world.shoot(this.game.playerId ?? "_me", pointer.x, pointer.y);
     });
   }
 
@@ -61,7 +60,10 @@ export default class MainScene extends Phaser.Scene {
 
   update() {
     this.world.update();
-    this.world.updatePlayerPosition(this.game.playerId, this.controlKeys);
+    this.world.updatePlayerPosition(
+      this.game.playerId ?? "_me",
+      this.controlKeys
+    );
   }
 
   preload() {
@@ -69,19 +71,19 @@ export default class MainScene extends Phaser.Scene {
     this.load.image("bullet", "assets/bullet.png");
   }
 
-  public movePlayerUp(id: number) {
+  public movePlayerUp(id: string) {
     this.world.movePlayerUp(id);
   }
 
-  public movePlayerDown(id: number) {
+  public movePlayerDown(id: string) {
     this.world.movePlayerDown(id);
   }
 
-  public movePlayerLeft(id: number) {
+  public movePlayerLeft(id: string) {
     this.world.movePlayerLeft(id);
   }
 
-  public movePlayerRight(id: number) {
+  public movePlayerRight(id: string) {
     this.world.movePlayerRight(id);
   }
 }

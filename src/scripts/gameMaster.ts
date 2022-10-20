@@ -1,4 +1,5 @@
 import Peer, { DataConnection } from "peerjs";
+import { Player } from "./objects/player";
 import MainScene from "./scenes/mainScene";
 
 export type Direction = "up" | "down" | "left" | "right";
@@ -41,6 +42,8 @@ export class GameMaster {
     this.peer.on("open", () => {
       console.log("Connecting to id: " + id);
       this.socket = this.peer.connect(id);
+      this.scene.world.players[0].id = this.peer.id;
+      this.scene.game.playerId = this.peer.id;
 
       this.socket?.on("open", () => {
         console.log("Connection established with id: " + id);
@@ -88,8 +91,14 @@ export class GameMaster {
 
   waitForConnection() {
     console.log("Waiting for connection (HostId: " + this.peer.id + ")");
+    this.scene.world.players[0].id = this.peer.id;
+    this.scene.game.playerId = this.peer.id;
+
     this.peer.on("connection", (conn) => {
       console.log("Opened connection with id: " + conn.peer);
+      this.scene.world.players.push(
+        new Player(this.scene, 100, 100, conn.peer)
+      );
       this.socket = conn;
       this.socket?.on("open", () => {
         this.socket?.on("data", (data) => {
@@ -101,7 +110,7 @@ export class GameMaster {
     });
   }
 
-  public move(playerId: number, direction: Direction) {
+  public move(playerId: string, direction: Direction) {
     this.socket?.send({
       type: "move",
       playerId: playerId,
@@ -109,7 +118,7 @@ export class GameMaster {
     });
   }
 
-  public shoot(playerId: number, x: number, y: number) {
+  public shoot(playerId: string, x: number, y: number) {
     console.log("Sending shoot message");
     this.socket?.send({
       type: "shoot",
@@ -119,7 +128,7 @@ export class GameMaster {
     });
   }
 
-  public stop(playerId: number) {
+  public stop(playerId: string) {
     this.socket?.send({
       type: "stop",
       playerId: playerId,

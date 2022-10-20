@@ -7,7 +7,7 @@ import CursorKeys = Phaser.Types.Input.Keyboard.CursorKeys;
 const SPEED = 30;
 
 export type PlayerState = {
-  id: number;
+  id: string;
   position: {
     x: number;
     y: number;
@@ -20,16 +20,20 @@ export type PlayerState = {
 };
 
 export class Player extends Sprite {
-  gameMaster: GameMaster;
-  id: number;
+  scene: MainScene;
+  id: string;
 
-  constructor(scene: MainScene, x: number, y: number, id: number) {
+  constructor(scene: MainScene, x: number, y: number, id: string) {
     super(scene, x, y, "player");
     scene.add.existing(this);
     scene.physics.add.existing(this);
 
     this.id = id;
-    this.gameMaster = scene.gameMaster;
+    this.scene = scene;
+  }
+
+  getGameMaster() {
+    return this.scene.gameMaster;
   }
 
   public sync(state: PlayerState) {
@@ -85,7 +89,7 @@ export class Player extends Sprite {
       !cursorKeys.right.isDown
     ) {
       if (this.body.velocity.x !== 0 || this.body.velocity.y !== 0) {
-        this.gameMaster.stop(this.id);
+        this.getGameMaster()?.stop(this.id);
         this.stopMovement();
       }
     }
@@ -93,7 +97,7 @@ export class Player extends Sprite {
 
   updateUp(cursorKeys: CursorKeys) {
     if (cursorKeys.up.isDown) {
-      this.gameMaster.move(this.id, "up");
+      this.getGameMaster()?.move(this.id, "up");
       this.moveUp();
     } else {
       // TODO: if moving up, stop and send message to gameMaster
@@ -103,21 +107,21 @@ export class Player extends Sprite {
 
   updateDown(cursorKeys: CursorKeys) {
     if (cursorKeys.down.isDown) {
-      this.gameMaster.move(this.id, "down");
+      this.getGameMaster()?.move(this.id, "down");
       this.moveDown();
     }
   }
 
   updateLeft(cursorKeys: CursorKeys) {
     if (cursorKeys.left.isDown) {
-      this.gameMaster.move(this.id, "left");
+      this.getGameMaster()?.move(this.id, "left");
       this.moveLeft();
     }
   }
 
   updateRight(cursorKeys: CursorKeys) {
     if (cursorKeys.right.isDown) {
-      this.gameMaster.move(this.id, "right");
+      this.getGameMaster()?.move(this.id, "right");
       this.moveRight();
     }
   }
@@ -134,7 +138,7 @@ export class Player extends Sprite {
 
   public shootInWorld(x: number, y: number, world: World) {
     const angle = Phaser.Math.Angle.Between(this.x, this.y, x, y);
-    this.gameMaster.shoot(this.id, x, y);
+    this.getGameMaster()?.shoot(this.id, x, y);
     world.spawnBullet(this.x, this.y, angle);
   }
 

@@ -16,8 +16,8 @@ export class World {
     this.bulletsGroup = new BulletGroup(scene);
   }
 
-  public updatePlayerPosition(playerId: number, cursorKeys: CursorKeys) {
-    this.players[playerId].update(cursorKeys);
+  public updatePlayerPosition(playerId: string, cursorKeys: CursorKeys) {
+    this.players.find((p) => p.id == playerId)?.update(cursorKeys);
   }
 
   public update() {
@@ -44,32 +44,32 @@ export class World {
     };
   }
 
-  public stop(playerId: number) {
-    this.players[playerId].stopMovement();
+  public stop(playerId: string) {
+    this.players.find((p) => p.id == playerId)?.stopMovement();
   }
 
-  public shoot(playerId: number, x: number, y: number) {
-    this.players[playerId].shootInWorld(x, y, this);
+  public shoot(playerId: string, x: number, y: number) {
+    this.players.find((p) => p.id == playerId)?.shootInWorld(x, y, this);
   }
 
   public spawnBullet(x: number, y: number, angle: number) {
     this.bulletsGroup.shootBullet(x, y, angle);
   }
 
-  public movePlayerUp(id: number) {
-    this.players[id].moveUp();
+  public movePlayerUp(id: string) {
+    this.players.find((p) => p.id == id)?.moveUp();
   }
 
-  public movePlayerDown(id: number) {
-    this.players[id].moveDown();
+  public movePlayerDown(id: string) {
+    this.players.find((p) => p.id == id)?.moveDown();
   }
 
-  public movePlayerLeft(id: number) {
-    this.players[id].moveLeft();
+  public movePlayerLeft(id: string) {
+    this.players.find((p) => p.id == id)?.moveLeft();
   }
 
-  public movePlayerRight(id: number) {
-    this.players[id].moveRight();
+  public movePlayerRight(id: string) {
+    this.players.find((p) => p.id == id)?.moveRight();
   }
 
   /*

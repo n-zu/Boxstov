@@ -65,13 +65,13 @@ window.addEventListener("load", () => {
   // If there's a join_id, we're joining.
   if (join_id) {
     console.log(`Joining game id: ${join_id}`);
-    new MultiplayerGame(guestConfig, 1, undefined, join_id);
+    new MultiplayerGame(guestConfig, undefined, join_id);
     addUrl(join_id);
     return;
   }
 
   // No join_id: we're hosting.
   console.log(`Hosting game id: ${host_with}`);
-  new MultiplayerGame(hostConfig, 0, host_with ?? undefined);
+  new MultiplayerGame(hostConfig, host_with ?? undefined);
   addUrl(host_with ?? "");
 });
