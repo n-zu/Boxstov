@@ -1,6 +1,5 @@
 import MainScene from "../scenes/mainScene";
 import { World } from "./world";
-import { GameMaster } from "../gameMaster";
 import Sprite = Phaser.Physics.Arcade.Sprite;
 import CursorKeys = Phaser.Types.Input.Keyboard.CursorKeys;
 

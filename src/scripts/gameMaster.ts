@@ -7,10 +7,12 @@ export type Direction = "up" | "down" | "left" | "right";
 export class GameMaster {
   peer: Peer;
   socket: DataConnection | undefined;
+  guest_sockets: DataConnection[] | undefined;
   scene: MainScene;
 
   constructor(scene: MainScene, socketId?: string, idToConnect?: string) {
     this.scene = scene;
+    this.guest_sockets = idToConnect ? undefined : [];
 
     this.peer = this.createPeer(socketId);
     if (idToConnect) {
@@ -21,12 +23,14 @@ export class GameMaster {
 
     if (idToConnect === undefined) {
       setInterval(() => {
-        this.socket?.send({
-          type: "sync",
-          time: Date.now(),
-          state: this.scene.getState(),
-        });
-      }, 500);
+        this.guest_sockets?.forEach((socket) => {
+          socket?.send({
+            type: "sync",
+            time: Date.now(),
+            state: this.scene.getState(),
+          });
+        }, 600);
+      });
     }
   }
 
@@ -99,14 +103,15 @@ export class GameMaster {
       this.scene.world.players.push(
         new Player(this.scene, 100, 100, conn.peer)
       );
-      this.socket = conn;
-      this.socket?.on("open", () => {
-        this.socket?.on("data", (data) => {
+      const socket = conn;
+      socket?.on("open", () => {
+        socket?.on("data", (data) => {
           console.log("Data received");
           console.log(data);
           this.handleMessage(data);
         });
       });
+      this.guest_sockets?.push(socket);
     });
   }
 
