@@ -1,5 +1,6 @@
 import { DataConnection } from "peerjs";
 import { Action, GameMaster } from "./gameMaster";
+import { Message } from "./hostMaster";
 
 export class GuestMaster extends GameMaster {
   hostId: string;
@@ -37,6 +38,18 @@ export class GuestMaster extends GameMaster {
       if (action.type === type) {
         action.action(data);
       }
+    });
+  }
+
+  protected setupSocket(socket: DataConnection) {
+    socket.on("data", (data) => {
+      console.log("Received message", data);
+      const msg = data as Message;
+      this.actions.forEach((action) => {
+        if (action.type === msg.type) {
+          action.action(msg.data);
+        }
+      });
     });
   }
 }

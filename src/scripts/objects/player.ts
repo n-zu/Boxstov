@@ -17,6 +17,10 @@ export type PlayerState = {
     y: number;
   };
   rotation: number;
+  animation?: {
+    key: string;
+    frame: number;
+  };
 };
 
 export class Player extends Sprite {
@@ -32,6 +36,7 @@ export class Player extends Sprite {
     gameMaster: GameMaster
   ) {
     super(scene, x, y, "player");
+
     scene.add.existing(this);
     scene.physics.add.existing(this);
 
@@ -66,6 +71,13 @@ export class Player extends Sprite {
     this.setPosition(state.position.x, state.position.y);
     this.setVelocity(state.velocity.x, state.velocity.y);
     this.setRotation(state.rotation);
+    if (state.animation) {
+      this.anims.play({
+        key: state.animation.key,
+        startFrame: state.animation.frame,
+        duration: 0,
+      });
+    }
   }
 
   public update(cursorKeys: CursorKeys) {
@@ -77,22 +89,33 @@ export class Player extends Sprite {
   }
 
   public moveUp() {
+    this.anims.play("up", true);
     this.setVelocityY(-SPEED);
   }
 
   public moveDown() {
+    this.anims.play("down", true);
     this.setVelocityY(SPEED);
   }
 
   public moveLeft() {
+    this.anims.play("left", true);
     this.setVelocityX(-SPEED);
   }
 
   public moveRight() {
+    this.anims.play("right", true);
     this.setVelocityX(SPEED);
   }
 
   public getState(): PlayerState {
+    let currentAnimation: { key: string; frame: number } | undefined;
+    if (this.anims.currentAnim && this.anims.currentFrame) {
+      currentAnimation = {
+        key: this.anims.currentAnim.key,
+        frame: this.anims.currentFrame.index,
+      };
+    }
     return {
       id: this.id,
       position: {
@@ -104,6 +127,7 @@ export class Player extends Sprite {
         y: this.body.velocity.y,
       },
       rotation: this.rotation,
+      animation: currentAnimation,
     };
   }
 
@@ -114,6 +138,16 @@ export class Player extends Sprite {
       !cursorKeys.left.isDown &&
       !cursorKeys.right.isDown
     ) {
+      if (this.body.velocity.x > 0) {
+        this.anims.play("right-idle", true);
+      } else if (this.body.velocity.x < 0) {
+        this.anims.play("left-idle", true);
+      } else if (this.body.velocity.y > 0) {
+        this.anims.play("down-idle", true);
+      } else if (this.body.velocity.y < 0) {
+        this.anims.play("up-idle", true);
+      }
+
       if (this.body.velocity.x !== 0 || this.body.velocity.y !== 0) {
         this.gameMaster.send("stop", { id: this.id });
       }
@@ -158,16 +192,6 @@ export class Player extends Sprite {
       });
     }
   }
-
-  /*
-  public updateWith(playerState: PlayerState) {
-    if (playerState.velocity.x === 0 || playerState.velocity.y === 0) {
-      this.setPosition(playerState.position.x, playerState.position.y);
-    }
-    this.setVelocity(playerState.velocity.x, playerState.velocity.y);
-    this.setRotation(playerState.rotation);
-  }
-   */
 
   public shootInWorld(x: number, y: number, world: World) {
     const angle = Phaser.Math.Angle.Between(this.x, this.y, x, y);

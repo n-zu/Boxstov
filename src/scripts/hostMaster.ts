@@ -48,6 +48,23 @@ export class HostMaster extends GameMaster {
       }
     });
   }
+
+  protected setupSocket(socket: DataConnection) {
+    socket.on("data", (data) => {
+      console.log("Received message", data);
+      const msg = data as Message;
+      this.actions.forEach((action) => {
+        if (action.type === msg.type) {
+          action.action(msg.data);
+        }
+      });
+      this.guest_sockets.forEach((other_socket) => {
+        if (socket !== other_socket) {
+          other_socket.send(msg);
+        }
+      });
+    });
+  }
 }
 
 function addUrl(id: string) {

@@ -111,29 +111,33 @@ export class World {
   private setupGameMaster(gameMaster: GameMaster) {
     gameMaster.addAction("move", (data: any) => {
       const playerId = data.id;
-      const player = this.players.find((p) => p.id === playerId);
-      player?.move(data.direction);
+      let player = this.players.find((p) => p.id === playerId);
+      if (player === undefined) {
+        player = new Player(this.scene, 0, 0, playerId, this.gameMaster);
+        this.players.push(player);
+      }
+
+      player.move(data.direction);
     });
 
     gameMaster.addAction("shoot", (data: any) => {
       const playerId = data.playerId;
-      this.players.find((p) => p.id == playerId)?.shootIn(data.x, data.y, this);
+      let player = this.players.find((p) => p.id === playerId);
+      if (player === undefined) {
+        player = new Player(this.scene, 100, 100, playerId, this.gameMaster);
+        this.players.push(player);
+      }
+      player.shootIn(data.x, data.y, this);
     });
 
     gameMaster.addAction("stop", (data: any) => {
       const playerId = data.id;
-      const player = this.players.find((p) => p.id === playerId);
-      if (player) {
-        player.stop();
-      } else {
-        console.log("Player not found");
-        console.log(playerId);
-        console.log(this);
-        this.players.push(
-          new Player(this.scene, 100, 100, playerId, this.gameMaster)
-        );
+      let player = this.players.find((p) => p.id === playerId);
+      if (player === undefined) {
+        player = new Player(this.scene, 100, 100, playerId, this.gameMaster);
+        this.players.push(player);
       }
-      this.players.find((p) => p.id == playerId)?.stopMovement();
+      player.stopMovement();
     });
 
     gameMaster.addAction("sync", (data: any) => {

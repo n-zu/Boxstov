@@ -19,6 +19,7 @@ const hostConfig = {
     height: DEFAULT_HEIGHT,
   },
   scene: [MainScene],
+  antialias: false,
   physics: {
     default: "arcade",
     arcade: {
@@ -38,6 +39,7 @@ const guestConfig = {
     height: DEFAULT_HEIGHT,
   },
   scene: [MainScene],
+  antialias: false,
   physics: {
     default: "arcade",
     arcade: {

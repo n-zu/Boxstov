@@ -1,5 +1,4 @@
-import Peer, { DataConnection } from "peerjs";
-import { Message } from "./hostMaster";
+import Peer from "peerjs";
 
 export type Direction = "up" | "down" | "left" | "right";
 
@@ -28,17 +27,5 @@ export abstract class GameMaster {
     } else {
       return new Peer();
     }
-  }
-
-  protected setupSocket(socket: DataConnection) {
-    socket.on("data", (data) => {
-      console.log("Received message", data);
-      const msg = data as Message;
-      this.actions.forEach((action) => {
-        if (action.type === msg.type) {
-          action.action(msg.data);
-        }
-      });
-    });
   }
 }

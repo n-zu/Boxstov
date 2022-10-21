@@ -15,21 +15,9 @@ export default class MainScene extends Phaser.Scene {
     super({ key: "MainScene" });
   }
 
-  public shoot(playerId: string, x: number, y: number) {
-    const angle = Phaser.Math.Angle.Between(
-      this.world.players.find((p) => p.id == playerId)?.x ?? 0,
-      this.world.players.find((p) => p.id == playerId)?.y ?? 0,
-      x,
-      y
-    );
-    this.world.spawnBullet(
-      this.world.players.find((p) => p.id == playerId)?.x ?? 0,
-      this.world.players.find((p) => p.id == playerId)?.y ?? 0,
-      angle
-    );
-  }
-
   create() {
+    this.createAnimations();
+
     // FIXME: Need a way to get the ids
     const id = Math.random().toString(36).substring(7);
     const player = new Player(this, 100, 100, id, this.game.gameMaster);
@@ -43,7 +31,7 @@ export default class MainScene extends Phaser.Scene {
     if (this.gameMaster instanceof HostMaster) {
       setInterval(() => {
         this.gameMaster.send("sync", this.world.getState());
-      }, 100);
+      }, 5000);
 
       this.gameMaster.addAction("newPlayer", (data) => {
         const id = data.id;
@@ -70,23 +58,93 @@ export default class MainScene extends Phaser.Scene {
   }
 
   preload() {
-    this.load.image("player", "assets/bunny.png");
+    this.load.image("bunny", "assets/bunny.png");
     this.load.image("bullet", "assets/bullet.png");
+    this.load.spritesheet("player", "assets/player.png", {
+      frameWidth: 24,
+      frameHeight: 32,
+    });
   }
 
-  public movePlayerUp(id: string) {
-    this.world.movePlayerUp(id);
-  }
+  createAnimations() {
+    this.anims.create({
+      key: "up",
+      frames: this.anims.generateFrameNumbers("player", {
+        start: 0,
+        end: 11,
+      }),
+      frameRate: 30,
+      repeat: -1,
+    });
 
-  public movePlayerDown(id: string) {
-    this.world.movePlayerDown(id);
-  }
+    this.anims.create({
+      key: "right",
+      frames: this.anims.generateFrameNumbers("player", {
+        start: 12,
+        end: 23,
+      }),
+      frameRate: 30,
+      repeat: -1,
+    });
 
-  public movePlayerLeft(id: string) {
-    this.world.movePlayerLeft(id);
-  }
+    this.anims.create({
+      key: "down",
+      frames: this.anims.generateFrameNumbers("player", {
+        start: 24,
+        end: 35,
+      }),
+      frameRate: 30,
+      repeat: -1,
+    });
 
-  public movePlayerRight(id: string) {
-    this.world.movePlayerRight(id);
+    this.anims.create({
+      key: "left",
+      frames: this.anims.generateFrameNumbers("player", {
+        start: 36,
+        end: 47,
+      }),
+      frameRate: 30,
+      repeat: -1,
+    });
+
+    this.anims.create({
+      key: "up-idle",
+      frames: this.anims.generateFrameNumbers("player", {
+        start: 0,
+        end: 0,
+      }),
+      frameRate: 30,
+      repeat: -1,
+    });
+
+    this.anims.create({
+      key: "right-idle",
+      frames: this.anims.generateFrameNumbers("player", {
+        start: 12,
+        end: 12,
+      }),
+      frameRate: 30,
+      repeat: -1,
+    });
+
+    this.anims.create({
+      key: "down-idle",
+      frames: this.anims.generateFrameNumbers("player", {
+        start: 24,
+        end: 24,
+      }),
+      frameRate: 30,
+      repeat: -1,
+    });
+
+    this.anims.create({
+      key: "left-idle",
+      frames: this.anims.generateFrameNumbers("player", {
+        start: 36,
+        end: 36,
+      }),
+      frameRate: 30,
+      repeat: -1,
+    });
   }
 }
