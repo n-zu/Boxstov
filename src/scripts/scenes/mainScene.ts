@@ -2,8 +2,8 @@ import { MultiplayerGame } from "../game/multiplayerGame";
 import { Player } from "../objects/player";
 import { World, WorldState } from "../objects/world";
 import { GameMaster } from "../gameMaster";
+import { HostMaster } from "../hostMaster";
 import CursorKeys = Phaser.Types.Input.Keyboard.CursorKeys;
-import Pointer = Phaser.Input.Pointer;
 
 export default class MainScene extends Phaser.Scene {
   game: MultiplayerGame;
@@ -29,25 +29,31 @@ export default class MainScene extends Phaser.Scene {
     );
   }
 
-  public stop(playerId: string) {
-    this.world.stop(playerId);
-  }
-
   create() {
     // FIXME: Need a way to get the ids
-    const player = new Player(this, 100, 100, "_me");
-    this.world = new World([player], this);
+    const id = Math.random().toString(36).substring(7);
+    const player = new Player(this, 100, 100, id, this.game.gameMaster);
+    this.world = new World(player, this, this.game.gameMaster);
 
-    this.gameMaster = new GameMaster(
-      this,
-      this.game.socketId,
-      this.game.idToConnect
-    );
+    this.gameMaster = this.game.gameMaster;
 
     this.controlKeys = this.input.keyboard.createCursorKeys();
-    this.input.on("pointerdown", (pointer: Pointer) => {
-      this.world.shoot(this.game.playerId ?? "_me", pointer.x, pointer.y);
-    });
+
+    // FIXME: :(
+    if (this.gameMaster instanceof HostMaster) {
+      setInterval(() => {
+        this.gameMaster.send("sync", this.world.getState());
+      }, 100);
+
+      this.gameMaster.addAction("newPlayer", (data) => {
+        const id = data.id;
+        this.world.players.push(
+          new Player(this, 100, 100, id, this.game.gameMaster)
+        );
+      });
+    } else {
+      this.gameMaster.send("newPlayer", { id: id });
+    }
   }
 
   public getState(): WorldState {
@@ -59,11 +65,8 @@ export default class MainScene extends Phaser.Scene {
   }
 
   update() {
-    this.world.update();
-    this.world.updatePlayerPosition(
-      this.game.playerId ?? "_me",
-      this.controlKeys
-    );
+    // FIXME
+    this.world.players[0].update(this.controlKeys);
   }
 
   preload() {

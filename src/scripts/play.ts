@@ -2,6 +2,8 @@ import "../styles/menu.css";
 import "phaser";
 import { MultiplayerGame } from "./game/multiplayerGame";
 import MainScene from "./scenes/mainScene";
+import { GuestMaster } from "./guestMaster";
+import { HostMaster } from "./hostMaster";
 
 const DEFAULT_WIDTH = 300;
 const DEFAULT_HEIGHT = 200;
@@ -70,13 +72,23 @@ window.addEventListener("load", () => {
   // If there's a join_id, we're joining.
   if (join_id) {
     console.log(`Joining game id: ${join_id}`);
-    new MultiplayerGame(guestConfig, undefined, join_id);
+    const gameMaster = new GuestMaster(join_id);
+    gameMaster.start();
+
+    new MultiplayerGame(guestConfig, gameMaster);
     addUrl(join_id);
     return;
   }
 
   // No join_id: we're hosting.
   console.log(`Hosting game id: ${host_with}`);
-  new MultiplayerGame(hostConfig, host_with ?? undefined);
+  let gameMaster: HostMaster;
+  if (host_with) {
+    gameMaster = new HostMaster(host_with);
+  } else {
+    gameMaster = new HostMaster();
+  }
+  gameMaster.start();
+  new MultiplayerGame(hostConfig, gameMaster);
   addUrl(host_with ?? "");
 });

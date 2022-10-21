@@ -1,5 +1,7 @@
 import { Player, PlayerState } from "./player";
 import { BulletGroup, BulletGroupState } from "./bulletGroup";
+import { GameMaster } from "../gameMaster";
+import MainScene from "../scenes/mainScene";
 import CursorKeys = Phaser.Types.Input.Keyboard.CursorKeys;
 
 export type WorldState = {
@@ -10,10 +12,27 @@ export type WorldState = {
 export class World {
   players: Player[];
   bulletsGroup: BulletGroup;
+  gameMaster: GameMaster;
+  scene: MainScene;
 
-  constructor(players: Player[], scene: Phaser.Scene) {
-    this.players = players;
+  constructor(player: Player, scene: MainScene, gameMaster: GameMaster) {
+    this.players = [player];
     this.bulletsGroup = new BulletGroup(scene);
+    this.gameMaster = gameMaster;
+    this.scene = scene;
+
+    this.setupGameMaster(gameMaster);
+    scene.input.on("pointerdown", (pointer) => {
+      this.gameMaster.send("shoot", {
+        playerId: player.id,
+        x: pointer.x,
+        y: pointer.y,
+      });
+    });
+  }
+
+  public createBullet(x: number, y: number, angle: number) {
+    this.bulletsGroup.shootBullet(x, y, angle);
   }
 
   public updatePlayerPosition(playerId: string, cursorKeys: CursorKeys) {
@@ -28,12 +47,16 @@ export class World {
     if (worldState.players.length != this.players.length) {
       // Add new ones
       worldState.players.forEach((player) => {
-        const scene = this.players[0].scene;
-
         const found = this.players.find((p) => p.id == player.id);
         if (found == undefined) {
           this.players.push(
-            new Player(scene, player.position.x, player.position.y, player.id)
+            new Player(
+              this.scene,
+              player.position.x,
+              player.position.y,
+              player.id,
+              this.gameMaster
+            )
           );
         }
       });
@@ -61,10 +84,6 @@ export class World {
     };
   }
 
-  public stop(playerId: string) {
-    this.players.find((p) => p.id == playerId)?.stopMovement();
-  }
-
   public shoot(playerId: string, x: number, y: number) {
     this.players.find((p) => p.id == playerId)?.shootInWorld(x, y, this);
   }
@@ -87,6 +106,39 @@ export class World {
 
   public movePlayerRight(id: string) {
     this.players.find((p) => p.id == id)?.moveRight();
+  }
+
+  private setupGameMaster(gameMaster: GameMaster) {
+    gameMaster.addAction("move", (data: any) => {
+      const playerId = data.id;
+      const player = this.players.find((p) => p.id === playerId);
+      player?.move(data.direction);
+    });
+
+    gameMaster.addAction("shoot", (data: any) => {
+      const playerId = data.playerId;
+      this.players.find((p) => p.id == playerId)?.shootIn(data.x, data.y, this);
+    });
+
+    gameMaster.addAction("stop", (data: any) => {
+      const playerId = data.id;
+      const player = this.players.find((p) => p.id === playerId);
+      if (player) {
+        player.stop();
+      } else {
+        console.log("Player not found");
+        console.log(playerId);
+        console.log(this);
+        this.players.push(
+          new Player(this.scene, 100, 100, playerId, this.gameMaster)
+        );
+      }
+      this.players.find((p) => p.id == playerId)?.stopMovement();
+    });
+
+    gameMaster.addAction("sync", (data: any) => {
+      this.sync(data);
+    });
   }
 
   /*

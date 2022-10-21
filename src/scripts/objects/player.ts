@@ -1,5 +1,6 @@
 import MainScene from "../scenes/mainScene";
 import { World } from "./world";
+import { GameMaster } from "../gameMaster";
 import Sprite = Phaser.Physics.Arcade.Sprite;
 import CursorKeys = Phaser.Types.Input.Keyboard.CursorKeys;
 
@@ -20,19 +21,45 @@ export type PlayerState = {
 
 export class Player extends Sprite {
   scene: MainScene;
+  gameMaster: GameMaster;
   id: string;
 
-  constructor(scene: MainScene, x: number, y: number, id: string) {
+  constructor(
+    scene: MainScene,
+    x: number,
+    y: number,
+    id: string,
+    gameMaster: GameMaster
+  ) {
     super(scene, x, y, "player");
     scene.add.existing(this);
     scene.physics.add.existing(this);
 
     this.id = id;
     this.scene = scene;
+    this.gameMaster = gameMaster;
   }
 
-  getGameMaster() {
-    return this.scene.gameMaster;
+  public shootIn(x: number, y: number, world: World) {
+    const angle = Phaser.Math.Angle.Between(this.x, this.y, x, y);
+    world.createBullet(this.x, this.y, angle);
+  }
+
+  public move(direction: "up" | "down" | "left" | "right") {
+    switch (direction) {
+      case "up":
+        this.moveUp();
+        break;
+      case "down":
+        this.moveDown();
+        break;
+      case "left":
+        this.moveLeft();
+        break;
+      case "right":
+        this.moveRight();
+        break;
+    }
   }
 
   public sync(state: PlayerState) {
@@ -88,16 +115,17 @@ export class Player extends Sprite {
       !cursorKeys.right.isDown
     ) {
       if (this.body.velocity.x !== 0 || this.body.velocity.y !== 0) {
-        this.getGameMaster()?.stop(this.id);
-        this.stopMovement();
+        this.gameMaster.send("stop", { id: this.id });
       }
     }
   }
 
   updateUp(cursorKeys: CursorKeys) {
     if (cursorKeys.up.isDown) {
-      this.getGameMaster()?.move(this.id, "up");
-      this.moveUp();
+      this.gameMaster.send("move", {
+        id: this.id,
+        direction: "up",
+      });
     } else {
       // TODO: if moving up, stop and send message to gameMaster
       // the same with the other directions
@@ -106,22 +134,28 @@ export class Player extends Sprite {
 
   updateDown(cursorKeys: CursorKeys) {
     if (cursorKeys.down.isDown) {
-      this.getGameMaster()?.move(this.id, "down");
-      this.moveDown();
+      this.gameMaster.send("move", {
+        id: this.id,
+        direction: "down",
+      });
     }
   }
 
   updateLeft(cursorKeys: CursorKeys) {
     if (cursorKeys.left.isDown) {
-      this.getGameMaster()?.move(this.id, "left");
-      this.moveLeft();
+      this.gameMaster.send("move", {
+        id: this.id,
+        direction: "left",
+      });
     }
   }
 
   updateRight(cursorKeys: CursorKeys) {
     if (cursorKeys.right.isDown) {
-      this.getGameMaster()?.move(this.id, "right");
-      this.moveRight();
+      this.gameMaster.send("move", {
+        id: this.id,
+        direction: "right",
+      });
     }
   }
 
@@ -137,8 +171,7 @@ export class Player extends Sprite {
 
   public shootInWorld(x: number, y: number, world: World) {
     const angle = Phaser.Math.Angle.Between(this.x, this.y, x, y);
-    this.getGameMaster()?.shoot(this.id, x, y);
-    world.spawnBullet(this.x, this.y, angle);
+    this.gameMaster.send("shoot", { id: this.id, angle: angle });
   }
 
   public stopMovement() {
