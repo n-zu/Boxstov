@@ -31,7 +31,7 @@ export default class MainScene extends Phaser.Scene {
     if (this.gameMaster instanceof HostMaster) {
       setInterval(() => {
         this.gameMaster.send("sync", this.world.getState());
-      }, 5000);
+      }, 500);
 
       this.gameMaster.addAction("newPlayer", (data) => {
         const id = data.id;
