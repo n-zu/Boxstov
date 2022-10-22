@@ -1,6 +1,5 @@
 /* eslint-disable */
 const path = require("path");
-const CopyWebpackPlugin = require("copy-webpack-plugin");
 const HtmlWebpackPlugin = require("html-webpack-plugin");
 const MiniCssExtractPlugin = require("mini-css-extract-plugin");
 
@@ -54,13 +53,6 @@ module.exports = {
       filename: "play/index.html",
       template: "src/play/index.html",
       chunks: ["play"],
-    }),
-    new CopyWebpackPlugin({
-      patterns: [
-        { from: "src/assets", to: "assets" },
-        { from: "pwa", to: "" },
-        { from: "src/favicon.ico", to: "" },
-      ],
     }),
     new MiniCssExtractPlugin(),
   ],

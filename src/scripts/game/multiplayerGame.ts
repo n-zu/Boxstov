@@ -1,25 +1,13 @@
 import { Game } from "phaser";
+import { GameMaster } from "../gameMaster";
 import GameConfig = Phaser.Types.Core.GameConfig;
 
 export class MultiplayerGame extends Game {
-  playerId: number;
-  socketId: string | undefined;
-  idToConnect: string | undefined;
+  gameMaster: GameMaster;
 
-  constructor(
-    config: GameConfig,
-    playerId: number,
-    socketId?: string,
-    idToConnect?: string
-  ) {
-    console.log("Creating game");
-    console.log("Player id: " + playerId);
-    console.log("Socket id: " + socketId);
-    console.log("Id to connect: " + idToConnect);
-
+  constructor(config: GameConfig, gameMaster: GameMaster) {
     super(config);
-    this.playerId = playerId;
-    this.socketId = socketId;
-    this.idToConnect = idToConnect;
+    // TODO: need to learn how to pass the gameMaster to the scene without relying on this
+    this.gameMaster = gameMaster;
   }
 }

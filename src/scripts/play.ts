@@ -2,10 +2,11 @@ import "../styles/menu.css";
 import "phaser";
 import { MultiplayerGame } from "./game/multiplayerGame";
 import MainScene from "./scenes/mainScene";
+import { GuestMaster } from "./guestMaster";
+import { HostMaster } from "./hostMaster";
 
 const DEFAULT_WIDTH = 300;
 const DEFAULT_HEIGHT = 200;
-const URL_PREFIX = "http://localhost:8080";
 
 const hostConfig = {
   type: Phaser.AUTO,
@@ -18,6 +19,7 @@ const hostConfig = {
     height: DEFAULT_HEIGHT,
   },
   scene: [MainScene],
+  antialias: false,
   physics: {
     default: "arcade",
     arcade: {
@@ -37,6 +39,7 @@ const guestConfig = {
     height: DEFAULT_HEIGHT,
   },
   scene: [MainScene],
+  antialias: false,
   physics: {
     default: "arcade",
     arcade: {
@@ -46,15 +49,21 @@ const guestConfig = {
 };
 
 function addUrl(id: string) {
-  const url = `${URL_PREFIX}/play?id=${id}`;
-  const anchor = document.getElementById("joinLink");
-  if (anchor instanceof HTMLAnchorElement) {
-    anchor.href = url;
-  }
-  const text = document.getElementById("joinText");
-  if (text instanceof HTMLHeadingElement) {
-    text.innerText = `Join with URL: ${url}`;
-  }
+  const loc = window.location.href;
+  const url = `${loc.split("play")[0]}play?id=${id}`;
+  const anchor = document.getElementById("joinLink") as HTMLAnchorElement;
+  anchor.href = url;
+  const text = document.getElementById("joinText") as HTMLHeadingElement;
+  text.innerText = `Join with URL: ${url}`;
+
+  anchor.onclick = (e) => {
+    e.preventDefault();
+    navigator.clipboard.writeText(url);
+    text.innerText = "Copied to Clipboard!";
+    setTimeout(() => {
+      text.innerText = `Join with URL: ${url}`;
+    }, 1000);
+  };
 }
 
 window.addEventListener("load", () => {
@@ -65,13 +74,23 @@ window.addEventListener("load", () => {
   // If there's a join_id, we're joining.
   if (join_id) {
     console.log(`Joining game id: ${join_id}`);
-    new MultiplayerGame(guestConfig, 1, undefined, join_id);
+    const gameMaster = new GuestMaster(join_id);
+    gameMaster.start();
+
+    new MultiplayerGame(guestConfig, gameMaster);
     addUrl(join_id);
     return;
   }
 
   // No join_id: we're hosting.
   console.log(`Hosting game id: ${host_with}`);
-  new MultiplayerGame(hostConfig, 0, host_with ?? undefined);
+  let gameMaster: HostMaster;
+  if (host_with) {
+    gameMaster = new HostMaster(host_with);
+  } else {
+    gameMaster = new HostMaster();
+  }
+  gameMaster.start();
+  new MultiplayerGame(hostConfig, gameMaster);
   addUrl(host_with ?? "");
 });

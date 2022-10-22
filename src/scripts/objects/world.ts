@@ -1,5 +1,7 @@
 import { Player, PlayerState } from "./player";
 import { BulletGroup, BulletGroupState } from "./bulletGroup";
+import { GameMaster } from "../gameMaster";
+import MainScene from "../scenes/mainScene";
 import CursorKeys = Phaser.Types.Input.Keyboard.CursorKeys;
 
 export type WorldState = {
@@ -10,31 +12,69 @@ export type WorldState = {
 export class World {
   players: Player[];
   bulletsGroup: BulletGroup;
+  gameMaster: GameMaster;
+  scene: MainScene;
 
-  constructor(players: Player[], scene: Phaser.Scene) {
-    this.players = players;
+  constructor(player: Player, scene: MainScene, gameMaster: GameMaster) {
+    this.players = [player];
     this.bulletsGroup = new BulletGroup(scene);
+    this.gameMaster = gameMaster;
+    this.scene = scene;
+
+    this.setupGameMaster(gameMaster);
+    scene.input.on("pointerdown", (pointer) => {
+      this.gameMaster.send("shoot", {
+        playerId: player.id,
+        x: pointer.x,
+        y: pointer.y,
+      });
+    });
   }
 
-  public updatePlayerPosition(playerId: number, cursorKeys: CursorKeys) {
-    this.players[playerId].update(cursorKeys);
+  public createBullet(x: number, y: number, angle: number) {
+    this.bulletsGroup.shootBullet(x, y, angle);
+  }
+
+  public updatePlayerPosition(playerId: string, cursorKeys: CursorKeys) {
+    this.players.find((p) => p.id == playerId)?.update(cursorKeys);
   }
 
   public update() {
-    // TODO
+    // TODO: update world
   }
 
   public sync(worldState: WorldState) {
+    if (worldState.players.length != this.players.length) {
+      // Add new ones
+      worldState.players.forEach((player) => {
+        const found = this.players.find((p) => p.id == player.id);
+        if (found == undefined) {
+          this.players.push(
+            new Player(
+              this.scene,
+              player.position.x,
+              player.position.y,
+              player.id,
+              this.gameMaster
+            )
+          );
+        }
+      });
+      // TODO: sync players
+      // - Handle if someone disconnects
+      // - Handle same num cuz x left and x joined (odd)
+    }
+
     this.players.forEach((player) => {
-      const playerState = worldState.players.find(
-        (playerState) => playerState.id === player.id
-      );
+      const playerState = worldState.players.find((p) => p.id === player.id);
       if (playerState) {
         // There is an error here probably
         player.sync(playerState);
       }
     });
     // TODO: sync bullets
+
+    this.bulletsGroup.sync(worldState.bullets);
   }
 
   public getState(): WorldState {
@@ -44,32 +84,65 @@ export class World {
     };
   }
 
-  public stop(playerId: number) {
-    this.players[playerId].stopMovement();
-  }
-
-  public shoot(playerId: number, x: number, y: number) {
-    this.players[playerId].shootInWorld(x, y, this);
+  public shoot(playerId: string, x: number, y: number) {
+    this.players.find((p) => p.id == playerId)?.shootInWorld(x, y, this);
   }
 
   public spawnBullet(x: number, y: number, angle: number) {
     this.bulletsGroup.shootBullet(x, y, angle);
   }
 
-  public movePlayerUp(id: number) {
-    this.players[id].moveUp();
+  public movePlayerUp(id: string) {
+    this.players.find((p) => p.id == id)?.moveUp();
   }
 
-  public movePlayerDown(id: number) {
-    this.players[id].moveDown();
+  public movePlayerDown(id: string) {
+    this.players.find((p) => p.id == id)?.moveDown();
   }
 
-  public movePlayerLeft(id: number) {
-    this.players[id].moveLeft();
+  public movePlayerLeft(id: string) {
+    this.players.find((p) => p.id == id)?.moveLeft();
   }
 
-  public movePlayerRight(id: number) {
-    this.players[id].moveRight();
+  public movePlayerRight(id: string) {
+    this.players.find((p) => p.id == id)?.moveRight();
+  }
+
+  private setupGameMaster(gameMaster: GameMaster) {
+    gameMaster.addAction("move", (data: any) => {
+      const playerId = data.id;
+      let player = this.players.find((p) => p.id === playerId);
+      if (player === undefined) {
+        player = new Player(this.scene, 0, 0, playerId, this.gameMaster);
+        this.players.push(player);
+      }
+
+      player.move(data.direction);
+    });
+
+    gameMaster.addAction("shoot", (data: any) => {
+      const playerId = data.playerId;
+      let player = this.players.find((p) => p.id === playerId);
+      if (player === undefined) {
+        player = new Player(this.scene, 100, 100, playerId, this.gameMaster);
+        this.players.push(player);
+      }
+      player.shootIn(data.x, data.y, this);
+    });
+
+    gameMaster.addAction("stop", (data: any) => {
+      const playerId = data.id;
+      let player = this.players.find((p) => p.id === playerId);
+      if (player === undefined) {
+        player = new Player(this.scene, 100, 100, playerId, this.gameMaster);
+        this.players.push(player);
+      }
+      player.stopMovement();
+    });
+
+    gameMaster.addAction("sync", (data: any) => {
+      this.sync(data);
+    });
   }
 
   /*

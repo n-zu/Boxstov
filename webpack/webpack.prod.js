@@ -3,6 +3,7 @@ const path = require("path");
 const { merge } = require("webpack-merge");
 const common = require("./webpack.common");
 const { InjectManifest } = require("workbox-webpack-plugin");
+const CopyWebpackPlugin = require("copy-webpack-plugin");
 // const WebpackObfuscator = require('webpack-obfuscator')
 
 const prod = {
@@ -34,6 +35,13 @@ const prod = {
     new InjectManifest({
       swSrc: path.resolve(__dirname, "../pwa/sw.js"),
       swDest: "sw.js",
+    }),
+    new CopyWebpackPlugin({
+      patterns: [
+        { from: "src/assets", to: "play/assets" },
+        { from: "pwa", to: "" },
+        { from: "src/favicon.ico", to: "" },
+      ],
     }),
   ],
 };
