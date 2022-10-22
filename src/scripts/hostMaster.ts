@@ -41,12 +41,6 @@ export class HostMaster extends GameMaster {
     this.guest_sockets.forEach((socket) => {
       socket.send(msg);
     });
-
-    this.actions.forEach((action) => {
-      if (action.type === msg.type) {
-        action.action(data);
-      }
-    });
   }
 
   protected setupSocket(socket: DataConnection) {

@@ -3,12 +3,12 @@ import { Player } from "../objects/player";
 import { World, WorldState } from "../objects/world";
 import { GameMaster } from "../gameMaster";
 import { HostMaster } from "../hostMaster";
-import CursorKeys = Phaser.Types.Input.Keyboard.CursorKeys;
+import { PlayerControls } from "../objects/playerControls";
 
 export default class MainScene extends Phaser.Scene {
   game: MultiplayerGame;
   world: World;
-  controlKeys: CursorKeys;
+  playerControls: PlayerControls;
   gameMaster: GameMaster;
 
   protected constructor() {
@@ -21,11 +21,11 @@ export default class MainScene extends Phaser.Scene {
     // FIXME: Need a way to get the ids
     const id = Math.random().toString(36).substring(7);
     const player = new Player(this, 100, 100, id, this.game.gameMaster);
+
+    this.playerControls = new PlayerControls(player);
     this.world = new World(player, this, this.game.gameMaster);
 
     this.gameMaster = this.game.gameMaster;
-
-    this.controlKeys = this.input.keyboard.createCursorKeys();
 
     // FIXME: :(
     if (this.gameMaster instanceof HostMaster) {
@@ -53,15 +53,19 @@ export default class MainScene extends Phaser.Scene {
   }
 
   update() {
-    // FIXME
-    this.world.players[0].update(this.controlKeys);
+    this.world.update();
+    this.playerControls.update();
   }
 
   preload() {
     this.load.image("bunny", "assets/bunny.png");
     this.load.image("bullet", "assets/bullet.png");
-    this.load.spritesheet("player", "assets/player.png", {
-      frameWidth: 24,
+    this.load.spritesheet("player", "assets/run.png", {
+      frameWidth: 32,
+      frameHeight: 32,
+    });
+    this.load.spritesheet("player-idle", "assets/idle.png", {
+      frameWidth: 32,
       frameHeight: 32,
     });
   }
@@ -70,8 +74,8 @@ export default class MainScene extends Phaser.Scene {
     this.anims.create({
       key: "up",
       frames: this.anims.generateFrameNumbers("player", {
-        start: 0,
-        end: 11,
+        start: 8,
+        end: 15,
       }),
       frameRate: 30,
       repeat: -1,
@@ -80,7 +84,7 @@ export default class MainScene extends Phaser.Scene {
     this.anims.create({
       key: "right",
       frames: this.anims.generateFrameNumbers("player", {
-        start: 12,
+        start: 16,
         end: 23,
       }),
       frameRate: 30,
@@ -90,8 +94,8 @@ export default class MainScene extends Phaser.Scene {
     this.anims.create({
       key: "down",
       frames: this.anims.generateFrameNumbers("player", {
-        start: 24,
-        end: 35,
+        start: 32,
+        end: 39,
       }),
       frameRate: 30,
       repeat: -1,
@@ -100,8 +104,8 @@ export default class MainScene extends Phaser.Scene {
     this.anims.create({
       key: "left",
       frames: this.anims.generateFrameNumbers("player", {
-        start: 36,
-        end: 47,
+        start: 48,
+        end: 55,
       }),
       frameRate: 30,
       repeat: -1,
@@ -109,41 +113,41 @@ export default class MainScene extends Phaser.Scene {
 
     this.anims.create({
       key: "up-idle",
-      frames: this.anims.generateFrameNumbers("player", {
+      frames: this.anims.generateFrameNumbers("player-idle", {
         start: 0,
-        end: 0,
+        end: 7,
       }),
-      frameRate: 30,
+      frameRate: 10,
       repeat: -1,
     });
 
     this.anims.create({
       key: "right-idle",
-      frames: this.anims.generateFrameNumbers("player", {
-        start: 12,
-        end: 12,
+      frames: this.anims.generateFrameNumbers("player-idle", {
+        start: 16,
+        end: 23,
       }),
-      frameRate: 30,
+      frameRate: 10,
       repeat: -1,
     });
 
     this.anims.create({
       key: "down-idle",
-      frames: this.anims.generateFrameNumbers("player", {
-        start: 24,
-        end: 24,
+      frames: this.anims.generateFrameNumbers("player-idle", {
+        start: 32,
+        end: 39,
       }),
-      frameRate: 30,
+      frameRate: 10,
       repeat: -1,
     });
 
     this.anims.create({
       key: "left-idle",
-      frames: this.anims.generateFrameNumbers("player", {
-        start: 36,
-        end: 36,
+      frames: this.anims.generateFrameNumbers("player-idle", {
+        start: 40,
+        end: 47,
       }),
-      frameRate: 30,
+      frameRate: 10,
       repeat: -1,
     });
   }

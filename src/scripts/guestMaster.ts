@@ -33,17 +33,10 @@ export class GuestMaster extends GameMaster {
     if (this.socket) {
       this.socket.send({ type, data });
     }
-
-    this.actions.forEach((action) => {
-      if (action.type === type) {
-        action.action(data);
-      }
-    });
   }
 
   protected setupSocket(socket: DataConnection) {
     socket.on("data", (data) => {
-      console.log("Received message", data);
       const msg = data as Message;
       this.actions.forEach((action) => {
         if (action.type === msg.type) {
