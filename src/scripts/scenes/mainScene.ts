@@ -90,8 +90,48 @@ export default class MainScene extends Phaser.Scene {
     this.anims.create({
       key: "left",
       frames: this.anims.generateFrameNumbers("player", {
-        start: 44,
-        end: 49,
+        start: 50,
+        end: 55,
+      }),
+      frameRate: RUN_FRAMERATE,
+      repeat: -1,
+    });
+
+    this.anims.create({
+      key: "up-right",
+      frames: this.anims.generateFrameNumbers("player", {
+        start: 26,
+        end: 31,
+      }),
+      frameRate: RUN_FRAMERATE,
+      repeat: -1,
+    });
+
+    this.anims.create({
+      key: "up-left",
+      frames: this.anims.generateFrameNumbers("player", {
+        start: 43,
+        end: 47,
+      }),
+      frameRate: RUN_FRAMERATE,
+      repeat: -1,
+    });
+
+    this.anims.create({
+      key: "down-right",
+      frames: this.anims.generateFrameNumbers("player", {
+        start: 10,
+        end: 15,
+      }),
+      frameRate: RUN_FRAMERATE,
+      repeat: -1,
+    });
+
+    this.anims.create({
+      key: "down-left",
+      frames: this.anims.generateFrameNumbers("player", {
+        start: 58,
+        end: 63,
       }),
       frameRate: RUN_FRAMERATE,
       repeat: -1,
@@ -130,8 +170,48 @@ export default class MainScene extends Phaser.Scene {
     this.anims.create({
       key: "left-idle",
       frames: this.anims.generateFrameNumbers("player", {
-        start: 42,
-        end: 43,
+        start: 48,
+        end: 49,
+      }),
+      frameRate: IDLE_FRAMERATE,
+      repeat: -1,
+    });
+
+    this.anims.create({
+      key: "up-right-idle",
+      frames: this.anims.generateFrameNumbers("player", {
+        start: 24,
+        end: 25,
+      }),
+      frameRate: IDLE_FRAMERATE,
+      repeat: -1,
+    });
+
+    this.anims.create({
+      key: "up-left-idle",
+      frames: this.anims.generateFrameNumbers("player", {
+        start: 41,
+        end: 42,
+      }),
+      frameRate: IDLE_FRAMERATE,
+      repeat: -1,
+    });
+
+    this.anims.create({
+      key: "down-right-idle",
+      frames: this.anims.generateFrameNumbers("player", {
+        start: 8,
+        end: 9,
+      }),
+      frameRate: IDLE_FRAMERATE,
+      repeat: -1,
+    });
+
+    this.anims.create({
+      key: "down-left-idle",
+      frames: this.anims.generateFrameNumbers("player", {
+        start: 56,
+        end: 57,
       }),
       frameRate: IDLE_FRAMERATE,
       repeat: -1,

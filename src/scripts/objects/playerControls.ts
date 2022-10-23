@@ -26,6 +26,20 @@ export class PlayerControls {
         this.player.moveRight(true);
       }
     }
+    if (amountOfKeysDown === 2) {
+      if (this.cursorKeys.up.isDown && this.cursorKeys.left.isDown) {
+        this.player.moveUpLeft(true);
+      }
+      if (this.cursorKeys.up.isDown && this.cursorKeys.right.isDown) {
+        this.player.moveUpRight(true);
+      }
+      if (this.cursorKeys.down.isDown && this.cursorKeys.left.isDown) {
+        this.player.moveDownLeft(true);
+      }
+      if (this.cursorKeys.down.isDown && this.cursorKeys.right.isDown) {
+        this.player.moveDownRight(true);
+      }
+    }
     if (amountOfKeysDown === 0) {
       this.player.stopMovement(true);
     }

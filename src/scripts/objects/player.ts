@@ -3,7 +3,7 @@ import * as Phaser from "phaser";
 import { BulletGroup } from "./bulletGroup";
 import Sprite = Phaser.Physics.Arcade.Sprite;
 
-const SPEED = 100;
+const SPEED = 200;
 
 export type MovementMessage = {
   type: "move";
@@ -71,7 +71,17 @@ export class Player extends Sprite {
     this.bulletGroup.shootBullet(this.x, this.y, angle);
   }
 
-  public move(direction: "up" | "down" | "left" | "right") {
+  public move(
+    direction:
+      | "up"
+      | "down"
+      | "left"
+      | "right"
+      | "up-left"
+      | "up-right"
+      | "down-left"
+      | "down-right"
+  ) {
     switch (direction) {
       case "up":
         this.moveUp(false);
@@ -84,6 +94,18 @@ export class Player extends Sprite {
         break;
       case "right":
         this.moveRight(false);
+        break;
+      case "up-left":
+        this.moveUpLeft(false);
+        break;
+      case "up-right":
+        this.moveUpRight(false);
+        break;
+      case "down-left":
+        this.moveDownLeft(false);
+        break;
+      case "down-right":
+        this.moveDownRight(false);
         break;
     }
   }
@@ -150,6 +172,66 @@ export class Player extends Sprite {
     }
     this.anims.play("right", true);
     this.setVelocity(SPEED, 0);
+  }
+
+  public moveUpLeft(emitAlert: boolean = true) {
+    if (
+      (this.body.velocity.y !== -SPEED || this.body.velocity.x !== -SPEED) &&
+      emitAlert
+    ) {
+      this.gameMaster.send("move", {
+        id: this.id,
+        direction: "up-left",
+      });
+    }
+    this.anims.play("up-left", true);
+    // we probably want to use trigonometry here
+    this.setVelocity(-SPEED, -SPEED);
+  }
+
+  public moveUpRight(emitAlert: boolean = true) {
+    if (
+      (this.body.velocity.y !== -SPEED || this.body.velocity.x !== SPEED) &&
+      emitAlert
+    ) {
+      this.gameMaster.send("move", {
+        id: this.id,
+        direction: "up-right",
+      });
+    }
+
+    this.anims.play("up-right", true);
+    this.setVelocity(SPEED, -SPEED);
+  }
+
+  public moveDownLeft(emitAlert: boolean = true) {
+    if (
+      (this.body.velocity.y !== SPEED || this.body.velocity.x !== -SPEED) &&
+      emitAlert
+    ) {
+      this.gameMaster.send("move", {
+        id: this.id,
+        direction: "down-left",
+      });
+    }
+
+    this.anims.play("down-left", true);
+    this.setVelocity(-SPEED, SPEED);
+  }
+
+  public moveDownRight(emitAlert: boolean = true) {
+    if (
+      (this.body.velocity.y !== SPEED || this.body.velocity.x !== SPEED) &&
+      emitAlert
+    ) {
+      this.gameMaster.send("move", {
+        id: this.id,
+        direction: "down-right",
+      });
+    }
+
+    this.anims.play("down-right", true);
+    this.setVelocity(SPEED, SPEED);
   }
 
   public getState(): PlayerState {
