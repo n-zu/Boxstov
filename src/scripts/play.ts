@@ -5,10 +5,10 @@ import MainScene from "./scenes/mainScene";
 import { GuestMaster } from "./guestMaster";
 import { HostMaster } from "./hostMaster";
 
-const DEFAULT_WIDTH = 300;
-const DEFAULT_HEIGHT = 200;
+const DEFAULT_WIDTH = 1280;
+const DEFAULT_HEIGHT = 720;
 
-const hostConfig = {
+const gameConfig = {
   type: Phaser.AUTO,
   backgroundColor: "#ffffff",
   scale: {
@@ -19,27 +19,7 @@ const hostConfig = {
     height: DEFAULT_HEIGHT,
   },
   scene: [MainScene],
-  antialias: false,
-  physics: {
-    default: "arcade",
-    arcade: {
-      debug: false,
-    },
-  },
-};
-
-const guestConfig = {
-  type: Phaser.AUTO,
-  backgroundColor: "#ffffff",
-  scale: {
-    parent: "phaser-game",
-    mode: Phaser.Scale.FIT,
-    autoCenter: Phaser.Scale.CENTER_BOTH,
-    width: DEFAULT_WIDTH,
-    height: DEFAULT_HEIGHT,
-  },
-  scene: [MainScene],
-  antialias: false,
+  antialias: true,
   physics: {
     default: "arcade",
     arcade: {
@@ -77,7 +57,7 @@ window.addEventListener("load", () => {
     const gameMaster = new GuestMaster(join_id);
     gameMaster.start();
 
-    new MultiplayerGame(guestConfig, gameMaster);
+    new MultiplayerGame(gameConfig, gameMaster);
     addUrl(join_id);
     return;
   }
@@ -91,6 +71,6 @@ window.addEventListener("load", () => {
     gameMaster = new HostMaster();
   }
   gameMaster.start();
-  new MultiplayerGame(hostConfig, gameMaster);
+  new MultiplayerGame(gameConfig, gameMaster);
   addUrl(host_with ?? "");
 });

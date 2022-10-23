@@ -3,6 +3,9 @@ import { World, WorldState } from "../objects/world";
 import { GameMaster } from "../gameMaster";
 import { HostMaster } from "../hostMaster";
 
+const IDLE_FRAMERATE = 1;
+const RUN_FRAMERATE = 10;
+
 export default class MainScene extends Phaser.Scene {
   game: MultiplayerGame;
   world: World;
@@ -42,11 +45,10 @@ export default class MainScene extends Phaser.Scene {
   }
 
   preload() {
-    this.load.image("bunny", "assets/bunny.png");
     this.load.image("bullet", "assets/bullet.png");
-    this.load.spritesheet("player", "assets/run.png", {
-      frameWidth: 32,
-      frameHeight: 32,
+    this.load.spritesheet("player", "assets/Player/rifle_map.png", {
+      frameWidth: 512,
+      frameHeight: 512,
     });
     this.load.spritesheet("player-idle", "assets/idle.png", {
       frameWidth: 32,
@@ -58,80 +60,160 @@ export default class MainScene extends Phaser.Scene {
     this.anims.create({
       key: "up",
       frames: this.anims.generateFrameNumbers("player", {
-        start: 8,
-        end: 15,
+        start: 34,
+        end: 39,
       }),
-      frameRate: 30,
+      frameRate: RUN_FRAMERATE,
       repeat: -1,
     });
 
     this.anims.create({
       key: "right",
       frames: this.anims.generateFrameNumbers("player", {
-        start: 16,
+        start: 18,
         end: 23,
       }),
-      frameRate: 30,
+      frameRate: RUN_FRAMERATE,
       repeat: -1,
     });
 
     this.anims.create({
       key: "down",
       frames: this.anims.generateFrameNumbers("player", {
-        start: 32,
-        end: 39,
+        start: 2,
+        end: 7,
       }),
-      frameRate: 30,
+      frameRate: RUN_FRAMERATE,
       repeat: -1,
     });
 
     this.anims.create({
       key: "left",
       frames: this.anims.generateFrameNumbers("player", {
-        start: 48,
+        start: 50,
         end: 55,
       }),
-      frameRate: 30,
+      frameRate: RUN_FRAMERATE,
+      repeat: -1,
+    });
+
+    this.anims.create({
+      key: "up-right",
+      frames: this.anims.generateFrameNumbers("player", {
+        start: 26,
+        end: 31,
+      }),
+      frameRate: RUN_FRAMERATE,
+      repeat: -1,
+    });
+
+    this.anims.create({
+      key: "up-left",
+      frames: this.anims.generateFrameNumbers("player", {
+        start: 43,
+        end: 47,
+      }),
+      frameRate: RUN_FRAMERATE,
+      repeat: -1,
+    });
+
+    this.anims.create({
+      key: "down-right",
+      frames: this.anims.generateFrameNumbers("player", {
+        start: 10,
+        end: 15,
+      }),
+      frameRate: RUN_FRAMERATE,
+      repeat: -1,
+    });
+
+    this.anims.create({
+      key: "down-left",
+      frames: this.anims.generateFrameNumbers("player", {
+        start: 58,
+        end: 63,
+      }),
+      frameRate: RUN_FRAMERATE,
       repeat: -1,
     });
 
     this.anims.create({
       key: "up-idle",
-      frames: this.anims.generateFrameNumbers("player-idle", {
-        start: 0,
-        end: 7,
+      frames: this.anims.generateFrameNumbers("player", {
+        start: 32,
+        end: 33,
       }),
-      frameRate: 10,
+      frameRate: IDLE_FRAMERATE,
       repeat: -1,
     });
 
     this.anims.create({
       key: "right-idle",
-      frames: this.anims.generateFrameNumbers("player-idle", {
+      frames: this.anims.generateFrameNumbers("player", {
         start: 16,
-        end: 23,
+        end: 17,
       }),
-      frameRate: 10,
+      frameRate: IDLE_FRAMERATE,
       repeat: -1,
     });
 
     this.anims.create({
       key: "down-idle",
-      frames: this.anims.generateFrameNumbers("player-idle", {
-        start: 32,
-        end: 39,
+      frames: this.anims.generateFrameNumbers("player", {
+        start: 0,
+        end: 1,
       }),
-      frameRate: 10,
+      frameRate: IDLE_FRAMERATE,
       repeat: -1,
     });
 
     this.anims.create({
       key: "left-idle",
-      frames: this.anims.generateFrameNumbers("player-idle", {
-        start: 40,
-        end: 47,
+      frames: this.anims.generateFrameNumbers("player", {
+        start: 48,
+        end: 49,
       }),
-      frameRate: 10,
+      frameRate: IDLE_FRAMERATE,
+      repeat: -1,
+    });
+
+    this.anims.create({
+      key: "up-right-idle",
+      frames: this.anims.generateFrameNumbers("player", {
+        start: 24,
+        end: 25,
+      }),
+      frameRate: IDLE_FRAMERATE,
+      repeat: -1,
+    });
+
+    this.anims.create({
+      key: "up-left-idle",
+      frames: this.anims.generateFrameNumbers("player", {
+        start: 41,
+        end: 42,
+      }),
+      frameRate: IDLE_FRAMERATE,
+      repeat: -1,
+    });
+
+    this.anims.create({
+      key: "down-right-idle",
+      frames: this.anims.generateFrameNumbers("player", {
+        start: 8,
+        end: 9,
+      }),
+      frameRate: IDLE_FRAMERATE,
+      repeat: -1,
+    });
+
+    this.anims.create({
+      key: "down-left-idle",
+      frames: this.anims.generateFrameNumbers("player", {
+        start: 56,
+        end: 57,
+      }),
+      frameRate: IDLE_FRAMERATE,
       repeat: -1,
     });
   }
