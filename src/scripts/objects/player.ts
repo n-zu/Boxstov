@@ -60,7 +60,7 @@ export class Player extends Sprite {
     return this.id;
   }
 
-  public shoot(x: number, y: number, emitAlert: boolean = true) {
+  public shoot(x: number, y: number, emitAlert = true) {
     const angle = Phaser.Math.Angle.Between(this.x, this.y, x, y);
     if (emitAlert) {
       this.gameMaster.send("shoot", {
@@ -131,7 +131,7 @@ export class Player extends Sprite {
     }
   }
 
-  public moveUp(emitAlert: boolean = true) {
+  public moveUp(emitAlert = true) {
     if (this.body.velocity.y !== -SPEED && emitAlert) {
       this.gameMaster.send("move", {
         id: this.id,
@@ -142,7 +142,7 @@ export class Player extends Sprite {
     this.setVelocity(0, -SPEED);
   }
 
-  public moveDown(emitAlert: boolean = true) {
+  public moveDown(emitAlert = true) {
     if (this.body.velocity.y !== SPEED && emitAlert) {
       this.gameMaster.send("move", {
         id: this.id,
@@ -153,7 +153,7 @@ export class Player extends Sprite {
     this.setVelocity(0, SPEED);
   }
 
-  public moveLeft(emmitAlert: boolean = true) {
+  public moveLeft(emmitAlert = true) {
     if (this.body.velocity.x !== -SPEED && emmitAlert) {
       this.gameMaster.send("move", {
         id: this.id,
@@ -164,7 +164,7 @@ export class Player extends Sprite {
     this.setVelocity(-SPEED, 0);
   }
 
-  public moveRight(emmitAlert: boolean = true) {
+  public moveRight(emmitAlert = true) {
     if (this.body.velocity.x !== SPEED && emmitAlert) {
       this.gameMaster.send("move", {
         id: this.id,
@@ -175,7 +175,7 @@ export class Player extends Sprite {
     this.setVelocity(SPEED, 0);
   }
 
-  public moveUpLeft(emitAlert: boolean = true) {
+  public moveUpLeft(emitAlert = true) {
     if (
       (this.body.velocity.y !== -SPEED * diagonalFactor ||
         this.body.velocity.x !== -SPEED * diagonalFactor) &&
@@ -190,7 +190,7 @@ export class Player extends Sprite {
     this.setVelocity(-SPEED * diagonalFactor, -SPEED * diagonalFactor);
   }
 
-  public moveUpRight(emitAlert: boolean = true) {
+  public moveUpRight(emitAlert = true) {
     if (
       (this.body.velocity.y !== -SPEED * diagonalFactor ||
         this.body.velocity.x !== SPEED * diagonalFactor) &&
@@ -206,7 +206,7 @@ export class Player extends Sprite {
     this.setVelocity(SPEED * diagonalFactor, -SPEED * diagonalFactor);
   }
 
-  public moveDownLeft(emitAlert: boolean = true) {
+  public moveDownLeft(emitAlert = true) {
     if (
       (this.body.velocity.y !== SPEED * diagonalFactor ||
         this.body.velocity.x !== -SPEED * diagonalFactor) &&
@@ -222,7 +222,7 @@ export class Player extends Sprite {
     this.setVelocity(-SPEED * diagonalFactor, SPEED * diagonalFactor);
   }
 
-  public moveDownRight(emitAlert: boolean = true) {
+  public moveDownRight(emitAlert = true) {
     if (
       (this.body.velocity.y !== SPEED * diagonalFactor ||
         this.body.velocity.x !== SPEED * diagonalFactor) &&
@@ -261,7 +261,7 @@ export class Player extends Sprite {
     };
   }
 
-  public stopMovement(emitAlert: boolean = true) {
+  public stopMovement(emitAlert = true) {
     if (this.body.velocity.x !== 0 || this.body.velocity.y !== 0) {
       if (emitAlert) {
         this.gameMaster.send("stop", { id: this.id });
