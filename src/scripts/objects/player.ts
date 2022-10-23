@@ -3,7 +3,7 @@ import * as Phaser from "phaser";
 import { BulletGroup } from "./bulletGroup";
 import Sprite = Phaser.Physics.Arcade.Sprite;
 
-const SPEED = 30;
+const SPEED = 100;
 
 export type MovementMessage = {
   type: "move";
@@ -51,6 +51,8 @@ export class Player extends Sprite {
     this.scene = scene;
     this.gameMaster = gameMaster;
     this.bulletGroup = bulletGroup;
+
+    this.scale = 0.5;
   }
 
   public getId() {

@@ -5,8 +5,8 @@ import MainScene from "./scenes/mainScene";
 import { GuestMaster } from "./guestMaster";
 import { HostMaster } from "./hostMaster";
 
-const DEFAULT_WIDTH = 300;
-const DEFAULT_HEIGHT = 200;
+const DEFAULT_WIDTH = 1920;
+const DEFAULT_HEIGHT = 1080;
 
 const hostConfig = {
   type: Phaser.AUTO,
@@ -19,7 +19,7 @@ const hostConfig = {
     height: DEFAULT_HEIGHT,
   },
   scene: [MainScene],
-  antialias: false,
+  antialias: true,
   physics: {
     default: "arcade",
     arcade: {
