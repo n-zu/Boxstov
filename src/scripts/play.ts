@@ -48,7 +48,7 @@ const guestConfig = {
   },
 };
 
-function addUrl(id: string) {
+export function addUrl(id: string) {
   const loc = window.location.href;
   const url = `${loc.split("play")[0]}play?id=${id}`;
   const anchor = document.getElementById("joinLink") as HTMLAnchorElement;
