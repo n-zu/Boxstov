@@ -4,6 +4,7 @@ import { BulletGroup } from "./bulletGroup";
 import Sprite = Phaser.Physics.Arcade.Sprite;
 
 const SPEED = 200;
+const diagonalFactor = Math.sqrt(2) / 2;
 
 export type MovementMessage = {
   type: "move";
@@ -176,7 +177,8 @@ export class Player extends Sprite {
 
   public moveUpLeft(emitAlert: boolean = true) {
     if (
-      (this.body.velocity.y !== -SPEED || this.body.velocity.x !== -SPEED) &&
+      (this.body.velocity.y !== -SPEED * diagonalFactor ||
+        this.body.velocity.x !== -SPEED * diagonalFactor) &&
       emitAlert
     ) {
       this.gameMaster.send("move", {
@@ -185,13 +187,13 @@ export class Player extends Sprite {
       });
     }
     this.anims.play("up-left", true);
-    // we probably want to use trigonometry here
-    this.setVelocity(-SPEED, -SPEED);
+    this.setVelocity(-SPEED * diagonalFactor, -SPEED * diagonalFactor);
   }
 
   public moveUpRight(emitAlert: boolean = true) {
     if (
-      (this.body.velocity.y !== -SPEED || this.body.velocity.x !== SPEED) &&
+      (this.body.velocity.y !== -SPEED * diagonalFactor ||
+        this.body.velocity.x !== SPEED * diagonalFactor) &&
       emitAlert
     ) {
       this.gameMaster.send("move", {
@@ -201,12 +203,13 @@ export class Player extends Sprite {
     }
 
     this.anims.play("up-right", true);
-    this.setVelocity(SPEED, -SPEED);
+    this.setVelocity(SPEED * diagonalFactor, -SPEED * diagonalFactor);
   }
 
   public moveDownLeft(emitAlert: boolean = true) {
     if (
-      (this.body.velocity.y !== SPEED || this.body.velocity.x !== -SPEED) &&
+      (this.body.velocity.y !== SPEED * diagonalFactor ||
+        this.body.velocity.x !== -SPEED * diagonalFactor) &&
       emitAlert
     ) {
       this.gameMaster.send("move", {
@@ -216,12 +219,13 @@ export class Player extends Sprite {
     }
 
     this.anims.play("down-left", true);
-    this.setVelocity(-SPEED, SPEED);
+    this.setVelocity(-SPEED * diagonalFactor, SPEED * diagonalFactor);
   }
 
   public moveDownRight(emitAlert: boolean = true) {
     if (
-      (this.body.velocity.y !== SPEED || this.body.velocity.x !== SPEED) &&
+      (this.body.velocity.y !== SPEED * diagonalFactor ||
+        this.body.velocity.x !== SPEED * diagonalFactor) &&
       emitAlert
     ) {
       this.gameMaster.send("move", {
@@ -231,7 +235,7 @@ export class Player extends Sprite {
     }
 
     this.anims.play("down-right", true);
-    this.setVelocity(SPEED, SPEED);
+    this.setVelocity(SPEED * diagonalFactor, SPEED * diagonalFactor);
   }
 
   public getState(): PlayerState {
