@@ -1,14 +1,11 @@
 import { MultiplayerGame } from "../game/multiplayerGame";
-import { Player } from "../objects/player";
 import { World, WorldState } from "../objects/world";
 import { GameMaster } from "../gameMaster";
 import { HostMaster } from "../hostMaster";
-import { PlayerControls } from "../objects/playerControls";
 
 export default class MainScene extends Phaser.Scene {
   game: MultiplayerGame;
   world: World;
-  playerControls: PlayerControls;
   gameMaster: GameMaster;
 
   protected constructor() {
@@ -19,11 +16,8 @@ export default class MainScene extends Phaser.Scene {
     this.createAnimations();
 
     // FIXME: Need a way to get the ids
-    const id = Math.random().toString(36).substring(7);
-    const player = new Player(this, 100, 100, id, this.game.gameMaster);
 
-    this.playerControls = new PlayerControls(player);
-    this.world = new World(player, this, this.game.gameMaster);
+    this.world = new World(this, this.game.gameMaster);
 
     this.gameMaster = this.game.gameMaster;
 
@@ -32,15 +26,6 @@ export default class MainScene extends Phaser.Scene {
       setInterval(() => {
         this.gameMaster.send("sync", this.world.getState());
       }, 500);
-
-      this.gameMaster.addAction("newPlayer", (data) => {
-        const id = data.id;
-        this.world.players.push(
-          new Player(this, 100, 100, id, this.game.gameMaster)
-        );
-      });
-    } else {
-      this.gameMaster.send("newPlayer", { id: id });
     }
   }
 
@@ -54,7 +39,6 @@ export default class MainScene extends Phaser.Scene {
 
   update() {
     this.world.update();
-    this.playerControls.update();
   }
 
   preload() {

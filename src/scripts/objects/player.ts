@@ -1,6 +1,6 @@
-import { World } from "./world";
 import { GameMaster } from "../gameMaster";
 import * as Phaser from "phaser";
+import { BulletGroup } from "./bulletGroup";
 import Sprite = Phaser.Physics.Arcade.Sprite;
 
 const SPEED = 30;
@@ -31,6 +31,7 @@ export type PlayerState = {
 export class Player extends Sprite {
   scene: Phaser.Scene;
   gameMaster: GameMaster;
+  bulletGroup: BulletGroup;
   id: string;
 
   constructor(
@@ -38,7 +39,8 @@ export class Player extends Sprite {
     x: number,
     y: number,
     id: string,
-    gameMaster: GameMaster
+    gameMaster: GameMaster,
+    bulletGroup: BulletGroup
   ) {
     super(scene, x, y, "player");
 
@@ -48,10 +50,23 @@ export class Player extends Sprite {
     this.id = id;
     this.scene = scene;
     this.gameMaster = gameMaster;
+    this.bulletGroup = bulletGroup;
   }
 
   public getId() {
     return this.id;
+  }
+
+  public shoot(x: number, y: number, emitAlert: boolean = true) {
+    const angle = Phaser.Math.Angle.Between(this.x, this.y, x, y);
+    if (emitAlert) {
+      this.gameMaster.send("shoot", {
+        id: this.id,
+        x: x,
+        y: y,
+      });
+    }
+    this.bulletGroup.shootBullet(this.x, this.y, angle);
   }
 
   public move(direction: "up" | "down" | "left" | "right") {
@@ -76,7 +91,6 @@ export class Player extends Sprite {
     this.setVelocity(state.velocity.x, state.velocity.y);
     this.setRotation(state.rotation);
     if (state.animation) {
-      console.log("syncing animation", state.animation);
       // There is a bug here, probably
       // If I set ignoreIfPlaying to false, and then move the guest player, when it
       // receives a sync message, I get the following error:
@@ -86,9 +100,6 @@ export class Player extends Sprite {
         {
           key: state.animation.key,
           startFrame: state.animation.frame,
-          frameRate: 30,
-          duration: 0,
-          repeat: -1,
         },
         true
       );
@@ -160,11 +171,6 @@ export class Player extends Sprite {
       rotation: this.rotation,
       animation: currentAnimation,
     };
-  }
-
-  public shootInWorld(x: number, y: number, world: World) {
-    const angle = Phaser.Math.Angle.Between(this.x, this.y, x, y);
-    this.gameMaster.send("shoot", { id: this.id, angle: angle });
   }
 
   public stopMovement(emitAlert: boolean = true) {

@@ -1,5 +1,6 @@
 import { GameMaster } from "./gameMaster";
 import Peer, { DataConnection } from "peerjs";
+import { addUrl } from "./play";
 
 export type Message = {
   type: string;
@@ -45,7 +46,6 @@ export class HostMaster extends GameMaster {
 
   protected setupSocket(socket: DataConnection) {
     socket.on("data", (data) => {
-      console.log("Received message", data);
       const msg = data as Message;
       this.actions.forEach((action) => {
         if (action.type === msg.type) {
@@ -59,22 +59,4 @@ export class HostMaster extends GameMaster {
       });
     });
   }
-}
-
-function addUrl(id: string) {
-  const loc = window.location.href;
-  const url = `${loc.split("play")[0]}play?id=${id}`;
-  const anchor = document.getElementById("joinLink") as HTMLAnchorElement;
-  anchor.href = url;
-  const text = document.getElementById("joinText") as HTMLHeadingElement;
-  text.innerText = `Join with URL: ${url}`;
-
-  anchor.onclick = (e) => {
-    e.preventDefault();
-    navigator.clipboard.writeText(url);
-    text.innerText = "Copied to Clipboard!";
-    setTimeout(() => {
-      text.innerText = `Join with URL: ${url}`;
-    }, 1000);
-  };
 }
