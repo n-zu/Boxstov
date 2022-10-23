@@ -2,14 +2,18 @@ import { Player, PlayerState } from "./player";
 import { BulletGroup, BulletGroupState } from "./bulletGroup";
 import { GameMaster } from "../gameMaster";
 import { PlayerControls } from "./playerControls";
+import { Enemy, EnemyState } from "./enemy";
+import { Bullet } from "./bullet";
 
 export type WorldState = {
   players: PlayerState[];
   bullets: BulletGroupState;
+  enemies: EnemyState[];
 };
 
 export class World {
   players: Player[];
+  enemies: Enemy[];
   playerControls: PlayerControls;
   bulletGroup: BulletGroup;
   gameMaster: GameMaster;
@@ -22,16 +26,41 @@ export class World {
     this.scene = scene;
 
     this.setupGameMaster(gameMaster);
+
+    const enemy = new Enemy(scene, 200, 200);
+    const enemy2 = new Enemy(scene, 0, 200);
+    this.enemies = [enemy, enemy2];
+
+    scene.physics.add.overlap(this.bulletGroup, this.enemies, (e, b) => {
+      const bullet = b as Bullet;
+      const enemy = e as Enemy;
+
+      bullet.destroy();
+      enemy.destroy();
+      this.enemies = this.enemies.filter((e) => e.id !== enemy.id);
+    });
   }
 
   public update() {
     this.playerControls.update();
+    this.enemies.forEach((enemy) => enemy.update(this.players));
   }
 
   public sync(worldState: WorldState) {
     worldState.players.forEach((playerState) => {
       const player = this.getOrCreatePlayer(playerState.id);
       player.sync(playerState);
+    });
+    worldState.enemies.forEach((enemyState) => {
+      const enemy = this.getOrCreateEnemy(enemyState.id);
+      enemy.sync(enemyState);
+    });
+    this.enemies.forEach((enemy) => {
+      if (!worldState.enemies.find((e) => e.id === enemy.id)) {
+        enemy.destroy();
+
+        this.enemies = this.enemies.filter((e) => e.id !== enemy.id);
+      }
     });
 
     this.bulletGroup.sync(worldState.bullets);
@@ -41,6 +70,7 @@ export class World {
     return {
       players: this.players.map((player) => player.getState()),
       bullets: this.bulletGroup.getState(),
+      enemies: this.enemies.map((enemy) => enemy.getState()),
     };
   }
 
@@ -79,6 +109,15 @@ export class World {
       this.players.push(player);
     }
     return player;
+  }
+
+  private getOrCreateEnemy(id: string): Enemy {
+    let enemy = this.enemies.find((e) => e.id === id);
+    if (enemy === undefined) {
+      enemy = new Enemy(this.scene, 100, 100, id);
+      this.enemies.push(enemy);
+    }
+    return enemy;
   }
 
   private setupGameMaster(gameMaster: GameMaster) {
