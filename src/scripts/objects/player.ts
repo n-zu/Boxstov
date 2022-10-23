@@ -54,6 +54,7 @@ export class Player extends Sprite {
     this.bulletGroup = bulletGroup;
 
     this.scale = 0.5;
+    this.anims.play("down-idle", true);
   }
 
   public getId() {
@@ -122,13 +123,19 @@ export class Player extends Sprite {
       // receives a sync message, I get the following error:
       // Uncaught TypeError: Cannot read properties of undefined (reading 'duration')
       // It seems that ignoreIfPlaying to true makes the bug less reproducible
-      this.anims.play(
-        {
-          key: state.animation.key,
-          startFrame: state.animation.frame,
-        },
-        true
-      );
+      try {
+        if (this.anims.currentFrame) {
+          this.anims.play(
+            {
+              key: state.animation.key,
+              startFrame: state.animation.frame,
+            },
+            true
+          );
+        }
+      } catch (e) {
+        console.log(e);
+      }
     }
   }
 
@@ -255,16 +262,13 @@ export class Player extends Sprite {
     }
     if (this.body.velocity.x > 0) {
       this.anims.play("right-idle", true);
-      this.setVelocity(0, 0);
     } else if (this.body.velocity.x < 0) {
       this.anims.play("left-idle", true);
-      this.setVelocity(0, 0);
     } else if (this.body.velocity.y > 0) {
       this.anims.play("down-idle", true);
-      this.setVelocity(0, 0);
     } else if (this.body.velocity.y < 0) {
       this.anims.play("up-idle", true);
-      this.setVelocity(0, 0);
     }
+    this.setVelocity(0, 0);
   }
 }
