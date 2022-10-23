@@ -113,6 +113,7 @@ export class Player extends Sprite {
 
   public sync(state: PlayerState) {
     this.setPosition(state.position.x, state.position.y);
+    this.setDepth(state.position.y);
     this.setVelocity(state.velocity.x, state.velocity.y);
     this.setRotation(state.rotation);
     if (state.animation) {
@@ -132,7 +133,7 @@ export class Player extends Sprite {
   }
 
   public moveUp(emitAlert = true) {
-    if (this.body.velocity.y !== -SPEED && emitAlert) {
+    if (emitAlert) {
       this.gameMaster.send("move", {
         id: this.id,
         direction: "up",
@@ -143,7 +144,7 @@ export class Player extends Sprite {
   }
 
   public moveDown(emitAlert = true) {
-    if (this.body.velocity.y !== SPEED && emitAlert) {
+    if (emitAlert) {
       this.gameMaster.send("move", {
         id: this.id,
         direction: "down",
@@ -153,8 +154,8 @@ export class Player extends Sprite {
     this.setVelocity(0, SPEED);
   }
 
-  public moveLeft(emmitAlert = true) {
-    if (this.body.velocity.x !== -SPEED && emmitAlert) {
+  public moveLeft(emitAlert = true) {
+    if (emitAlert) {
       this.gameMaster.send("move", {
         id: this.id,
         direction: "left",
@@ -164,8 +165,8 @@ export class Player extends Sprite {
     this.setVelocity(-SPEED, 0);
   }
 
-  public moveRight(emmitAlert = true) {
-    if (this.body.velocity.x !== SPEED && emmitAlert) {
+  public moveRight(emitAlert = true) {
+    if (emitAlert) {
       this.gameMaster.send("move", {
         id: this.id,
         direction: "right",
@@ -176,11 +177,7 @@ export class Player extends Sprite {
   }
 
   public moveUpLeft(emitAlert = true) {
-    if (
-      (this.body.velocity.y !== -SPEED * diagonalFactor ||
-        this.body.velocity.x !== -SPEED * diagonalFactor) &&
-      emitAlert
-    ) {
+    if (emitAlert) {
       this.gameMaster.send("move", {
         id: this.id,
         direction: "up-left",
@@ -191,11 +188,7 @@ export class Player extends Sprite {
   }
 
   public moveUpRight(emitAlert = true) {
-    if (
-      (this.body.velocity.y !== -SPEED * diagonalFactor ||
-        this.body.velocity.x !== SPEED * diagonalFactor) &&
-      emitAlert
-    ) {
+    if (emitAlert) {
       this.gameMaster.send("move", {
         id: this.id,
         direction: "up-right",
@@ -207,11 +200,7 @@ export class Player extends Sprite {
   }
 
   public moveDownLeft(emitAlert = true) {
-    if (
-      (this.body.velocity.y !== SPEED * diagonalFactor ||
-        this.body.velocity.x !== -SPEED * diagonalFactor) &&
-      emitAlert
-    ) {
+    if (emitAlert) {
       this.gameMaster.send("move", {
         id: this.id,
         direction: "down-left",
@@ -223,11 +212,7 @@ export class Player extends Sprite {
   }
 
   public moveDownRight(emitAlert = true) {
-    if (
-      (this.body.velocity.y !== SPEED * diagonalFactor ||
-        this.body.velocity.x !== SPEED * diagonalFactor) &&
-      emitAlert
-    ) {
+    if (emitAlert) {
       this.gameMaster.send("move", {
         id: this.id,
         direction: "down-right",
@@ -246,6 +231,7 @@ export class Player extends Sprite {
         frame: this.anims.currentFrame.index,
       };
     }
+    this.setDepth(this.y);
     return {
       id: this.id,
       position: {
