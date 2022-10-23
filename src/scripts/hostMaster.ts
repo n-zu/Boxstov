@@ -34,7 +34,7 @@ export class HostMaster extends GameMaster {
   }
 
   public send(type: string, data: any) {
-    let msg = {
+    const msg = {
       type,
       data,
     } as Message;

@@ -15,6 +15,11 @@ export default class MainScene extends Phaser.Scene {
   create() {
     this.createAnimations();
 
+    const factor = 3;
+    this.add
+      .tileSprite(150, 100, 300 * factor, 200 * factor, "tiles")
+      .setScale(1 / factor);
+
     // FIXME: Need a way to get the ids
 
     this.world = new World(this, this.game.gameMaster);
@@ -43,6 +48,7 @@ export default class MainScene extends Phaser.Scene {
 
   preload() {
     this.load.image("bunny", "assets/bunny.png");
+    this.load.image("tiles", "assets/Floor.png");
     this.load.image("bullet", "assets/bullet.png");
     this.load.spritesheet("player", "assets/run.png", {
       frameWidth: 32,
