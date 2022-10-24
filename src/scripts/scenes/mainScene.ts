@@ -34,7 +34,7 @@ export default class MainScene extends Phaser.Scene {
     if (this.gameMaster instanceof HostMaster) {
       setInterval(() => {
         this.gameMaster.send("sync", this.world.getState());
-      }, 1000);
+      }, 500);
     }
   }
 
@@ -303,16 +303,6 @@ export default class MainScene extends Phaser.Scene {
       }),
       frameRate: ZOMBIE_RUN_FRAMERATE,
       repeat: -1,
-    });
-
-    this.anims.create({
-      key: "explode",
-      frames: this.anims.generateFrameNumbers("explosion", {
-        start: 2,
-        end: 4,
-      }),
-      frameRate: 200,
-      repeat: 0,
     });
   }
 }

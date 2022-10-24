@@ -95,9 +95,6 @@ export class World {
 
     scene.cameras.main.startFollow(player);
 
-    scene.add.existing(player);
-    scene.physics.add.existing(player);
-
     scene.input.on("wheel", (pointer, gameObjects, deltaX, deltaY, deltaZ) => {
       scene.cameras.main.zoom -= deltaY * 0.001;
     });
@@ -115,6 +112,7 @@ export class World {
         this.bulletGroup
       );
       this.players.push(player);
+      this.gameMaster.send("sync", this.getState());
     }
     return player;
   }
