@@ -1,7 +1,7 @@
 import Sprite = Phaser.Physics.Arcade.Sprite;
 import { Player } from "./player";
 
-const SPEED = 5;
+const SPEED = 50;
 
 export type EnemyState = {
   id: string;
@@ -25,7 +25,6 @@ export class Enemy extends Sprite {
 
   constructor(scene: Phaser.Scene, x: number, y: number, id?: string) {
     super(scene, x, y, "player");
-    this.setTint(0xff0000);
 
     scene.add.existing(this);
     scene.physics.add.existing(this);
@@ -51,20 +50,38 @@ export class Enemy extends Sprite {
     this.setVelocityX(velocityX);
     this.setVelocityY(velocityY);
 
-    const absVelocityX = Math.abs(velocityX);
-    const absVelocityY = Math.abs(velocityY);
-    if (absVelocityX > absVelocityY) {
-      if (velocityX > 0) {
-        this.anims.play("right", true);
-      } else {
-        this.anims.play("left", true);
-      }
-    } else {
-      if (velocityY > 0) {
-        this.anims.play("down", true);
-      } else {
-        this.anims.play("up", true);
-      }
+    let yMovement = "idle";
+    let xMovement = "idle";
+
+    if (velocityY < 0) {
+      yMovement = "up";
+    } else if (velocityY > 0) {
+      yMovement = "down";
+    }
+    if (velocityX < 0) {
+      xMovement = "left";
+    } else if (velocityX > 0) {
+      xMovement = "right";
+    }
+
+    // I do this to avoid the diagonal animations when little movement is happening in the x or y-axis
+    if (
+      yMovement !== "idle" &&
+      xMovement !== "idle" &&
+      Math.abs(velocityX) > 15 &&
+      Math.abs(velocityY) > 15
+    ) {
+      this.anims.play(`zombie-${yMovement}-${xMovement}`, true);
+    } else if (
+      yMovement !== "idle" &&
+      Math.abs(velocityY) > Math.abs(velocityX)
+    ) {
+      this.anims.play(`zombie-${yMovement}`, true);
+    } else if (
+      xMovement !== "idle" &&
+      Math.abs(velocityX) > Math.abs(velocityY)
+    ) {
+      this.anims.play(`zombie-${xMovement}`, true);
     }
   }
 

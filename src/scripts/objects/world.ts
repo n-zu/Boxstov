@@ -27,16 +27,19 @@ export class World {
 
     this.setupGameMaster(gameMaster);
 
-    const enemy = new Enemy(scene, 200, 200);
-    const enemy2 = new Enemy(scene, 0, 200);
+    const enemy = new Enemy(scene, 500, 200);
+    const enemy2 = new Enemy(scene, 200, 600);
     this.enemies = [enemy, enemy2];
 
     scene.physics.add.overlap(this.bulletGroup, this.enemies, (e, b) => {
       const bullet = b as Bullet;
       const enemy = e as Enemy;
 
-      bullet.destroy();
-      enemy.destroy();
+      if (bullet.active) {
+        enemy.destroy();
+        bullet.die();
+      }
+
       this.enemies = this.enemies.filter((e) => e.id !== enemy.id);
     });
   }
@@ -80,8 +83,8 @@ export class World {
     const playerId = Math.random().toString(36).substring(7);
     const player = new Player(
       scene,
-      100,
-      100,
+      800,
+      500,
       playerId,
       gameMaster,
       this.bulletGroup
@@ -89,10 +92,6 @@ export class World {
     this.playerControls = new PlayerControls(player);
 
     this.players = [player];
-
-    scene.input.on("pointerdown", (pointer) => {
-      player.shoot(pointer.x, pointer.y);
-    });
   }
 
   private getOrCreatePlayer(id: string): Player {
@@ -126,7 +125,7 @@ export class World {
     });
 
     gameMaster.addAction("shoot", (data: any) => {
-      this.getOrCreatePlayer(data.id).shoot(data.x, data.y, false);
+      this.getOrCreatePlayer(data.id).shoot(false);
     });
 
     gameMaster.addAction("stop", (data: any) => {

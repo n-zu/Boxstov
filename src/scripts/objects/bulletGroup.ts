@@ -1,4 +1,5 @@
 import { Bullet } from "./bullet";
+import { Direction } from "./player";
 
 type BulletState = {
   x: number;
@@ -22,10 +23,10 @@ export class BulletGroup extends Phaser.Physics.Arcade.Group {
     });
   }
 
-  public shootBullet(x: number, y: number, rotation: number) {
+  public shootBullet(x: number, y: number, direction: Direction) {
     const bullet = this.getFirstDead(false) as Bullet;
     if (bullet) {
-      bullet.fire(x, y, rotation);
+      bullet.fire(x, y, direction);
     }
   }
 

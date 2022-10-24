@@ -5,6 +5,7 @@ import { HostMaster } from "../hostMaster";
 
 const IDLE_FRAMERATE = 1;
 const RUN_FRAMERATE = 10;
+const ZOMBIE_RUN_FRAMERATE = 8;
 
 export default class MainScene extends Phaser.Scene {
   game: MultiplayerGame;
@@ -50,9 +51,9 @@ export default class MainScene extends Phaser.Scene {
       frameWidth: 512,
       frameHeight: 512,
     });
-    this.load.spritesheet("player-idle", "assets/idle.png", {
-      frameWidth: 32,
-      frameHeight: 32,
+    this.load.spritesheet("zombie", "assets/Mobs/zombie_map_big.png", {
+      frameWidth: 512,
+      frameHeight: 512,
     });
   }
 
@@ -214,6 +215,87 @@ export default class MainScene extends Phaser.Scene {
         end: 57,
       }),
       frameRate: IDLE_FRAMERATE,
+      repeat: -1,
+    });
+
+    // Zombie animations
+    this.anims.create({
+      key: "zombie-up",
+      frames: this.anims.generateFrameNumbers("zombie", {
+        start: 64,
+        end: 69,
+      }),
+      frameRate: ZOMBIE_RUN_FRAMERATE,
+      repeat: -1,
+    });
+
+    this.anims.create({
+      key: "zombie-right",
+      frames: this.anims.generateFrameNumbers("zombie", {
+        start: 20,
+        end: 23,
+      }),
+      frameRate: ZOMBIE_RUN_FRAMERATE,
+      repeat: -1,
+    });
+
+    this.anims.create({
+      key: "zombie-down",
+      frames: this.anims.generateFrameNumbers("zombie", {
+        start: 4,
+        end: 7,
+      }),
+      frameRate: ZOMBIE_RUN_FRAMERATE,
+      repeat: -1,
+    });
+
+    this.anims.create({
+      key: "zombie-left",
+      frames: this.anims.generateFrameNumbers("zombie", {
+        start: 96,
+        end: 99,
+      }),
+      frameRate: ZOMBIE_RUN_FRAMERATE,
+      repeat: -1,
+    });
+
+    this.anims.create({
+      key: "zombie-up-right",
+      frames: this.anims.generateFrameNumbers("zombie", {
+        start: 48,
+        end: 51,
+      }),
+      frameRate: ZOMBIE_RUN_FRAMERATE,
+      repeat: -1,
+    });
+
+    this.anims.create({
+      key: "zombie-up-left",
+      frames: this.anims.generateFrameNumbers("zombie", {
+        start: 80,
+        end: 83,
+      }),
+      frameRate: ZOMBIE_RUN_FRAMERATE,
+      repeat: -1,
+    });
+
+    this.anims.create({
+      key: "zombie-down-right",
+      frames: this.anims.generateFrameNumbers("zombie", {
+        start: 16,
+        end: 19,
+      }),
+      frameRate: ZOMBIE_RUN_FRAMERATE,
+      repeat: -1,
+    });
+
+    this.anims.create({
+      key: "zombie-down-left",
+      frames: this.anims.generateFrameNumbers("zombie", {
+        start: 112,
+        end: 115,
+      }),
+      frameRate: ZOMBIE_RUN_FRAMERATE,
       repeat: -1,
     });
   }

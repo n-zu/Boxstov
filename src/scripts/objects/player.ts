@@ -6,10 +6,20 @@ import Sprite = Phaser.Physics.Arcade.Sprite;
 const SPEED = 200;
 const diagonalFactor = Math.sqrt(2) / 2;
 
+export type Direction =
+  | "up"
+  | "down"
+  | "left"
+  | "right"
+  | "up-left"
+  | "up-right"
+  | "down-left"
+  | "down-right";
+
 export type MovementMessage = {
   type: "move";
   playerId: string;
-  direction: "up" | "down" | "left" | "right";
+  direction: Direction;
 };
 
 export type PlayerState = {
@@ -34,6 +44,7 @@ export class Player extends Sprite {
   gameMaster: GameMaster;
   bulletGroup: BulletGroup;
   id: string;
+  facing: Direction = "down";
 
   constructor(
     scene: Phaser.Scene,
@@ -61,16 +72,16 @@ export class Player extends Sprite {
     return this.id;
   }
 
-  public shoot(x: number, y: number, emitAlert = true) {
-    const angle = Phaser.Math.Angle.Between(this.x, this.y, x, y);
+  public shoot(emitAlert = true) {
+    console.log(this.facing);
+    const { x: xGun, y: yGun } = this.getGunPosition();
+
     if (emitAlert) {
       this.gameMaster.send("shoot", {
         id: this.id,
-        x: x,
-        y: y,
       });
     }
-    this.bulletGroup.shootBullet(this.x, this.y, angle);
+    this.bulletGroup.shootBullet(xGun, yGun, this.facing);
   }
 
   public move(
@@ -147,6 +158,7 @@ export class Player extends Sprite {
       });
     }
     this.anims.play("up", true);
+    this.facing = "up";
     this.setVelocity(0, -SPEED);
   }
 
@@ -158,6 +170,7 @@ export class Player extends Sprite {
       });
     }
     this.anims.play("down", true);
+    this.facing = "down";
     this.setVelocity(0, SPEED);
   }
 
@@ -169,6 +182,7 @@ export class Player extends Sprite {
       });
     }
     this.anims.play("left", true);
+    this.facing = "left";
     this.setVelocity(-SPEED, 0);
   }
 
@@ -180,6 +194,7 @@ export class Player extends Sprite {
       });
     }
     this.anims.play("right", true);
+    this.facing = "right";
     this.setVelocity(SPEED, 0);
   }
 
@@ -191,6 +206,7 @@ export class Player extends Sprite {
       });
     }
     this.anims.play("up-left", true);
+    this.facing = "up-left";
     this.setVelocity(-SPEED * diagonalFactor, -SPEED * diagonalFactor);
   }
 
@@ -203,6 +219,7 @@ export class Player extends Sprite {
     }
 
     this.anims.play("up-right", true);
+    this.facing = "up-right";
     this.setVelocity(SPEED * diagonalFactor, -SPEED * diagonalFactor);
   }
 
@@ -215,6 +232,7 @@ export class Player extends Sprite {
     }
 
     this.anims.play("down-left", true);
+    this.facing = "down-left";
     this.setVelocity(-SPEED * diagonalFactor, SPEED * diagonalFactor);
   }
 
@@ -227,6 +245,7 @@ export class Player extends Sprite {
     }
 
     this.anims.play("down-right", true);
+    this.facing = "down-right";
     this.setVelocity(SPEED * diagonalFactor, SPEED * diagonalFactor);
   }
 
@@ -270,5 +289,60 @@ export class Player extends Sprite {
       this.anims.play("up-idle", true);
     }
     this.setVelocity(0, 0);
+  }
+
+  private getGunPosition(): { x: number; y: number } {
+    // We should change this logic so that the bullet receives the position and angle
+    // of shooting, so that the bullet travels parallel to the player's gun
+    switch (this.facing) {
+      case "up":
+        return {
+          x: this.x + 15,
+          y: this.y + 20,
+        };
+      case "down":
+        return {
+          x: this.x - 16,
+          y: this.y,
+        };
+      case "left":
+        return {
+          x: this.x - 85,
+          y: this.y - 50,
+        };
+      case "right":
+        return {
+          x: this.x + 85,
+          y: this.y - 35,
+        };
+      case "up-left":
+        return {
+          x: this.x - 45,
+          y: this.y - 60,
+        };
+
+      case "up-right":
+        return {
+          x: this.x + 45,
+          y: this.y - 40,
+        };
+
+      case "down-left":
+        return {
+          x: this.x - 35,
+          y: this.y - 40,
+        };
+
+      case "down-right":
+        return {
+          x: this.x + 45,
+          y: this.y - 10,
+        };
+      default:
+        return {
+          x: this.x + 85,
+          y: this.y - 35,
+        };
+    }
   }
 }

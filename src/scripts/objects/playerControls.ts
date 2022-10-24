@@ -11,8 +11,8 @@ export class PlayerControls {
   }
 
   update() {
-    const amountOfKeysDown = this.getAmountOfKeysDown();
-    if (amountOfKeysDown === 1) {
+    const amountOfArrowsDown = this.getAmountOfArrowsDown();
+    if (amountOfArrowsDown === 1) {
       if (this.cursorKeys.up.isDown) {
         this.player.moveUp(true);
       }
@@ -26,7 +26,7 @@ export class PlayerControls {
         this.player.moveRight(true);
       }
     }
-    if (amountOfKeysDown === 2) {
+    if (amountOfArrowsDown === 2) {
       if (this.cursorKeys.up.isDown && this.cursorKeys.left.isDown) {
         this.player.moveUpLeft(true);
       }
@@ -40,12 +40,16 @@ export class PlayerControls {
         this.player.moveDownRight(true);
       }
     }
-    if (amountOfKeysDown === 0) {
+    if (amountOfArrowsDown === 0) {
       this.player.stopMovement(true);
+    }
+
+    if (Phaser.Input.Keyboard.JustDown(this.cursorKeys.space)) {
+      this.player.shoot(true);
     }
   }
 
-  private getAmountOfKeysDown() {
+  private getAmountOfArrowsDown() {
     let count = 0;
     if (this.cursorKeys.up.isDown) {
       count++;
