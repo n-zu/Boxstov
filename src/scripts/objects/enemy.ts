@@ -24,10 +24,11 @@ export class Enemy extends Sprite {
   id: string;
 
   constructor(scene: Phaser.Scene, x: number, y: number, id?: string) {
-    super(scene, x, y, "player");
-
+    super(scene, x, y, "zombie");
     scene.add.existing(this);
     scene.physics.add.existing(this);
+
+    this.scale = 0.5;
 
     if (id) {
       this.id = id;

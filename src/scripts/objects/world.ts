@@ -92,6 +92,15 @@ export class World {
     this.playerControls = new PlayerControls(player);
 
     this.players = [player];
+
+    scene.cameras.main.startFollow(player);
+
+    scene.add.existing(player);
+    scene.physics.add.existing(player);
+
+    scene.input.on("wheel", (pointer, gameObjects, deltaX, deltaY, deltaZ) => {
+      scene.cameras.main.zoom -= deltaY * 0.001;
+    });
   }
 
   private getOrCreatePlayer(id: string): Player {

@@ -64,7 +64,7 @@ export class Player extends Sprite {
     this.gameMaster = gameMaster;
     this.bulletGroup = bulletGroup;
 
-    this.scale = 0.5;
+    this.scale = 0.25;
     this.anims.play("down-idle", true);
   }
 
