@@ -23,7 +23,7 @@ const gameConfig = {
   physics: {
     default: "arcade",
     arcade: {
-      debug: false,
+      debug: false, //true,
     },
   },
 };

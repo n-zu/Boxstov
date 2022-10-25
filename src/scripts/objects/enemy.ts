@@ -28,7 +28,8 @@ export class Enemy extends Sprite {
     scene.add.existing(this);
     scene.physics.add.existing(this);
 
-    this.scale = 0.5;
+    this.scale = 0.8;
+    this.setBodySize(50, 80);
 
     if (id) {
       this.id = id;
@@ -52,11 +53,18 @@ export class Enemy extends Sprite {
       closestPlayer.x,
       closestPlayer.y
     );
+    const distance = Phaser.Math.Distance.Between(
+      this.x,
+      this.y,
+      closestPlayer.x,
+      closestPlayer.y
+    );
+    const isFar = distance > 70 ? 1 : 0;
     const velocityX = Math.cos(angle) * SPEED;
     const velocityY = Math.sin(angle) * SPEED;
 
-    this.setVelocityX(velocityX);
-    this.setVelocityY(velocityY);
+    this.setVelocityX(velocityX * isFar);
+    this.setVelocityY(velocityY * isFar);
 
     let yMovement = "idle";
     let xMovement = "idle";
@@ -72,6 +80,8 @@ export class Enemy extends Sprite {
       xMovement = "right";
     }
 
+    const suffix = isFar ? "" : "-atk";
+
     // I do this to avoid the diagonal animations when little movement is happening in the x or y-axis
     if (
       yMovement !== "idle" &&
@@ -79,24 +89,27 @@ export class Enemy extends Sprite {
       Math.abs(velocityX) > 15 &&
       Math.abs(velocityY) > 15
     ) {
-      this.anims.play(`zombie-${yMovement}-${xMovement}`, true);
+      this.anims.play(`zombie-${yMovement}-${xMovement}${suffix}`, true);
     } else if (
       yMovement !== "idle" &&
       Math.abs(velocityY) > Math.abs(velocityX)
     ) {
-      this.anims.play(`zombie-${yMovement}`, true);
+      this.anims.play(`zombie-${yMovement}${suffix}`, true);
     } else if (
       xMovement !== "idle" &&
       Math.abs(velocityX) > Math.abs(velocityY)
     ) {
-      this.anims.play(`zombie-${xMovement}`, true);
+      this.anims.play(`zombie-${xMovement}${suffix}`, true);
     }
+
+    this.setDepth(this.y);
   }
 
   public sync(state: EnemyState) {
     this.setPosition(state.position.x, state.position.y);
     this.setVelocity(state.velocity.x, state.velocity.y);
     this.setRotation(state.rotation);
+    this.setDepth(this.y);
     if (state.animation) {
       this.anims.play(state.animation.key, true);
     }
@@ -128,7 +141,7 @@ export class Enemy extends Sprite {
   private getClosesPlayer(players: Player[]): Player {
     let closestPlayer: Player = players[0];
     let distanceToClosestPlayer: number | null = null;
-    for (let player of players) {
+    for (const player of players) {
       const distance = Phaser.Math.Distance.Between(
         this.x,
         this.y,
