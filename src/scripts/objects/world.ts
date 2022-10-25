@@ -27,9 +27,11 @@ export class World {
 
     this.setupGameMaster(gameMaster);
 
-    const enemy = new Enemy(scene, 500, 200);
-    const enemy2 = new Enemy(scene, 200, 600);
-    this.enemies = [enemy, enemy2];
+    this.enemies = [];
+    for (let i = 0; i < 50; i++) {
+      const enemy = new Enemy(scene, 500 + Math.random() * 500, 200);
+      this.enemies.push(enemy);
+    }
 
     scene.physics.add.overlap(this.bulletGroup, this.enemies, (e, b) => {
       const bullet = b as Bullet;

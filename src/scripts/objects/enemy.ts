@@ -38,6 +38,13 @@ export class Enemy extends Sprite {
   }
 
   public update(players: Player[]) {
+    // This allows random movement and improves performance by not updating
+    // the enemy every frame. We should consider the consequences of using
+    // randomness, because the guest will calculate a different path. Maybe
+    // we should use a seed
+    if (Math.random() < 0.95) {
+      return;
+    }
     const closestPlayer = this.getClosesPlayer(players);
     const angle = Phaser.Math.Angle.Between(
       this.x,
