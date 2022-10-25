@@ -98,4 +98,5 @@ input:hover {
 canvas {
   background-image: url("https://t4.ftcdn.net/jpg/00/74/04/43/360_F_74044371_fHXDQ9UrOTRkZffoef1QXtuYX7suMNXr.jpg");
   box-shadow: inset 0 0 500px 20px #000;
+  background-size: 360px 200px;
 }
