@@ -5,6 +5,7 @@ import { HostMaster } from "../hostMaster";
 
 const IDLE_FRAMERATE = 1;
 const RUN_FRAMERATE = 10;
+const ZOMBIE_WALK_FRAMERATE = 8;
 const ZOMBIE_RUN_FRAMERATE = 8;
 
 export default class MainScene extends Phaser.Scene {
@@ -21,8 +22,9 @@ export default class MainScene extends Phaser.Scene {
 
     const factor = 3;
     this.add
-      .tileSprite(150, 100, 300 * factor, 200 * factor, "tiles")
-      .setScale(1 / factor);
+      .tileSprite(0, 0, 6000 * factor, 4000 * factor, "tiles")
+      .setScale(1 / factor)
+      .setDepth(-9999999);
 
     // FIXME: Need a way to get the ids
 
@@ -225,6 +227,49 @@ export default class MainScene extends Phaser.Scene {
     });
 
     // Zombie animations
+
+    const zombieKeys = [
+      "zombie-down",
+      "zombie-down-right",
+      "zombie-right",
+      "zombie-up-right",
+      "zombie-up",
+      "zombie-up-left",
+      "zombie-left",
+      "zombie-down-left",
+    ];
+
+    zombieKeys.forEach((key, index) => {
+      this.anims.create({
+        key,
+        frames: this.anims.generateFrameNumbers("zombie", {
+          start: index * 16,
+          end: index * 16 + 3,
+        }),
+        frameRate: ZOMBIE_WALK_FRAMERATE,
+        repeat: -1,
+      });
+      this.anims.create({
+        key: key + "-run",
+        frames: this.anims.generateFrameNumbers("zombie", {
+          start: index * 16 + 4,
+          end: index * 16 + 3 + 4,
+        }),
+        frameRate: ZOMBIE_RUN_FRAMERATE,
+        repeat: -1,
+      });
+      this.anims.create({
+        key: key + "-atk",
+        frames: this.anims.generateFrameNumbers("zombie", {
+          start: index * 16 + 4 * 2,
+          end: index * 16 + 3 + 4 * 2,
+        }),
+        frameRate: ZOMBIE_RUN_FRAMERATE,
+        repeat: -1,
+      });
+    });
+
+    /*
     this.anims.create({
       key: "zombie-up",
       frames: this.anims.generateFrameNumbers("zombie", {
@@ -303,6 +348,6 @@ export default class MainScene extends Phaser.Scene {
       }),
       frameRate: ZOMBIE_RUN_FRAMERATE,
       repeat: -1,
-    });
+    });*/
   }
 }
