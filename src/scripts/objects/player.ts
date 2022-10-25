@@ -78,6 +78,13 @@ export class Player extends Sprite {
 
   public shoot(emitAlert = true) {
     console.log(this.facing);
+
+    {
+      const aud = new Audio("/assets/shoot.mp3");
+      aud.volume = 0.1;
+      aud.play();
+    }
+
     const { x: xGun, y: yGun } = this.getGunPosition();
 
     if (emitAlert) {
@@ -302,7 +309,7 @@ export class Player extends Sprite {
       case "up":
         return {
           x: this.x + 15,
-          y: this.y + 20,
+          y: this.y - 120,
         };
       case "down":
         return {
@@ -311,24 +318,24 @@ export class Player extends Sprite {
         };
       case "left":
         return {
-          x: this.x - 85,
-          y: this.y - 50,
+          x: this.x - 95,
+          y: this.y - 75,
         };
       case "right":
         return {
-          x: this.x + 85,
-          y: this.y - 35,
+          x: this.x + 95,
+          y: this.y - 65,
         };
       case "up-left":
         return {
-          x: this.x - 45,
-          y: this.y - 60,
+          x: this.x - 75,
+          y: this.y - 120,
         };
 
       case "up-right":
         return {
-          x: this.x + 45,
-          y: this.y - 40,
+          x: this.x + 95,
+          y: this.y - 120,
         };
 
       case "down-left":

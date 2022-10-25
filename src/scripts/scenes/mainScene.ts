@@ -54,7 +54,7 @@ export default class MainScene extends Phaser.Scene {
 
   preload() {
     this.load.image("tiles", "assets/Floor.png");
-    this.load.image("bullet", "assets/bullet.png");
+    this.load.image("bullet", "assets/strip.png");
     this.load.spritesheet("player", "assets/Player/rifle_map.png", {
       frameWidth: 512,
       frameHeight: 512,

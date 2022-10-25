@@ -4,10 +4,18 @@ import { Direction } from "./player";
 const DIAGONAL_FACTOR = Math.sqrt(2) / 2;
 
 export class Bullet extends Sprite {
+  constructor(scene: Phaser.Scene, x: number, y: number) {
+    super(scene, x, y, "bullet");
+  }
+
   public fire(x: number, y: number, direction: Direction) {
-    const speed = 2500;
+    const speed = 2000;
     const [velocityX, velocityY] = this.getVelocity(direction, speed);
     const rotation = Math.atan2(velocityY, velocityX);
+
+    this.setScale(0.5);
+    this.setAlpha(0.3);
+    this.setBodySize(70, 70);
 
     this.setPosition(x, y);
     this.setRotation(rotation);

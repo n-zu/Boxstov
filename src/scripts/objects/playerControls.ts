@@ -1,6 +1,8 @@
 import CursorKeys = Phaser.Types.Input.Keyboard.CursorKeys;
 import { Player } from "./player";
 
+let lasShot = 0;
+
 export class PlayerControls {
   cursorKeys: CursorKeys;
   player: Player;
@@ -46,6 +48,15 @@ export class PlayerControls {
 
     if (Phaser.Input.Keyboard.JustDown(this.cursorKeys.space)) {
       this.player.shoot(true);
+    }
+
+    // if mouse click
+    if (this.player.scene.input.activePointer.isDown) {
+      const now = Date.now();
+      if (now - lasShot > 100) {
+        lasShot = now;
+        this.player.shoot(true);
+      }
     }
   }
 
