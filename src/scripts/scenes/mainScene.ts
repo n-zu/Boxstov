@@ -20,12 +20,6 @@ export default class MainScene extends Phaser.Scene {
   create() {
     this.createAnimations();
 
-    const factor = 3;
-    this.add
-      .tileSprite(0, 0, 6000 * factor, 4000 * factor, "tiles")
-      .setScale(1 / factor)
-      .setDepth(-9999999);
-
     // FIXME: Need a way to get the ids
 
     this.world = new World(this, this.game.gameMaster);

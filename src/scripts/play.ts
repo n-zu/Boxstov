@@ -26,6 +26,7 @@ const gameConfig = {
       debug: false,
     },
   },
+  transparent: true,
 };
 
 export function addUrl(id: string) {

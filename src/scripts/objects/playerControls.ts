@@ -58,6 +58,14 @@ export class PlayerControls {
         this.player.shoot(true);
       }
     }
+
+    {
+      const canvas = document.querySelector("canvas");
+      if (canvas && canvas.style) {
+        canvas.style.backgroundPositionX = `${-this.player.x}px`;
+        canvas.style.backgroundPositionY = `${-this.player.y}px`;
+      }
+    }
   }
 
   private getAmountOfArrowsDown() {
