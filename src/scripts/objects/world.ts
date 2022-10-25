@@ -38,15 +38,18 @@ export class World {
       if (bullet.active) {
         enemy.destroy();
         bullet.die();
+        this.enemies = this.enemies.filter(
+          (anEnemy) => anEnemy.id !== enemy.id
+        );
       }
-
-      this.enemies = this.enemies.filter((e) => e.id !== enemy.id);
     });
   }
 
   public update() {
     this.playerControls.update();
-    this.enemies.forEach((enemy) => enemy.update(this.players));
+    this.enemies.forEach((enemy) => {
+      enemy.update(this.players);
+    });
   }
 
   public sync(worldState: WorldState) {
