@@ -1,8 +1,6 @@
 import Sprite = Phaser.Physics.Arcade.Sprite;
 import { Direction, getUnitVector } from "./player";
 
-const DIAGONAL_FACTOR = Math.sqrt(2) / 2;
-
 export class Bullet extends Sprite {
   damage = 50;
 

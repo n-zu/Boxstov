@@ -28,7 +28,7 @@ export class World {
     this.setupGameMaster(gameMaster);
 
     this.enemies = [];
-    for (let i = 0; i < 50; i++) {
+    for (let i = 0; i < 1; i++) {
       const enemy = new Enemy(scene, 500 + Math.random() * 500, 200);
       this.enemies.push(enemy);
       enemy.onAction("die", () => {

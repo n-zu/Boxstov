@@ -1,6 +1,6 @@
 import Sprite = Phaser.Physics.Arcade.Sprite;
 import { Direction, Player } from "./player";
-import { AnimationSuffix } from "../scenes/mainScene";
+import { AnimationActor, AnimationSuffix } from "../scenes/mainScene";
 import { Action } from "../gameMaster";
 
 const SPEED = 50;
@@ -28,6 +28,7 @@ export class Enemy extends Sprite {
   id: string;
   health = 100;
   actions: Action[] = [];
+  facing: Direction = Direction.Down;
 
   constructor(scene: Phaser.Scene, x: number, y: number, id?: string) {
     super(scene, x, y, "zombie");
@@ -87,6 +88,7 @@ export class Enemy extends Sprite {
     );
 
     if (direction) {
+      this.facing = direction;
       this.playAnimation(direction, isFar === 0);
     }
     this.setDepth(this.y);
@@ -141,7 +143,7 @@ export class Enemy extends Sprite {
 
   private playAnimation(direction: Direction, attack: boolean) {
     const suffix = attack ? AnimationSuffix.Attack : AnimationSuffix.Run;
-    this.anims.play(`zombie-${direction}-${suffix}`, true);
+    this.anims.play(`${AnimationActor.Zombie}-${direction}-${suffix}`, true);
   }
 
   private getMovementAnimationDirection(
@@ -193,21 +195,16 @@ export class Enemy extends Sprite {
     return closestPlayer;
   }
 
+  private playDeathAnimation() {
+    this.anims.play(`${AnimationActor.Zombie}-${this.facing}-${AnimationSuffix.Die}`, true);
+  }
+
   private die() {
-    const directions: string[] = [];
-
-    if (this.body.velocity.y > 0) directions.push("down");
-    else if (this.body.velocity.y < 0) directions.push("up");
-
-    if (this.body.velocity.x > 0) directions.push("right");
-    else if (this.body.velocity.x < 0) directions.push("left");
-
-    const direction = directions.join("-") || "down";
-
     this.setVelocity(0, 0);
-    this.setOffset(9999, 9999); // re trucho esto . FIXME
+    this.body.enable = false;
 
-    this.anims.play(`zombie-${direction}-die`, true);
+    this.playDeathAnimation();
+
     this.scene.time.delayedCall(3000, () => {
       const callback = this.actions.find(
         action => action.type === "die"

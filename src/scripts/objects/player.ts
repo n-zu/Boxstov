@@ -2,10 +2,13 @@ import { GameMaster } from "../gameMaster";
 import * as Phaser from "phaser";
 import { BulletGroup } from "./bulletGroup";
 import { AnimationActor, AnimationSuffix } from "../scenes/mainScene";
+import { BaseMessage } from "../hostMaster";
 import Sprite = Phaser.Physics.Arcade.Sprite;
 
 const SPEED = 200;
 const diagonalFactor = Math.sqrt(2) / 2;
+const SYNC_DIFF_TOLERANCE = 50;
+const SYNC_DEPTH_TOLERANCE = 0.1;
 
 export enum Direction {
   Up,
@@ -16,6 +19,11 @@ export enum Direction {
   UpRight,
   DownLeft,
   DownRight,
+}
+
+export type PlayerMessage = {
+  id: string;
+  payload: PlayerState;
 }
 
 export function getUnitVector(direction: Direction): [number, number] {
@@ -38,12 +46,6 @@ export function getUnitVector(direction: Direction): [number, number] {
       return [diagonalFactor, diagonalFactor];
   }
 }
-
-export type MovementMessage = {
-  type: "move";
-  playerId: string;
-  direction: Direction;
-};
 
 export type PlayerState = {
   id: string;
@@ -100,8 +102,6 @@ export class Player extends Sprite {
   }
 
   public shoot(emitAlert = true) {
-    console.log(this.facing);
-
     {
       const aud = new Audio("/assets/shoot.mp3");
       aud.volume = 0.1;
@@ -111,8 +111,11 @@ export class Player extends Sprite {
     const { x: xGun, y: yGun } = this.getGunPosition();
 
     if (emitAlert) {
-      this.gameMaster.send("shoot", {
-        id: this.id
+      this.gameMaster.send("player", {
+        id: this.id,
+        payload: {
+          type: "shoot"
+        }
       });
     }
     this.bulletGroup.shootBullet(xGun, yGun, this.facing);
@@ -131,9 +134,9 @@ export class Player extends Sprite {
   }
 
   public sync(state: PlayerState) {
-    this.setPosition(state.position.x, state.position.y);
-    this.setDepth(state.position.y);
-    this.setVelocity(state.velocity.x, state.velocity.y);
+    this.syncPosition(state.position);
+    this.syncVelocity(state.velocity);
+    this.syncDepth(state.position.y);
     this.setRotation(state.rotation);
     if (state.animation) {
       // There is a bug here, probably
@@ -183,13 +186,18 @@ export class Player extends Sprite {
 
   public stopMovement(emitAlert = true) {
     if (this.isMoving() && emitAlert) {
-      this.gameMaster.send("stop", { id: this.id });
+      this.gameMaster.send("player", {
+        id: this.id,
+        payload: {
+          type: "stop"
+        }
+      });
     }
     this.playIdleAnimation(this.facing);
     this.setVelocity(0, 0);
   }
 
-  public handleMessage(message: any) {
+  public handleMessage(message: BaseMessage) {
     switch (message.type) {
       case "move":
         this.move(message.direction, false);
@@ -203,6 +211,29 @@ export class Player extends Sprite {
     }
   }
 
+  private syncDepth(y: number) {
+    if (Math.abs(this.y - y) > SYNC_DEPTH_TOLERANCE) {
+      this.setDepth(y);
+    }
+  }
+
+  private syncVelocity(velocity: { x: number; y: number }) {
+    if (
+      Math.abs(this.body.velocity.x - velocity.x) > SYNC_DIFF_TOLERANCE ||
+      Math.abs(this.body.velocity.y - velocity.y) > SYNC_DIFF_TOLERANCE
+    ) {
+      this.setVelocity(velocity.x, velocity.y);
+    }
+  }
+
+  private syncPosition(position: { x: number; y: number }) {
+    const diffX = Math.abs(this.x - position.x);
+    const diffY = Math.abs(this.y - position.y);
+    if (diffX > SYNC_DIFF_TOLERANCE || diffY > SYNC_DIFF_TOLERANCE) {
+      this.setPosition(position.x, position.y);
+    }
+  }
+
   private isMoving(): boolean {
     return this.body.velocity.x !== 0 || this.body.velocity.y !== 0;
   }
@@ -213,9 +244,12 @@ export class Player extends Sprite {
   }
 
   private sendMovementMessage(direction: Direction) {
-    this.gameMaster.send("move", {
+    this.gameMaster.send("player", {
       id: this.id,
-      direction
+      payload: {
+        type: "move",
+        direction
+      }
     });
   }
 

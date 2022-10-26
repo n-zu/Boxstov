@@ -6,6 +6,8 @@ import { Direction } from "../objects/player";
 
 const IDLE_FRAMERATE = 1;
 const RUN_FRAMERATE = 10;
+const ATTACK_FRAMERATE = 10;
+const DEATH_FRAMERATE = 10;
 const ZOMBIE_WALK_FRAMERATE = 8;
 const ZOMBIE_RUN_FRAMERATE = 8;
 
@@ -19,6 +21,7 @@ export enum AnimationSuffix {
   Idle = "idle",
   Run = "run",
   Attack = "atk",
+  Die = "die",
 }
 
 export default class MainScene extends Phaser.Scene {
@@ -89,34 +92,48 @@ export default class MainScene extends Phaser.Scene {
     ];
 
     directions.forEach((direction, index) => {
-      this.createMovementAnimation(AnimationActor.Player, direction, AnimationSuffix.Idle, index * 8, index * 8 + 1);
-      this.createMovementAnimation(AnimationActor.Player, direction, AnimationSuffix.Run, index * 8 + 2, index * 8 + 7);
+      this.createAnimation(AnimationActor.Player, direction, AnimationSuffix.Idle, index * 8, index * 8 + 1);
+      this.createAnimation(AnimationActor.Player, direction, AnimationSuffix.Run, index * 8 + 2, index * 8 + 7);
 
-      this.createMovementAnimation(AnimationActor.Zombie, direction, AnimationSuffix.Run, index * 16, index * 16 + 3, ZOMBIE_RUN_FRAMERATE);
-      this.createMovementAnimation(AnimationActor.Zombie, direction, AnimationSuffix.Idle, index * 16 + 4, index * 16 + 7, ZOMBIE_WALK_FRAMERATE);
-      this.createAttackAnimation(AnimationActor.Zombie, direction, index * 16 + 8, index * 16 + 11);
+      this.createAnimation(AnimationActor.Zombie, direction, AnimationSuffix.Run, index * 16, index * 16 + 3, ZOMBIE_RUN_FRAMERATE);
+      this.createAnimation(AnimationActor.Zombie, direction, AnimationSuffix.Idle, index * 16 + 4, index * 16 + 7, ZOMBIE_WALK_FRAMERATE);
+      this.createAnimation(AnimationActor.Zombie, direction, AnimationSuffix.Attack, index * 16 + 8, index * 16 + 11);
+    });
+
+    const directionsDie = [
+      Direction.Left,
+      Direction.DownLeft,
+      Direction.Down,
+      Direction.DownRight,
+      Direction.Right,
+      Direction.UpRight,
+      Direction.Up,
+      Direction.UpLeft
+    ];
+
+    directionsDie.forEach((direction, index) => {
+      this.createAnimation(AnimationActor.Zombie, direction, AnimationSuffix.Die, index * 16 + 12, index * 16 + 15, DEATH_FRAMERATE);
     });
 
   }
 
-  private createAttackAnimation(actor: AnimationActor, direction: Direction, startFrame: number, endFrame: number) {
-    this.anims.create({
-      key: `${actor}-${direction}-atk`,
-      frames: this.anims.generateFrameNumbers(actor, {
-        start: startFrame,
-        end: endFrame
-      }),
-      frameRate: RUN_FRAMERATE,
-      repeat: -1
-    });
-  }
-
-  private createMovementAnimation(actor: AnimationActor, direction: Direction, suffix: AnimationSuffix, startFrame: number, endFrame: number, frameRate?: number) {
+  private createAnimation(actor: AnimationActor, direction: Direction, suffix: AnimationSuffix, startFrame: number, endFrame: number, frameRate?: number) {
     let frameRateToUse = frameRate;
-    if (suffix === AnimationSuffix.Run) {
-      frameRateToUse = RUN_FRAMERATE;
-    } else {
-      frameRateToUse = IDLE_FRAMERATE;
+    if (!frameRateToUse) {
+      switch (suffix) {
+        case AnimationSuffix.Idle:
+          frameRateToUse = IDLE_FRAMERATE;
+          break;
+        case AnimationSuffix.Run:
+          frameRateToUse = RUN_FRAMERATE;
+          break;
+        case AnimationSuffix.Attack:
+          frameRateToUse = ATTACK_FRAMERATE;
+          break;
+        case AnimationSuffix.Die:
+          frameRateToUse = DEATH_FRAMERATE;
+          break;
+      }
     }
 
     this.anims.create({
@@ -126,17 +143,7 @@ export default class MainScene extends Phaser.Scene {
         end: endFrame
       }),
       frameRate: frameRateToUse,
-      repeat: -1
-    });
-
-    this.anims.create({
-      key: "zombie-down-left",
-      frames: this.anims.generateFrameNumbers("zombie", {
-        start: 112,
-        end: 115
-      }),
-      frameRate: ZOMBIE_RUN_FRAMERATE,
-      repeat: -1
+      repeat: suffix == AnimationSuffix.Die ? 0 : -1
     });
   }
 }

@@ -1,4 +1,5 @@
 import Peer from "peerjs";
+import { Message } from "./hostMaster";
 
 
 export type Action = {
@@ -18,7 +19,7 @@ export abstract class GameMaster {
     this.actions.push({ type, action });
   }
 
-  public abstract send(type: string, data: any): void;
+  public abstract send(type: string, message: Message): void;
 
   createPeer(socketId?: string): Peer {
     if (socketId) {

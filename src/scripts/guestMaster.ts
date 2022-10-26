@@ -29,9 +29,14 @@ export class GuestMaster extends GameMaster {
     this.actions.push({ type, action });
   }
 
-  public send(type: string, data: any) {
+  public send(type: string, payload: Message) {
+    const msg = {
+      type,
+      payload
+    } as Message;
+
     if (this.socket) {
-      this.socket.send({ type, data });
+      this.socket.send(msg);
     }
   }
 
@@ -40,7 +45,7 @@ export class GuestMaster extends GameMaster {
       const msg = data as Message;
       this.actions.forEach((action) => {
         if (action.type === msg.type) {
-          action.action(msg.data);
+          action.action(msg.payload);
         }
       });
     });
