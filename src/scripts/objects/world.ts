@@ -31,18 +31,19 @@ export class World {
     for (let i = 0; i < 50; i++) {
       const enemy = new Enemy(scene, 500 + Math.random() * 500, 200);
       this.enemies.push(enemy);
+      enemy.onAction("die", () => {
+        enemy.destroy();
+        this.enemies = this.enemies.filter(
+          (anEnemy) => anEnemy.id !== enemy.id
+        );
+      });
     }
 
     scene.physics.add.overlap(this.bulletGroup, this.enemies, (e, b) => {
       const bullet = b as Bullet;
       const enemy = e as Enemy;
       if (bullet.active) {
-        enemy.receiveDamage(bullet.damage, () => {
-          enemy.destroy();
-          this.enemies = this.enemies.filter(
-            (anEnemy) => anEnemy.id !== enemy.id
-          );
-        });
+        enemy.receiveDamage(bullet.damage);
 
         bullet.die();
       }
@@ -105,7 +106,7 @@ export class World {
 
     scene.cameras.main.startFollow(player);
 
-    scene.input.on("wheel", (pointer, gameObjects, deltaX, deltaY, deltaZ) => {
+    scene.input.on("wheel", (pointer, gameObjects, deltaX, deltaY) => {
       scene.cameras.main.zoom -= deltaY * 0.001;
       {
         const canvas = document.querySelector("canvas");
@@ -143,16 +144,9 @@ export class World {
   }
 
   private setupGameMaster(gameMaster: GameMaster) {
-    gameMaster.addAction("move", (data: any) => {
-      this.getOrCreatePlayer(data.id).move(data.direction);
-    });
-
-    gameMaster.addAction("shoot", (data: any) => {
-      this.getOrCreatePlayer(data.id).shoot(false);
-    });
-
-    gameMaster.addAction("stop", (data: any) => {
-      this.getOrCreatePlayer(data.id).stopMovement(false);
+    gameMaster.addAction("player", (data: any) => {
+      const player = this.getOrCreatePlayer(data.id);
+      player.handleMessage(data.payload);
     });
 
     gameMaster.addAction("sync", (data: any) => {

@@ -1,8 +1,11 @@
 import Sprite = Phaser.Physics.Arcade.Sprite;
 import { Direction, Player } from "./player";
 import { AnimationSuffix } from "../scenes/mainScene";
+import { Action } from "../gameMaster";
 
 const SPEED = 50;
+
+export type EnemyActionType = "die";
 
 export type EnemyState = {
   id: string;
@@ -24,6 +27,7 @@ export type EnemyState = {
 export class Enemy extends Sprite {
   id: string;
   health = 100;
+  actions: Action[] = [];
 
   constructor(scene: Phaser.Scene, x: number, y: number, id?: string) {
     super(scene, x, y, "zombie");
@@ -38,6 +42,10 @@ export class Enemy extends Sprite {
     } else {
       this.id = Phaser.Math.RND.uuid();
     }
+  }
+
+  public onAction(actionMsg: EnemyActionType, callback: () => void) {
+    this.actions.push({ type: actionMsg, action: callback });
   }
 
   public update(players: Player[]) {
@@ -117,6 +125,20 @@ export class Enemy extends Sprite {
     };
   }
 
+  public receiveDamage(damage: number) {
+    if (this.health <= 0) return;
+
+    this.health -= damage;
+
+    // paint red for a second
+    this.setTint(0xff0000);
+    this.scene.time.delayedCall(100, () => {
+      this && this.clearTint();
+    });
+
+    if (this.health <= 0) this.die();
+  }
+
   private playAnimation(direction: Direction, attack: boolean) {
     const suffix = attack ? AnimationSuffix.Attack : AnimationSuffix.Run;
     this.anims.play(`zombie-${direction}-${suffix}`, true);
@@ -171,21 +193,7 @@ export class Enemy extends Sprite {
     return closestPlayer;
   }
 
-  public receiveDamage(damage: number, onDeath: () => void) {
-    if (this.health <= 0) return;
-
-    this.health -= damage;
-
-    // paint red for a second
-    this.setTint(0xff0000);
-    this.scene.time.delayedCall(100, () => {
-      this && this.clearTint();
-    });
-
-    if (this.health <= 0) this.die(onDeath);
-  }
-
-  private die(onDeath: () => void) {
+  private die() {
     const directions: string[] = [];
 
     if (this.body.velocity.y > 0) directions.push("down");
@@ -201,7 +209,12 @@ export class Enemy extends Sprite {
 
     this.anims.play(`zombie-${direction}-die`, true);
     this.scene.time.delayedCall(3000, () => {
-      onDeath();
+      const callback = this.actions.find(
+        action => action.type === "die"
+      );
+      if (callback) {
+        callback.action();
+      }
     });
   }
 }

@@ -189,6 +189,20 @@ export class Player extends Sprite {
     this.setVelocity(0, 0);
   }
 
+  public handleMessage(message: any) {
+    switch (message.type) {
+      case "move":
+        this.move(message.direction, false);
+        break;
+      case "stop":
+        this.stopMovement(false);
+        break;
+      case "shoot":
+        this.shoot(false);
+        break;
+    }
+  }
+
   private isMoving(): boolean {
     return this.body.velocity.x !== 0 || this.body.velocity.y !== 0;
   }

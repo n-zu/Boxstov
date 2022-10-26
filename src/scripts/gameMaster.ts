@@ -1,10 +1,9 @@
 import Peer from "peerjs";
 
-export type Direction = "up" | "down" | "left" | "right";
 
 export type Action = {
   type: string;
-  action: (any) => void;
+  action: (any?) => void;
 };
 
 export abstract class GameMaster {

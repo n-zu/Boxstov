@@ -25,6 +25,8 @@ export default class MainScene extends Phaser.Scene {
   game: MultiplayerGame;
   world: World;
   gameMaster: GameMaster;
+  syncCountdown = 30;
+  tileSprite: Phaser.GameObjects.TileSprite;
 
   protected constructor() {
     super({ key: "MainScene" });
@@ -38,13 +40,6 @@ export default class MainScene extends Phaser.Scene {
     this.world = new World(this, this.game.gameMaster);
 
     this.gameMaster = this.game.gameMaster;
-
-    // FIXME: :(
-    if (this.gameMaster instanceof HostMaster) {
-      setInterval(() => {
-        this.gameMaster.send("sync", this.world.getState());
-      }, 500);
-    }
   }
 
   public getState(): WorldState {
@@ -56,6 +51,15 @@ export default class MainScene extends Phaser.Scene {
   }
 
   update() {
+    // FIXME: :(
+    if (this.syncCountdown == 0) {
+      if (this.gameMaster instanceof HostMaster) {
+        this.gameMaster.send("sync", this.world.getState());
+        this.syncCountdown = 30;
+      }
+    } else {
+      this.syncCountdown--;
+    }
     this.world.update();
   }
 
@@ -64,11 +68,11 @@ export default class MainScene extends Phaser.Scene {
     this.load.image("bullet", "assets/strip.png");
     this.load.spritesheet("player", "assets/Player/rifle_map.png", {
       frameWidth: 512,
-      frameHeight: 512,
+      frameHeight: 512
     });
     this.load.spritesheet("zombie", "assets/Mobs/zombie_map_big.png", {
       frameWidth: 512,
-      frameHeight: 512,
+      frameHeight: 512
     });
   }
 
@@ -85,7 +89,7 @@ export default class MainScene extends Phaser.Scene {
     ];
 
     directions.forEach((direction, index) => {
-      this.createMovementAnimation(AnimationActor.Player, direction, AnimationSuffix.Idle, index * 8 + 1, index * 8 + 3);
+      this.createMovementAnimation(AnimationActor.Player, direction, AnimationSuffix.Idle, index * 8, index * 8 + 1);
       this.createMovementAnimation(AnimationActor.Player, direction, AnimationSuffix.Run, index * 8 + 2, index * 8 + 7);
 
       this.createMovementAnimation(AnimationActor.Zombie, direction, AnimationSuffix.Run, index * 16, index * 16 + 3, ZOMBIE_RUN_FRAMERATE);
@@ -129,10 +133,10 @@ export default class MainScene extends Phaser.Scene {
       key: "zombie-down-left",
       frames: this.anims.generateFrameNumbers("zombie", {
         start: 112,
-        end: 115,
+        end: 115
       }),
       frameRate: ZOMBIE_RUN_FRAMERATE,
-      repeat: -1,
+      repeat: -1
     });
   }
 }
