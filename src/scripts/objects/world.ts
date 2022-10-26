@@ -45,6 +45,24 @@ export class World {
         );
       }
     });
+
+    // Enemies repel each other
+    scene.physics.add.collider(this.enemies, this.enemies, (e1, e2) => {
+      const enemy1 = e1 as Enemy;
+      const enemy2 = e2 as Enemy;
+
+      const vector = new Phaser.Math.Vector2(
+        enemy1.x - enemy2.x,
+        enemy1.y - enemy2.y
+      );
+      const distance = vector.length();
+      const force = 1000 / (distance * distance);
+      vector.normalize();
+      vector.scale(force);
+
+      enemy1.setVelocity(vector.x, vector.y);
+      enemy2.setVelocity(-vector.x, -vector.y);
+    });
   }
 
   public update() {
