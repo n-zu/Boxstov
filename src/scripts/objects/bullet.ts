@@ -1,5 +1,5 @@
 import Sprite = Phaser.Physics.Arcade.Sprite;
-import { Direction } from "./player";
+import { Direction, getUnitVector } from "./player";
 
 const DIAGONAL_FACTOR = Math.sqrt(2) / 2;
 
@@ -29,7 +29,7 @@ export class Bullet extends Sprite {
       callback: () => {
         this.setActive(false);
         this.setVisible(false);
-      },
+      }
     });
   }
 
@@ -39,23 +39,7 @@ export class Bullet extends Sprite {
   }
 
   private getVelocity(direction: Direction, speed: number) {
-    switch (direction) {
-      case "up":
-        return [0, -speed];
-      case "down":
-        return [0, speed];
-      case "left":
-        return [-speed, 0];
-      case "right":
-        return [speed, 0];
-      case "up-left":
-        return [-speed * DIAGONAL_FACTOR, -speed * DIAGONAL_FACTOR];
-      case "up-right":
-        return [speed * DIAGONAL_FACTOR, -speed * DIAGONAL_FACTOR];
-      case "down-left":
-        return [-speed * DIAGONAL_FACTOR, speed * DIAGONAL_FACTOR];
-      case "down-right":
-        return [speed * DIAGONAL_FACTOR, speed * DIAGONAL_FACTOR];
-    }
+    const [x, y] = getUnitVector(direction);
+    return [x * speed, y * speed];
   }
 }

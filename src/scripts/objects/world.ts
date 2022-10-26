@@ -36,7 +36,6 @@ export class World {
     scene.physics.add.overlap(this.bulletGroup, this.enemies, (e, b) => {
       const bullet = b as Bullet;
       const enemy = e as Enemy;
-
       if (bullet.active) {
         enemy.destroy();
         bullet.die();
@@ -96,7 +95,7 @@ export class World {
     return {
       players: this.players.map((player) => player.getState()),
       bullets: this.bulletGroup.getState(),
-      enemies: this.enemies.map((enemy) => enemy.getState()),
+      enemies: this.enemies.map((enemy) => enemy.getState())
     };
   }
 

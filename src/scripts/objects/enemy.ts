@@ -1,5 +1,6 @@
 import Sprite = Phaser.Physics.Arcade.Sprite;
-import { Player } from "./player";
+import { Direction, Player } from "./player";
+import { AnimationSuffix } from "../scenes/mainScene";
 
 const SPEED = 50;
 
@@ -66,42 +67,15 @@ export class Enemy extends Sprite {
     this.setVelocityX(velocityX * isFar);
     this.setVelocityY(velocityY * isFar);
 
-    let yMovement = "idle";
-    let xMovement = "idle";
+    const direction = this.getMovementAnimationDirection(
+      velocityX,
+      velocityY,
+      2
+    );
 
-    if (velocityY < 0) {
-      yMovement = "up";
-    } else if (velocityY > 0) {
-      yMovement = "down";
+    if (direction) {
+      this.playAnimation(direction, isFar === 0);
     }
-    if (velocityX < 0) {
-      xMovement = "left";
-    } else if (velocityX > 0) {
-      xMovement = "right";
-    }
-
-    const suffix = isFar ? "" : "-atk";
-
-    // I do this to avoid the diagonal animations when little movement is happening in the x or y-axis
-    if (
-      yMovement !== "idle" &&
-      xMovement !== "idle" &&
-      Math.abs(velocityX) > 15 &&
-      Math.abs(velocityY) > 15
-    ) {
-      this.anims.play(`zombie-${yMovement}-${xMovement}${suffix}`, true);
-    } else if (
-      yMovement !== "idle" &&
-      Math.abs(velocityY) > Math.abs(velocityX)
-    ) {
-      this.anims.play(`zombie-${yMovement}${suffix}`, true);
-    } else if (
-      xMovement !== "idle" &&
-      Math.abs(velocityX) > Math.abs(velocityY)
-    ) {
-      this.anims.play(`zombie-${xMovement}${suffix}`, true);
-    }
-
     this.setDepth(this.y);
   }
 
@@ -120,22 +94,55 @@ export class Enemy extends Sprite {
     if (this.anims.currentAnim && this.anims.currentFrame) {
       currentAnimation = {
         key: this.anims.currentAnim.key,
-        frame: this.anims.currentFrame.index,
+        frame: this.anims.currentFrame.index
       };
     }
     return {
       id: this.id,
       position: {
         x: this.x,
-        y: this.y,
+        y: this.y
       },
       velocity: {
         x: this.body.velocity.x,
-        y: this.body.velocity.y,
+        y: this.body.velocity.y
       },
       rotation: this.rotation,
-      animation: currentAnimation,
+      animation: currentAnimation
     };
+  }
+
+  private playAnimation(direction: Direction, attack: boolean) {
+    const suffix = attack ? AnimationSuffix.Attack : AnimationSuffix.Run;
+    this.anims.play(`zombie-${direction}-${suffix}`, true);
+  }
+
+  private getMovementAnimationDirection(
+    xMovement: number,
+    yMovement: number,
+    precision: number
+  ): Direction | undefined {
+    let xDir;
+    let yDir;
+    if (xMovement < -precision) {
+      xDir = Direction.Left;
+    } else if (xMovement > precision) {
+      xDir = Direction.Right;
+    }
+
+    if (yMovement < -precision) {
+      yDir = Direction.Up;
+    } else if (yMovement > precision) {
+      yDir = Direction.Down;
+    }
+
+    if (xDir === Direction.Left && yDir === Direction.Up) {
+      return Direction.UpLeft;
+    } else if (xDir === Direction.Right && yDir === Direction.Up) {
+      return Direction.UpRight;
+    } else {
+      return xDir || yDir;
+    }
   }
 
   private getClosesPlayer(players: Player[]): Player {

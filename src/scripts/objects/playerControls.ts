@@ -1,5 +1,5 @@
 import CursorKeys = Phaser.Types.Input.Keyboard.CursorKeys;
-import { Player } from "./player";
+import { Direction, Player } from "./player";
 
 let lasShot = 0;
 
@@ -16,30 +16,30 @@ export class PlayerControls {
     const amountOfArrowsDown = this.getAmountOfArrowsDown();
     if (amountOfArrowsDown === 1) {
       if (this.cursorKeys.up.isDown) {
-        this.player.moveUp(true);
+        this.player.move(Direction.Up, true);
       }
       if (this.cursorKeys.down.isDown) {
-        this.player.moveDown(true);
+        this.player.move(Direction.Down, true);
       }
       if (this.cursorKeys.left.isDown) {
-        this.player.moveLeft(true);
+        this.player.move(Direction.Left, true);
       }
       if (this.cursorKeys.right.isDown) {
-        this.player.moveRight(true);
+        this.player.move(Direction.Right, true);
       }
     }
     if (amountOfArrowsDown === 2) {
       if (this.cursorKeys.up.isDown && this.cursorKeys.left.isDown) {
-        this.player.moveUpLeft(true);
+        this.player.move(Direction.UpLeft, true);
       }
       if (this.cursorKeys.up.isDown && this.cursorKeys.right.isDown) {
-        this.player.moveUpRight(true);
+        this.player.move(Direction.UpRight, true);
       }
       if (this.cursorKeys.down.isDown && this.cursorKeys.left.isDown) {
-        this.player.moveDownLeft(true);
+        this.player.move(Direction.DownLeft, true);
       }
       if (this.cursorKeys.down.isDown && this.cursorKeys.right.isDown) {
-        this.player.moveDownRight(true);
+        this.player.move(Direction.DownRight, true);
       }
     }
     if (amountOfArrowsDown === 0) {

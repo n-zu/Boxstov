@@ -1,20 +1,43 @@
 import { GameMaster } from "../gameMaster";
 import * as Phaser from "phaser";
 import { BulletGroup } from "./bulletGroup";
+import { AnimationActor, AnimationSuffix } from "../scenes/mainScene";
 import Sprite = Phaser.Physics.Arcade.Sprite;
 
 const SPEED = 200;
 const diagonalFactor = Math.sqrt(2) / 2;
 
-export type Direction =
-  | "up"
-  | "down"
-  | "left"
-  | "right"
-  | "up-left"
-  | "up-right"
-  | "down-left"
-  | "down-right";
+export enum Direction {
+  Up,
+  Down,
+  Left,
+  Right,
+  UpLeft,
+  UpRight,
+  DownLeft,
+  DownRight,
+}
+
+export function getUnitVector(direction: Direction): [number, number] {
+  switch (direction) {
+    case Direction.Up:
+      return [0, -1];
+    case Direction.Down:
+      return [0, 1];
+    case Direction.Left:
+      return [-1, 0];
+    case Direction.Right:
+      return [1, 0];
+    case Direction.UpLeft:
+      return [-diagonalFactor, -diagonalFactor];
+    case Direction.UpRight:
+      return [diagonalFactor, -diagonalFactor];
+    case Direction.DownLeft:
+      return [-diagonalFactor, diagonalFactor];
+    case Direction.DownRight:
+      return [diagonalFactor, diagonalFactor];
+  }
+}
 
 export type MovementMessage = {
   type: "move";
@@ -44,7 +67,7 @@ export class Player extends Sprite {
   gameMaster: GameMaster;
   bulletGroup: BulletGroup;
   id: string;
-  facing: Direction = "down";
+  facing: Direction = Direction.Down;
 
   constructor(
     scene: Phaser.Scene,
@@ -69,7 +92,7 @@ export class Player extends Sprite {
     this.setDisplayOrigin(250, 320);
     this.setOffset(160, 240);
 
-    this.anims.play("down-idle", true);
+    this.playIdleAnimation(Direction.Down);
   }
 
   public getId() {
@@ -89,48 +112,21 @@ export class Player extends Sprite {
 
     if (emitAlert) {
       this.gameMaster.send("shoot", {
-        id: this.id,
+        id: this.id
       });
     }
     this.bulletGroup.shootBullet(xGun, yGun, this.facing);
   }
 
   public move(
-    direction:
-      | "up"
-      | "down"
-      | "left"
-      | "right"
-      | "up-left"
-      | "up-right"
-      | "down-left"
-      | "down-right"
+    direction: Direction, emitAlert = true
   ) {
-    switch (direction) {
-      case "up":
-        this.moveUp(false);
-        break;
-      case "down":
-        this.moveDown(false);
-        break;
-      case "left":
-        this.moveLeft(false);
-        break;
-      case "right":
-        this.moveRight(false);
-        break;
-      case "up-left":
-        this.moveUpLeft(false);
-        break;
-      case "up-right":
-        this.moveUpRight(false);
-        break;
-      case "down-left":
-        this.moveDownLeft(false);
-        break;
-      case "down-right":
-        this.moveDownRight(false);
-        break;
+    const [x, y] = getUnitVector(direction);
+    this.setVelocity(x * SPEED, y * SPEED);
+    this.facing = direction;
+    this.playMovementAnimation(direction);
+    if (emitAlert) {
+      this.sendMovementMessage(direction);
     }
   }
 
@@ -150,7 +146,7 @@ export class Player extends Sprite {
           this.anims.play(
             {
               key: state.animation.key,
-              startFrame: state.animation.frame,
+              startFrame: state.animation.frame
             },
             true
           );
@@ -161,111 +157,12 @@ export class Player extends Sprite {
     }
   }
 
-  public moveUp(emitAlert = true) {
-    if (emitAlert) {
-      this.gameMaster.send("move", {
-        id: this.id,
-        direction: "up",
-      });
-    }
-    this.anims.play("up", true);
-    this.facing = "up";
-    this.setVelocity(0, -SPEED);
-  }
-
-  public moveDown(emitAlert = true) {
-    if (emitAlert) {
-      this.gameMaster.send("move", {
-        id: this.id,
-        direction: "down",
-      });
-    }
-    this.anims.play("down", true);
-    this.facing = "down";
-    this.setVelocity(0, SPEED);
-  }
-
-  public moveLeft(emitAlert = true) {
-    if (emitAlert) {
-      this.gameMaster.send("move", {
-        id: this.id,
-        direction: "left",
-      });
-    }
-    this.anims.play("left", true);
-    this.facing = "left";
-    this.setVelocity(-SPEED, 0);
-  }
-
-  public moveRight(emitAlert = true) {
-    if (emitAlert) {
-      this.gameMaster.send("move", {
-        id: this.id,
-        direction: "right",
-      });
-    }
-    this.anims.play("right", true);
-    this.facing = "right";
-    this.setVelocity(SPEED, 0);
-  }
-
-  public moveUpLeft(emitAlert = true) {
-    if (emitAlert) {
-      this.gameMaster.send("move", {
-        id: this.id,
-        direction: "up-left",
-      });
-    }
-    this.anims.play("up-left", true);
-    this.facing = "up-left";
-    this.setVelocity(-SPEED * diagonalFactor, -SPEED * diagonalFactor);
-  }
-
-  public moveUpRight(emitAlert = true) {
-    if (emitAlert) {
-      this.gameMaster.send("move", {
-        id: this.id,
-        direction: "up-right",
-      });
-    }
-
-    this.anims.play("up-right", true);
-    this.facing = "up-right";
-    this.setVelocity(SPEED * diagonalFactor, -SPEED * diagonalFactor);
-  }
-
-  public moveDownLeft(emitAlert = true) {
-    if (emitAlert) {
-      this.gameMaster.send("move", {
-        id: this.id,
-        direction: "down-left",
-      });
-    }
-
-    this.anims.play("down-left", true);
-    this.facing = "down-left";
-    this.setVelocity(-SPEED * diagonalFactor, SPEED * diagonalFactor);
-  }
-
-  public moveDownRight(emitAlert = true) {
-    if (emitAlert) {
-      this.gameMaster.send("move", {
-        id: this.id,
-        direction: "down-right",
-      });
-    }
-
-    this.anims.play("down-right", true);
-    this.facing = "down-right";
-    this.setVelocity(SPEED * diagonalFactor, SPEED * diagonalFactor);
-  }
-
   public getState(): PlayerState {
     let currentAnimation: { key: string; frame: number } | undefined;
     if (this.anims.currentAnim && this.anims.currentFrame) {
       currentAnimation = {
         key: this.anims.currentAnim.key,
-        frame: this.anims.currentFrame.index,
+        frame: this.anims.currentFrame.index
       };
     }
     this.setDepth(this.y);
@@ -273,86 +170,89 @@ export class Player extends Sprite {
       id: this.id,
       position: {
         x: this.x,
-        y: this.y,
+        y: this.y
       },
       velocity: {
         x: this.body.velocity.x,
-        y: this.body.velocity.y,
+        y: this.body.velocity.y
       },
       rotation: this.rotation,
-      animation: currentAnimation,
+      animation: currentAnimation
     };
   }
 
   public stopMovement(emitAlert = true) {
-    if (this.body.velocity.x !== 0 || this.body.velocity.y !== 0) {
-      if (emitAlert) {
-        this.gameMaster.send("stop", { id: this.id });
-      }
+    if (this.isMoving() && emitAlert) {
+      this.gameMaster.send("stop", { id: this.id });
     }
-    if (this.body.velocity.x > 0) {
-      this.anims.play("right-idle", true);
-    } else if (this.body.velocity.x < 0) {
-      this.anims.play("left-idle", true);
-    } else if (this.body.velocity.y > 0) {
-      this.anims.play("down-idle", true);
-    } else if (this.body.velocity.y < 0) {
-      this.anims.play("up-idle", true);
-    }
+    this.playIdleAnimation(this.facing);
     this.setVelocity(0, 0);
+  }
+
+  private isMoving(): boolean {
+    return this.body.velocity.x !== 0 || this.body.velocity.y !== 0;
+  }
+
+  private playIdleAnimation(direction: Direction) {
+    const animationName = `${AnimationActor.Player}-${direction}-${AnimationSuffix.Idle}`;
+    this.anims.play(animationName, true);
+  }
+
+  private sendMovementMessage(direction: Direction) {
+    this.gameMaster.send("move", {
+      id: this.id,
+      direction
+    });
+  }
+
+  private playMovementAnimation(direction: Direction) {
+    const animationName = `${AnimationActor.Player}-${direction}-${AnimationSuffix.Run}`;
+    this.anims.play(animationName, true);
   }
 
   private getGunPosition(): { x: number; y: number } {
     // We should change this logic so that the bullet receives the position and angle
     // of shooting, so that the bullet travels parallel to the player's gun
     switch (this.facing) {
-      case "up":
+      case Direction.Up:
         return {
           x: this.x + 15,
-          y: this.y - 120,
+          y: this.y - 120
         };
-      case "down":
+      case Direction.Down:
         return {
           x: this.x - 16,
-          y: this.y,
+          y: this.y
         };
-      case "left":
+      case Direction.Left:
         return {
           x: this.x - 95,
-          y: this.y - 75,
+          y: this.y - 75
         };
-      case "right":
+      case Direction.Right:
         return {
           x: this.x + 95,
-          y: this.y - 65,
+          y: this.y - 65
         };
-      case "up-left":
+      case Direction.UpLeft:
         return {
           x: this.x - 75,
-          y: this.y - 120,
+          y: this.y - 120
         };
-
-      case "up-right":
+      case Direction.UpRight:
         return {
           x: this.x + 95,
-          y: this.y - 120,
+          y: this.y - 120
         };
-
-      case "down-left":
+      case Direction.DownLeft:
         return {
           x: this.x - 35,
-          y: this.y - 40,
+          y: this.y - 40
         };
-
-      case "down-right":
+      case Direction.DownRight:
         return {
           x: this.x + 45,
-          y: this.y - 10,
-        };
-      default:
-        return {
-          x: this.x + 85,
-          y: this.y - 35,
+          y: this.y - 10
         };
     }
   }
