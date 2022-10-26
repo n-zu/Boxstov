@@ -261,6 +261,15 @@ export default class MainScene extends Phaser.Scene {
         frameRate: ZOMBIE_RUN_FRAMERATE,
         repeat: -1,
       });
+      this.anims.create({
+        key: key + "-die",
+        frames: this.anims.generateFrameNumbers("zombie", {
+          start: index * 16 + 4 * 3,
+          end: index * 16 + 3 + 4 * 3,
+        }),
+        frameRate: ZOMBIE_RUN_FRAMERATE,
+        repeat: 0,
+      });
     });
 
     /*

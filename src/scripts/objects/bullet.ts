@@ -4,6 +4,8 @@ import { Direction } from "./player";
 const DIAGONAL_FACTOR = Math.sqrt(2) / 2;
 
 export class Bullet extends Sprite {
+  damage = 50;
+
   constructor(scene: Phaser.Scene, x: number, y: number) {
     super(scene, x, y, "bullet");
   }
