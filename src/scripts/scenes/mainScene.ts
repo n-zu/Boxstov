@@ -64,11 +64,11 @@ export default class MainScene extends Phaser.Scene {
     this.load.image("bullet", "assets/strip.png");
     this.load.spritesheet("player", "assets/Player/rifle_map.png", {
       frameWidth: 512,
-      frameHeight: 512
+      frameHeight: 512,
     });
     this.load.spritesheet("zombie", "assets/Mobs/zombie_map_big.png", {
       frameWidth: 512,
-      frameHeight: 512
+      frameHeight: 512,
     });
   }
 
@@ -123,6 +123,16 @@ export default class MainScene extends Phaser.Scene {
       }),
       frameRate: frameRateToUse,
       repeat: -1
+    });
+
+    this.anims.create({
+      key: "zombie-down-left",
+      frames: this.anims.generateFrameNumbers("zombie", {
+        start: 112,
+        end: 115,
+      }),
+      frameRate: ZOMBIE_RUN_FRAMERATE,
+      repeat: -1,
     });
   }
 }

@@ -23,6 +23,7 @@ export type EnemyState = {
 
 export class Enemy extends Sprite {
   id: string;
+  health = 100;
 
   constructor(scene: Phaser.Scene, x: number, y: number, id?: string) {
     super(scene, x, y, "zombie");
@@ -30,7 +31,7 @@ export class Enemy extends Sprite {
     scene.physics.add.existing(this);
 
     this.scale = 0.8;
-    this.setBodySize(50, 80);
+    this.setBodySize(80, 180);
 
     if (id) {
       this.id = id;
@@ -44,9 +45,13 @@ export class Enemy extends Sprite {
     // the enemy every frame. We should consider the consequences of using
     // randomness, because the guest will calculate a different path. Maybe
     // we should use a seed
-    if (Math.random() < 0.95) {
+    if (Math.random() < 0.95) return;
+
+    if (this.health <= 0) {
+      this.setVelocity(0, 0);
       return;
     }
+
     const closestPlayer = this.getClosesPlayer(players);
     const angle = Phaser.Math.Angle.Between(
       this.x,
@@ -164,5 +169,39 @@ export class Enemy extends Sprite {
       }
     }
     return closestPlayer;
+  }
+
+  public receiveDamage(damage: number, onDeath: () => void) {
+    if (this.health <= 0) return;
+
+    this.health -= damage;
+
+    // paint red for a second
+    this.setTint(0xff0000);
+    this.scene.time.delayedCall(100, () => {
+      this && this.clearTint();
+    });
+
+    if (this.health <= 0) this.die(onDeath);
+  }
+
+  private die(onDeath: () => void) {
+    const directions: string[] = [];
+
+    if (this.body.velocity.y > 0) directions.push("down");
+    else if (this.body.velocity.y < 0) directions.push("up");
+
+    if (this.body.velocity.x > 0) directions.push("right");
+    else if (this.body.velocity.x < 0) directions.push("left");
+
+    const direction = directions.join("-") || "down";
+
+    this.setVelocity(0, 0);
+    this.setOffset(9999, 9999); // re trucho esto . FIXME
+
+    this.anims.play(`zombie-${direction}-die`, true);
+    this.scene.time.delayedCall(3000, () => {
+      onDeath();
+    });
   }
 }
