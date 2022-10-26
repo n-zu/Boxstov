@@ -190,8 +190,7 @@ export class Enemy extends Sprite {
     const direction = directions.join("-") || "down";
 
     this.setVelocity(0, 0);
-    this.setImmovable(true);
-    this.setBodySize(1, 1);
+    this.setOffset(9999, 9999); // re trucho esto . FIXME
 
     this.anims.play(`zombie-${direction}-die`, true);
     this.scene.time.delayedCall(3000, () => {
