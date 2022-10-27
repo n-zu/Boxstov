@@ -3,6 +3,7 @@ import { World, WorldState } from "../objects/world";
 import { GameMaster } from "../gameMaster";
 import { HostMaster } from "../hostMaster";
 import { Direction } from "../objects/player";
+import Sprite = Phaser.Physics.Arcade.Sprite;
 
 const IDLE_FRAMERATE = 1;
 const RUN_FRAMERATE = 10;
@@ -25,6 +26,10 @@ export enum AnimationSuffix {
   Die = "die",
 }
 
+export function playAnimation(sprite: Sprite, actor: AnimationActor, direction: Direction, suffix: AnimationSuffix) {
+  sprite.anims.play(`${actor}-${direction}-${suffix}`, true);
+}
+
 export default class MainScene extends Phaser.Scene {
   game: MultiplayerGame;
   world: World;
@@ -42,6 +47,7 @@ export default class MainScene extends Phaser.Scene {
     // FIXME: Need a way to get the ids
 
     this.world = new World(this, this.game.gameMaster);
+    this.scene.launch("UIScene", this.world.players[0]);
 
     this.gameMaster = this.game.gameMaster;
   }

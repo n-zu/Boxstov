@@ -1,6 +1,6 @@
 import Sprite = Phaser.Physics.Arcade.Sprite;
 import { Direction, Player } from "./player";
-import { AnimationActor, AnimationSuffix } from "../scenes/mainScene";
+import { AnimationActor, AnimationSuffix, playAnimation } from "../scenes/mainScene";
 
 const SPEED = 50;
 
@@ -73,7 +73,8 @@ export class Enemy extends Sprite {
 
     if (direction) {
       this.facing = direction;
-      this.playAnimation(direction, isFar === 0);
+      const suffix = isFar == 0 ? AnimationSuffix.Attack : AnimationSuffix.Run;
+      playAnimation(this, AnimationActor.Zombie, this.facing, suffix);
     }
     this.setDepth(this.y);
   }
@@ -133,16 +134,12 @@ export class Enemy extends Sprite {
   public spawn(x: number, y: number) {
     this.setPosition(x, y);
     this.health = 100;
-    this.playAnimation(this.facing, false);
+    playAnimation(this, AnimationActor.Zombie, Direction.Down, AnimationSuffix.Idle);
     this.setActive(true);
     this.setVisible(true);
     this.body.enable = true;
   }
 
-  private playAnimation(direction: Direction, attack: boolean) {
-    const suffix = attack ? AnimationSuffix.Attack : AnimationSuffix.Run;
-    this.anims.play(`${AnimationActor.Zombie}-${direction}-${suffix}`, true);
-  }
 
   private getMovementAnimationDirection(
     xMovement: number,
@@ -193,14 +190,10 @@ export class Enemy extends Sprite {
     return closestPlayer;
   }
 
-  private playDeathAnimation() {
-    this.anims.play(`${AnimationActor.Zombie}-${this.facing}-${AnimationSuffix.Die}`, true);
-  }
-
   private die() {
     this.setVelocity(0, 0);
     this.body.enable = false;
-    this.playDeathAnimation();
+    playAnimation(this, AnimationActor.Zombie, this.facing, AnimationSuffix.Die);
 
     this.scene.time.delayedCall(3000, () => {
       this.setVisible(false);

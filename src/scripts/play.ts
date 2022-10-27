@@ -4,6 +4,7 @@ import { MultiplayerGame } from "./game/multiplayerGame";
 import MainScene from "./scenes/mainScene";
 import { GuestMaster } from "./guestMaster";
 import { HostMaster } from "./hostMaster";
+import { UIScene } from "./scenes/uiScene";
 
 const DEFAULT_WIDTH = 1280;
 const DEFAULT_HEIGHT = 720;
@@ -18,7 +19,7 @@ const gameConfig = {
     width: DEFAULT_WIDTH,
     height: DEFAULT_HEIGHT
   },
-  scene: [MainScene],
+  scene: [MainScene, UIScene],
   antialias: true,
   physics: {
     default: "arcade",

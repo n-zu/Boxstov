@@ -1,7 +1,7 @@
 import { GameMaster } from "../gameMaster";
 import * as Phaser from "phaser";
 import { BulletGroup } from "./bulletGroup";
-import { AnimationActor, AnimationSuffix } from "../scenes/mainScene";
+import { AnimationActor, AnimationSuffix, playAnimation } from "../scenes/mainScene";
 import { BaseMessage } from "../hostMaster";
 import Sprite = Phaser.Physics.Arcade.Sprite;
 
@@ -62,6 +62,7 @@ export type PlayerState = {
     key: string;
     frame: number;
   };
+  health: number;
 };
 
 export class Player extends Sprite {
@@ -70,6 +71,8 @@ export class Player extends Sprite {
   bulletGroup: BulletGroup;
   id: string;
   facing: Direction = Direction.Down;
+  maxHealth = 100;
+  health = 100;
 
   constructor(
     scene: Phaser.Scene,
@@ -94,7 +97,7 @@ export class Player extends Sprite {
     this.setDisplayOrigin(250, 320);
     this.setOffset(160, 240);
 
-    this.playIdleAnimation(Direction.Down);
+    playAnimation(this, AnimationActor.Player, Direction.Down, AnimationSuffix.Idle);
   }
 
   public getId() {
@@ -127,7 +130,7 @@ export class Player extends Sprite {
     const [x, y] = getUnitVector(direction);
     this.setVelocity(x * SPEED, y * SPEED);
     this.facing = direction;
-    this.playMovementAnimation(direction);
+    playAnimation(this, AnimationActor.Player, direction, AnimationSuffix.Run);
     if (emitAlert) {
       this.sendMovementMessage(direction);
     }
@@ -138,6 +141,7 @@ export class Player extends Sprite {
     this.syncVelocity(state.velocity);
     this.syncDepth(state.position.y);
     this.setRotation(state.rotation);
+    this.health = state.health;
     if (state.animation) {
       // There is a bug here, probably
       // If I set ignoreIfPlaying to false, and then move the guest player, when it
@@ -180,7 +184,8 @@ export class Player extends Sprite {
         y: this.body.velocity.y
       },
       rotation: this.rotation,
-      animation: currentAnimation
+      animation: currentAnimation,
+      health: this.health
     };
   }
 
@@ -251,11 +256,6 @@ export class Player extends Sprite {
         direction
       }
     });
-  }
-
-  private playMovementAnimation(direction: Direction) {
-    const animationName = `${AnimationActor.Player}-${direction}-${AnimationSuffix.Run}`;
-    this.anims.play(animationName, true);
   }
 
   private getGunPosition(): { x: number; y: number } {
