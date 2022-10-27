@@ -7,7 +7,7 @@ import Sprite = Phaser.Physics.Arcade.Sprite;
 
 const SPEED = 200;
 const diagonalFactor = Math.sqrt(2) / 2;
-const SYNC_DIFF_TOLERANCE = 50;
+const SYNC_DIFF_TOLERANCE = 1;
 const SYNC_DEPTH_TOLERANCE = 0.1;
 
 export enum Direction {

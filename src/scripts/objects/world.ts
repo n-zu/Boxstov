@@ -2,18 +2,19 @@ import { Player, PlayerState } from "./player";
 import { BulletGroup, BulletGroupState } from "./bulletGroup";
 import { GameMaster } from "../gameMaster";
 import { PlayerControls } from "./playerControls";
-import { Enemy, EnemyState } from "./enemy";
+import { Enemy } from "./enemy";
 import { Bullet } from "./bullet";
+import { Difficulty, EnemyGroup, EnemyGroupState } from "./enemyGroup";
 
 export type WorldState = {
   players: PlayerState[];
   bullets: BulletGroupState;
-  enemies: EnemyState[];
+  enemies: EnemyGroupState;
 };
 
 export class World {
   players: Player[];
-  enemies: Enemy[];
+  enemies: EnemyGroup;
   playerControls: PlayerControls;
   bulletGroup: BulletGroup;
   gameMaster: GameMaster;
@@ -27,25 +28,20 @@ export class World {
 
     this.setupGameMaster(gameMaster);
 
-    this.enemies = [];
-    for (let i = 0; i < 1; i++) {
-      const enemy = new Enemy(scene, 500 + Math.random() * 500, 200);
-      this.enemies.push(enemy);
-      enemy.onAction("die", () => {
-        enemy.destroy();
-        this.enemies = this.enemies.filter(
-          (anEnemy) => anEnemy.id !== enemy.id
-        );
-      });
-    }
+    const spawnPoins = [
+      { x: 100, y: 100 },
+      { x: 100, y: 900 },
+      { x: 1800, y: 100 },
+      { x: 1800, y: 900 }
+    ];
 
-    scene.physics.add.overlap(this.bulletGroup, this.enemies, (e, b) => {
+    this.enemies = new EnemyGroup(scene, 50, Difficulty.Easy, spawnPoins);
+
+    scene.physics.add.overlap(this.enemies, this.bulletGroup, (e, b) => {
       const bullet = b as Bullet;
       const enemy = e as Enemy;
-      if (bullet.active) {
-        enemy.receiveDamage(bullet.damage);
-
-        bullet.die();
+      if (bullet.active && enemy.active) {
+        bullet.collideWith(enemy);
       }
     });
 
@@ -55,9 +51,7 @@ export class World {
 
   public update() {
     this.playerControls.update();
-    this.enemies.forEach((enemy) => {
-      enemy.update(this.players);
-    });
+    this.enemies.update(this.players);
   }
 
   public sync(worldState: WorldState) {
@@ -65,17 +59,7 @@ export class World {
       const player = this.getOrCreatePlayer(playerState.id);
       player.sync(playerState);
     });
-    worldState.enemies.forEach((enemyState) => {
-      const enemy = this.getOrCreateEnemy(enemyState.id);
-      enemy.sync(enemyState);
-    });
-    this.enemies.forEach((enemy) => {
-      if (!worldState.enemies.find((e) => e.id === enemy.id)) {
-        enemy.destroy();
-
-        this.enemies = this.enemies.filter((e) => e.id !== enemy.id);
-      }
-    });
+    this.enemies.sync(worldState.enemies);
 
     this.bulletGroup.sync(worldState.bullets);
   }
@@ -84,7 +68,7 @@ export class World {
     return {
       players: this.players.map((player) => player.getState()),
       bullets: this.bulletGroup.getState(),
-      enemies: this.enemies.map((enemy) => enemy.getState())
+      enemies: this.enemies.getState()
     };
   }
 
@@ -132,15 +116,6 @@ export class World {
       this.gameMaster.send("sync", this.getState());
     }
     return player;
-  }
-
-  private getOrCreateEnemy(id: string): Enemy {
-    let enemy = this.enemies.find((e) => e.id === id);
-    if (enemy === undefined) {
-      enemy = new Enemy(this.scene, 100, 100, id);
-      this.enemies.push(enemy);
-    }
-    return enemy;
   }
 
   private setupGameMaster(gameMaster: GameMaster) {

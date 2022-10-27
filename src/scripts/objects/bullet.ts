@@ -1,5 +1,14 @@
 import Sprite = Phaser.Physics.Arcade.Sprite;
 import { Direction, getUnitVector } from "./player";
+import { Enemy } from "./enemy";
+
+export type BulletState = {
+  x: number;
+  y: number;
+  rotation: number;
+  active: boolean;
+  visible: boolean;
+};
 
 export class Bullet extends Sprite {
   damage = 50;
@@ -23,6 +32,7 @@ export class Bullet extends Sprite {
     this.setVelocityY(velocityY);
     this.setActive(true);
     this.setVisible(true);
+    this.body.enable = true;
 
     this.scene.time.addEvent({
       delay: 3000,
@@ -36,6 +46,30 @@ export class Bullet extends Sprite {
   public die() {
     this.setActive(false);
     this.setVisible(false);
+    this.body.enable = false;
+  }
+
+  // We should use an interface for this
+  public collideWith(enemy: Enemy) {
+    enemy.receiveDamage(this.damage);
+    this.die();
+  }
+
+  public getState(): BulletState {
+    return {
+      x: this.x,
+      y: this.y,
+      rotation: this.rotation,
+      active: this.active,
+      visible: this.visible
+    };
+  }
+
+  public sync(bulletState: BulletState) {
+    this.setPosition(bulletState.x, bulletState.y);
+    this.setRotation(bulletState.rotation);
+    this.setActive(bulletState.active);
+    this.setVisible(bulletState.visible);
   }
 
   private getVelocity(direction: Direction, speed: number) {

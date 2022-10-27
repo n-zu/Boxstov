@@ -1,13 +1,6 @@
-import { Bullet } from "./bullet";
+import { Bullet, BulletState } from "./bullet";
 import { Direction } from "./player";
 
-type BulletState = {
-  x: number;
-  y: number;
-  rotation: number;
-  active: boolean;
-  visible: boolean;
-};
 export type BulletGroupState = BulletState[];
 
 export class BulletGroup extends Phaser.Physics.Arcade.Group {
@@ -19,7 +12,7 @@ export class BulletGroup extends Phaser.Physics.Arcade.Group {
       key: "bullet",
       active: false,
       visible: false,
-      classType: Bullet,
+      classType: Bullet
     });
   }
 
@@ -31,19 +24,10 @@ export class BulletGroup extends Phaser.Physics.Arcade.Group {
   }
 
   public getState(): BulletGroupState {
-    const bulletInfo: BulletGroupState = this.children.entries.map((bullet) => {
+    return this.children.entries.map((bullet) => {
       const b = bullet as Bullet;
-      b.setDepth(b.y);
-      const bState: BulletState = {
-        x: b.x,
-        y: b.y,
-        rotation: b.rotation,
-        active: b.active,
-        visible: b.visible,
-      };
-      return bState;
+      return b.getState();
     });
-    return bulletInfo;
   }
 
   public sync(bulletGroupState: BulletGroupState) {

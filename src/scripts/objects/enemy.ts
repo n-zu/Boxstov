@@ -1,14 +1,10 @@
 import Sprite = Phaser.Physics.Arcade.Sprite;
 import { Direction, Player } from "./player";
 import { AnimationActor, AnimationSuffix } from "../scenes/mainScene";
-import { Action } from "../gameMaster";
 
 const SPEED = 50;
 
-export type EnemyActionType = "die";
-
 export type EnemyState = {
-  id: string;
   position: {
     x: number;
     y: number;
@@ -22,31 +18,22 @@ export type EnemyState = {
     key: string;
     frame: number;
   };
+  health: number;
+  active: boolean;
+  visible: boolean;
 };
 
 export class Enemy extends Sprite {
-  id: string;
   health = 100;
-  actions: Action[] = [];
   facing: Direction = Direction.Down;
 
-  constructor(scene: Phaser.Scene, x: number, y: number, id?: string) {
+  constructor(scene: Phaser.Scene, x: number, y: number) {
     super(scene, x, y, "zombie");
     scene.add.existing(this);
     scene.physics.add.existing(this);
 
     this.scale = 0.8;
     this.setBodySize(80, 180);
-
-    if (id) {
-      this.id = id;
-    } else {
-      this.id = Phaser.Math.RND.uuid();
-    }
-  }
-
-  public onAction(actionMsg: EnemyActionType, callback: () => void) {
-    this.actions.push({ type: actionMsg, action: callback });
   }
 
   public update(players: Player[]) {
@@ -56,10 +43,7 @@ export class Enemy extends Sprite {
     // we should use a seed
     if (Math.random() < 0.95) return;
 
-    if (this.health <= 0) {
-      this.setVelocity(0, 0);
-      return;
-    }
+    if (!this.body.enable) return;
 
     const closestPlayer = this.getClosesPlayer(players);
     const angle = Phaser.Math.Angle.Between(
@@ -102,6 +86,9 @@ export class Enemy extends Sprite {
     if (state.animation) {
       this.anims.play(state.animation.key, true);
     }
+    this.setActive(state.active);
+    this.setVisible(state.visible);
+    this.body.enable = state.active;
   }
 
   public getState(): EnemyState {
@@ -113,7 +100,6 @@ export class Enemy extends Sprite {
       };
     }
     return {
-      id: this.id,
       position: {
         x: this.x,
         y: this.y
@@ -123,7 +109,10 @@ export class Enemy extends Sprite {
         y: this.body.velocity.y
       },
       rotation: this.rotation,
-      animation: currentAnimation
+      animation: currentAnimation,
+      health: this.health,
+      active: this.active,
+      visible: this.visible
     };
   }
 
@@ -139,6 +128,15 @@ export class Enemy extends Sprite {
     });
 
     if (this.health <= 0) this.die();
+  }
+
+  public spawn(x: number, y: number) {
+    this.setPosition(x, y);
+    this.health = 100;
+    this.playAnimation(this.facing, false);
+    this.setActive(true);
+    this.setVisible(true);
+    this.body.enable = true;
   }
 
   private playAnimation(direction: Direction, attack: boolean) {
@@ -202,16 +200,11 @@ export class Enemy extends Sprite {
   private die() {
     this.setVelocity(0, 0);
     this.body.enable = false;
-
     this.playDeathAnimation();
 
     this.scene.time.delayedCall(3000, () => {
-      const callback = this.actions.find(
-        action => action.type === "die"
-      );
-      if (callback) {
-        callback.action();
-      }
+      this.setVisible(false);
+      this.setActive(false);
     });
   }
 }

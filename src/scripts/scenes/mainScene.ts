@@ -11,6 +11,7 @@ const DEATH_FRAMERATE = 10;
 const ZOMBIE_WALK_FRAMERATE = 8;
 const ZOMBIE_RUN_FRAMERATE = 8;
 
+const SYNC_COUNTDOWN = 100;
 
 export enum AnimationActor {
   Player = "player",
@@ -28,7 +29,7 @@ export default class MainScene extends Phaser.Scene {
   game: MultiplayerGame;
   world: World;
   gameMaster: GameMaster;
-  syncCountdown = 30;
+  syncCountdown = SYNC_COUNTDOWN;
   tileSprite: Phaser.GameObjects.TileSprite;
 
   protected constructor() {
@@ -58,7 +59,7 @@ export default class MainScene extends Phaser.Scene {
     if (this.syncCountdown == 0) {
       if (this.gameMaster instanceof HostMaster) {
         this.gameMaster.send("sync", this.world.getState());
-        this.syncCountdown = 30;
+        this.syncCountdown = SYNC_COUNTDOWN;
       }
     } else {
       this.syncCountdown--;
