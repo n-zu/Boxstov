@@ -92,12 +92,6 @@ export class World {
 
     scene.input.on("wheel", (pointer, gameObjects, deltaX, deltaY) => {
       scene.cameras.main.zoom -= deltaY * 0.001;
-      {
-        const canvas = document.querySelector("canvas");
-        const sc = scene.cameras.main.zoom;
-        if (canvas && canvas.style)
-          canvas.style.backgroundSize = `${360 * sc}px ${200 * sc}px`;
-      }
     });
   }
 

@@ -43,6 +43,7 @@ export default class MainScene extends Phaser.Scene {
 
   create() {
     this.createAnimations();
+    this.add.tileSprite(0, 0, 7680, 4320, "tiles").setDepth(-9999);
 
     // FIXME: Need a way to get the ids
 
