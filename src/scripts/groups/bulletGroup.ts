@@ -1,5 +1,5 @@
-import { Bullet, BulletState } from "./bullet";
-import { Direction } from "./player";
+import { Bullet, BulletState } from "../objects/bullet";
+import { Direction } from "../objects/player";
 
 export type BulletGroupState = BulletState[];
 

@@ -59,21 +59,26 @@ export class Enemy extends Sprite {
       closestPlayer.y
     );
     const isFar = distance > 70 ? 1 : 0;
-    const velocityX = Math.cos(angle) * SPEED;
-    const velocityY = Math.sin(angle) * SPEED;
+    let xUnit = Math.cos(angle);
+    let yUnit = Math.sin(angle);
+
+    xUnit = Math.abs(xUnit) < 0.3 ? 0 : xUnit;
+    yUnit = Math.abs(yUnit) < 0.3 ? 0 : yUnit;
+
+    const velocityX = xUnit * SPEED;
+    const velocityY = yUnit * SPEED;
 
     this.setVelocityX(velocityX * isFar);
     this.setVelocityY(velocityY * isFar);
 
-    const direction = this.getMovementAnimationDirection(
+    const direction = this.getMovementDirection(
       velocityX,
-      velocityY,
-      2
+      velocityY
     );
 
     if (direction) {
       this.facing = direction;
-      const suffix = isFar == 0 ? AnimationSuffix.Attack : AnimationSuffix.Run;
+      const suffix = isFar == 0 ? AnimationSuffix.Attack : AnimationSuffix.Walk;
       playAnimation(this, AnimationActor.Zombie, this.facing, suffix);
     }
     this.setDepth(this.y);
@@ -134,39 +139,41 @@ export class Enemy extends Sprite {
   public spawn(x: number, y: number) {
     this.setPosition(x, y);
     this.health = 100;
-    playAnimation(this, AnimationActor.Zombie, Direction.Down, AnimationSuffix.Idle);
     this.setActive(true);
     this.setVisible(true);
     this.body.enable = true;
   }
 
 
-  private getMovementAnimationDirection(
+  private getMovementDirection(
     xMovement: number,
-    yMovement: number,
-    precision: number
-  ): Direction | undefined {
-    let xDir;
-    let yDir;
-    if (xMovement < -precision) {
-      xDir = Direction.Left;
-    } else if (xMovement > precision) {
-      xDir = Direction.Right;
+    yMovement: number
+  ): Direction {
+    if (xMovement > 0 && yMovement > 0) {
+      return Direction.DownRight;
     }
-
-    if (yMovement < -precision) {
-      yDir = Direction.Up;
-    } else if (yMovement > precision) {
-      yDir = Direction.Down;
-    }
-
-    if (xDir === Direction.Left && yDir === Direction.Up) {
-      return Direction.UpLeft;
-    } else if (xDir === Direction.Right && yDir === Direction.Up) {
+    if (xMovement > 0 && yMovement < 0) {
       return Direction.UpRight;
-    } else {
-      return xDir || yDir;
     }
+    if (xMovement < 0 && yMovement > 0) {
+      return Direction.DownLeft;
+    }
+    if (xMovement < 0 && yMovement < 0) {
+      return Direction.UpLeft;
+    }
+    if (xMovement > 0) {
+      return Direction.Right;
+    }
+    if (xMovement < 0) {
+      return Direction.Left;
+    }
+    if (yMovement > 0) {
+      return Direction.Down;
+    }
+    if (yMovement < 0) {
+      return Direction.Up;
+    }
+    return Direction.Down;
   }
 
   private getClosesPlayer(players: Player[]): Player {
@@ -192,10 +199,12 @@ export class Enemy extends Sprite {
 
   private die() {
     this.setVelocity(0, 0);
+    this.setDepth(this.y - 100);
     this.body.enable = false;
     playAnimation(this, AnimationActor.Zombie, this.facing, AnimationSuffix.Die);
+    this.setRotation(Math.random() * 0.4 - 0.2);
 
-    this.scene.time.delayedCall(3000, () => {
+    this.scene.time.delayedCall(10000, () => {
       this.setVisible(false);
       this.setActive(false);
     });

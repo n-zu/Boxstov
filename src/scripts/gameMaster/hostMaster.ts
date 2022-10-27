@@ -1,6 +1,6 @@
 import { GameMaster } from "./gameMaster";
 import Peer, { DataConnection } from "peerjs";
-import { addUrl } from "./play";
+import { addUrl } from "../play";
 
 export type BaseMessage = { [id: number | string]: any };
 

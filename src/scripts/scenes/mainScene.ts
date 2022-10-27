@@ -1,6 +1,6 @@
 import { MultiplayerGame } from "../game/multiplayerGame";
 import { World, WorldState } from "../objects/world";
-import { GameMaster } from "../gameMaster";
+import { GameMaster } from "../gameMaster/gameMaster";
 import { Direction } from "../objects/player";
 import Sprite = Phaser.Physics.Arcade.Sprite;
 
@@ -21,12 +21,16 @@ export enum AnimationActor {
 export enum AnimationSuffix {
   Idle = "idle",
   Run = "run",
+  Walk = "walk",
   Attack = "atk",
   Die = "die",
 }
 
-export function playAnimation(sprite: Sprite, actor: AnimationActor, direction: Direction, suffix: AnimationSuffix) {
-  sprite.anims.play(`${actor}-${direction}-${suffix}`, true);
+export function playAnimation(sprite: Sprite, actor: AnimationActor, direction: Direction, suffix: AnimationSuffix, startFrame?: number) {
+  sprite.anims.play({
+    key: `${actor}-${direction}-${suffix}`,
+    startFrame: startFrame || 0
+  }, true);
 }
 
 export default class MainScene extends Phaser.Scene {
@@ -101,9 +105,9 @@ export default class MainScene extends Phaser.Scene {
       this.createAnimation(AnimationActor.Player, direction, AnimationSuffix.Idle, index * 8, index * 8 + 1);
       this.createAnimation(AnimationActor.Player, direction, AnimationSuffix.Run, index * 8 + 2, index * 8 + 7);
 
-      this.createAnimation(AnimationActor.Zombie, direction, AnimationSuffix.Run, index * 16, index * 16 + 3, ZOMBIE_RUN_FRAMERATE);
-      this.createAnimation(AnimationActor.Zombie, direction, AnimationSuffix.Idle, index * 16 + 4, index * 16 + 7, ZOMBIE_WALK_FRAMERATE);
-      this.createAnimation(AnimationActor.Zombie, direction, AnimationSuffix.Attack, index * 16 + 8, index * 16 + 11);
+      this.createAnimation(AnimationActor.Zombie, direction, AnimationSuffix.Walk, index * 16, index * 16 + 3, ZOMBIE_RUN_FRAMERATE);
+      this.createAnimation(AnimationActor.Zombie, direction, AnimationSuffix.Run, index * 16 + 4, index * 16 + 7, ZOMBIE_RUN_FRAMERATE);
+      this.createAnimation(AnimationActor.Zombie, direction, AnimationSuffix.Attack, index * 16 + 8, index * 16 + 11, ZOMBIE_WALK_FRAMERATE);
     });
 
     const directionsDie = [

@@ -1,5 +1,5 @@
-import { Enemy, EnemyState } from "./enemy";
-import { Player } from "./player";
+import { Enemy, EnemyState } from "../objects/enemy";
+import { Player } from "../objects/player";
 
 const TIME_BETWEEN_HORDES = 1000;
 

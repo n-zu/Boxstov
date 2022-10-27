@@ -1,8 +1,8 @@
-import { GameMaster } from "../gameMaster";
+import { GameMaster } from "../gameMaster/gameMaster";
 import * as Phaser from "phaser";
-import { BulletGroup } from "./bulletGroup";
+import { BulletGroup } from "../groups/bulletGroup";
 import { AnimationActor, AnimationSuffix, playAnimation } from "../scenes/mainScene";
-import { BaseMessage } from "../hostMaster";
+import { BaseMessage } from "../gameMaster/hostMaster";
 import Sprite = Phaser.Physics.Arcade.Sprite;
 
 const SPEED = 200;
@@ -11,14 +11,14 @@ const SYNC_DIFF_TOLERANCE = 1;
 const SYNC_DEPTH_TOLERANCE = 0.1;
 
 export enum Direction {
-  Up,
-  Down,
-  Left,
-  Right,
-  UpLeft,
-  UpRight,
-  DownLeft,
-  DownRight,
+  Up = "up",
+  Down = "down",
+  Left = "left",
+  Right = "right",
+  UpLeft = "upLeft",
+  UpRight = "upRight",
+  DownLeft = "downLeft",
+  DownRight = "downRight",
 }
 
 export type PlayerMessage = {
