@@ -40,6 +40,10 @@ export class GuestMaster extends GameMaster {
     }
   }
 
+  shouldSendSync(): boolean {
+    return false;
+  }
+
   protected setupSocket(socket: DataConnection) {
     socket.on("data", (data) => {
       const msg = data as Message;

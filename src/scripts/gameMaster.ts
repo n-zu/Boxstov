@@ -28,4 +28,6 @@ export abstract class GameMaster {
       return new Peer();
     }
   }
+
+  public abstract shouldSendSync(): boolean;
 }

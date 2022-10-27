@@ -46,6 +46,10 @@ export class HostMaster extends GameMaster {
     });
   }
 
+  shouldSendSync(): boolean {
+    return true;
+  }
+
   protected setupSocket(socket: DataConnection) {
     socket.on("data", (data) => {
       const msg = data as Message;

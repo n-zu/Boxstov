@@ -1,7 +1,6 @@
 import { MultiplayerGame } from "../game/multiplayerGame";
 import { World, WorldState } from "../objects/world";
 import { GameMaster } from "../gameMaster";
-import { HostMaster } from "../hostMaster";
 import { Direction } from "../objects/player";
 import Sprite = Phaser.Physics.Arcade.Sprite;
 
@@ -62,9 +61,8 @@ export default class MainScene extends Phaser.Scene {
   }
 
   update() {
-    // FIXME: :(
     if (this.syncCountdown == 0) {
-      if (this.gameMaster instanceof HostMaster) {
+      if (this.gameMaster.shouldSendSync()) {
         this.gameMaster.send("sync", this.world.getState());
         this.syncCountdown = SYNC_COUNTDOWN;
       }
