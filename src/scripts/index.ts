@@ -1,5 +1,4 @@
 import "../styles/menu.css";
-console.log("Hello, world!");
 
 function getInputValue(id: string): string {
   const element = document.getElementById(id);
