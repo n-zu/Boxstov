@@ -1,6 +1,10 @@
 import Sprite = Phaser.Physics.Arcade.Sprite;
 import { Direction, Player } from "./player";
-import { AnimationActor, AnimationSuffix, playAnimation } from "../scenes/mainScene";
+import {
+  AnimationActor,
+  AnimationSuffix,
+  playAnimation,
+} from "../scenes/mainScene";
 
 const SPEED = 50;
 
@@ -32,7 +36,7 @@ export class Enemy extends Sprite {
     scene.add.existing(this);
     scene.physics.add.existing(this);
 
-    this.scale = 0.8;
+    this.scale = 0.75;
     this.setBodySize(80, 180);
   }
 
@@ -71,10 +75,7 @@ export class Enemy extends Sprite {
     this.setVelocityX(velocityX * isFar);
     this.setVelocityY(velocityY * isFar);
 
-    const direction = this.getMovementDirection(
-      velocityX,
-      velocityY
-    );
+    const direction = this.getMovementDirection(velocityX, velocityY);
 
     if (direction) {
       this.facing = direction;
@@ -102,23 +103,23 @@ export class Enemy extends Sprite {
     if (this.anims.currentAnim && this.anims.currentFrame) {
       currentAnimation = {
         key: this.anims.currentAnim.key,
-        frame: this.anims.currentFrame.index
+        frame: this.anims.currentFrame.index,
       };
     }
     return {
       position: {
         x: this.x,
-        y: this.y
+        y: this.y,
       },
       velocity: {
         x: this.body.velocity.x,
-        y: this.body.velocity.y
+        y: this.body.velocity.y,
       },
       rotation: this.rotation,
       animation: currentAnimation,
       health: this.health,
       active: this.active,
-      visible: this.visible
+      visible: this.visible,
     };
   }
 
@@ -143,7 +144,6 @@ export class Enemy extends Sprite {
     this.setVisible(true);
     this.body.enable = true;
   }
-
 
   private getMovementDirection(
     xMovement: number,
@@ -201,7 +201,12 @@ export class Enemy extends Sprite {
     this.setVelocity(0, 0);
     this.setDepth(this.y - 100);
     this.body.enable = false;
-    playAnimation(this, AnimationActor.Zombie, this.facing, AnimationSuffix.Die);
+    playAnimation(
+      this,
+      AnimationActor.Zombie,
+      this.facing,
+      AnimationSuffix.Die
+    );
     this.setRotation(Math.random() * 0.4 - 0.2);
 
     this.scene.time.delayedCall(10000, () => {
