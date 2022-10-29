@@ -1,5 +1,5 @@
 :root {
-    --main-color: #03989E;
+    --main-color: #03989e;
     --background-fill-color: #000;
 }
 
@@ -9,9 +9,8 @@ body {
     height: 100vh;
     width: 100%;
     background: var(--background-fill-color);
-    background-image:
-        linear-gradient(var(--main-color), transparent 2%),
-        linear-gradient(90deg, var(--main-color), transparent 2%);
+    background-image: linear-gradient(var(--main-color), transparent 2%),
+    linear-gradient(90deg, var(--main-color), transparent 2%);
     background-size: 2em 2em;
 }
 
@@ -65,7 +64,7 @@ button:hover {
 
 h2 {
     font-weight: 600;
-    font-family: 'Roboto', sans-serif;
+    font-family: "Roboto", sans-serif;
     text-align: center;
 }
 
@@ -74,11 +73,12 @@ input {
     border-radius: 6px;
     line-height: 1.5;
     padding: 5px 10px;
-    transition: box-shadow 100ms ease-in, border 100ms ease-in, background-color 100ms ease-in;
+    transition: box-shadow 100ms ease-in, border 100ms ease-in,
+    background-color 100ms ease-in;
     border: 2px solid #dee1e2;
     display: block;
     height: 16px;
-    margin: 20px
+    margin: 20px;
 }
 
 input:focus {

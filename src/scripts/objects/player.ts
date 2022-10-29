@@ -1,16 +1,51 @@
-import { GameMaster } from "../gameMaster";
+import { GameMaster } from "../gameMaster/gameMaster";
 import * as Phaser from "phaser";
-import { BulletGroup } from "./bulletGroup";
+import { BulletGroup } from "../groups/bulletGroup";
+import { AnimationActor, AnimationSuffix, playAnimation } from "../scenes/mainScene";
+import { BaseMessage } from "../gameMaster/hostMaster";
 import Sprite = Phaser.Physics.Arcade.Sprite;
 
 const SPEED = 200;
 const diagonalFactor = Math.sqrt(2) / 2;
+const SYNC_DIFF_TOLERANCE = 1;
+const SYNC_DEPTH_TOLERANCE = 0.1;
 
-export type MovementMessage = {
-  type: "move";
-  playerId: string;
-  direction: "up" | "down" | "left" | "right";
-};
+export enum Direction {
+  Up = "up",
+  Down = "down",
+  Left = "left",
+  Right = "right",
+  UpLeft = "upLeft",
+  UpRight = "upRight",
+  DownLeft = "downLeft",
+  DownRight = "downRight",
+}
+
+export type PlayerMessage = {
+  id: string;
+  payload: PlayerState;
+}
+
+export function getUnitVector(direction: Direction): [number, number] {
+  switch (direction) {
+    case Direction.Up:
+      return [0, -1];
+    case Direction.Down:
+      return [0, 1];
+    case Direction.Left:
+      return [-1, 0];
+    case Direction.Right:
+      return [1, 0];
+    case Direction.UpLeft:
+      return [-diagonalFactor, -diagonalFactor];
+    case Direction.UpRight:
+      return [diagonalFactor, -diagonalFactor];
+    case Direction.DownLeft:
+      return [-diagonalFactor, diagonalFactor];
+    case Direction.DownRight:
+      return [diagonalFactor, diagonalFactor];
+  }
+}
 
 export type PlayerState = {
   id: string;
@@ -27,6 +62,7 @@ export type PlayerState = {
     key: string;
     frame: number;
   };
+  health: number;
 };
 
 export class Player extends Sprite {
@@ -34,6 +70,9 @@ export class Player extends Sprite {
   gameMaster: GameMaster;
   bulletGroup: BulletGroup;
   id: string;
+  facing: Direction = Direction.Down;
+  maxHealth = 100;
+  health = 100;
 
   constructor(
     scene: Phaser.Scene,
@@ -53,174 +92,76 @@ export class Player extends Sprite {
     this.gameMaster = gameMaster;
     this.bulletGroup = bulletGroup;
 
-    this.scale = 0.5;
+    this.setBodySize(180, 220);
+    this.setDisplaySize(250, 250);
+    this.setDisplayOrigin(250, 320);
+    this.setOffset(160, 240);
+
+    playAnimation(this, AnimationActor.Player, Direction.Down, AnimationSuffix.Idle);
   }
 
   public getId() {
     return this.id;
   }
 
-  public shoot(x: number, y: number, emitAlert = true) {
-    const angle = Phaser.Math.Angle.Between(this.x, this.y, x, y);
+  public shoot(emitAlert = true) {
+    {
+      const aud = new Audio("/assets/shoot.mp3");
+      aud.volume = 0.1;
+      aud.play();
+    }
+
+    const { x: xGun, y: yGun } = this.getGunPosition();
+
     if (emitAlert) {
-      this.gameMaster.send("shoot", {
+      this.gameMaster.send("player", {
         id: this.id,
-        x: x,
-        y: y,
+        payload: {
+          type: "shoot"
+        }
       });
     }
-    this.bulletGroup.shootBullet(this.x, this.y, angle);
+    this.bulletGroup.shootBullet(xGun, yGun, this.facing);
   }
 
   public move(
-    direction:
-      | "up"
-      | "down"
-      | "left"
-      | "right"
-      | "up-left"
-      | "up-right"
-      | "down-left"
-      | "down-right"
+    direction: Direction, emitAlert = true
   ) {
-    switch (direction) {
-      case "up":
-        this.moveUp(false);
-        break;
-      case "down":
-        this.moveDown(false);
-        break;
-      case "left":
-        this.moveLeft(false);
-        break;
-      case "right":
-        this.moveRight(false);
-        break;
-      case "up-left":
-        this.moveUpLeft(false);
-        break;
-      case "up-right":
-        this.moveUpRight(false);
-        break;
-      case "down-left":
-        this.moveDownLeft(false);
-        break;
-      case "down-right":
-        this.moveDownRight(false);
-        break;
+    const [x, y] = getUnitVector(direction);
+    this.setVelocity(x * SPEED, y * SPEED);
+    this.facing = direction;
+    playAnimation(this, AnimationActor.Player, direction, AnimationSuffix.Run);
+    if (emitAlert) {
+      this.sendMovementMessage(direction);
     }
   }
 
   public sync(state: PlayerState) {
-    this.setPosition(state.position.x, state.position.y);
-    this.setDepth(state.position.y);
-    this.setVelocity(state.velocity.x, state.velocity.y);
+    this.syncPosition(state.position);
+    this.syncVelocity(state.velocity);
+    this.syncDepth(state.position.y);
     this.setRotation(state.rotation);
+    this.health = state.health;
     if (state.animation) {
       // There is a bug here, probably
       // If I set ignoreIfPlaying to false, and then move the guest player, when it
       // receives a sync message, I get the following error:
       // Uncaught TypeError: Cannot read properties of undefined (reading 'duration')
       // It seems that ignoreIfPlaying to true makes the bug less reproducible
-      this.anims.play(
-        {
-          key: state.animation.key,
-          startFrame: state.animation.frame,
-        },
-        true
-      );
+      try {
+        if (this.anims.currentFrame) {
+          this.anims.play(
+            {
+              key: state.animation.key,
+              startFrame: state.animation.frame
+            },
+            true
+          );
+        }
+      } catch (e) {
+        console.log(e);
+      }
     }
-  }
-
-  public moveUp(emitAlert = true) {
-    if (emitAlert) {
-      this.gameMaster.send("move", {
-        id: this.id,
-        direction: "up",
-      });
-    }
-    this.anims.play("up", true);
-    this.setVelocity(0, -SPEED);
-  }
-
-  public moveDown(emitAlert = true) {
-    if (emitAlert) {
-      this.gameMaster.send("move", {
-        id: this.id,
-        direction: "down",
-      });
-    }
-    this.anims.play("down", true);
-    this.setVelocity(0, SPEED);
-  }
-
-  public moveLeft(emitAlert = true) {
-    if (emitAlert) {
-      this.gameMaster.send("move", {
-        id: this.id,
-        direction: "left",
-      });
-    }
-    this.anims.play("left", true);
-    this.setVelocity(-SPEED, 0);
-  }
-
-  public moveRight(emitAlert = true) {
-    if (emitAlert) {
-      this.gameMaster.send("move", {
-        id: this.id,
-        direction: "right",
-      });
-    }
-    this.anims.play("right", true);
-    this.setVelocity(SPEED, 0);
-  }
-
-  public moveUpLeft(emitAlert = true) {
-    if (emitAlert) {
-      this.gameMaster.send("move", {
-        id: this.id,
-        direction: "up-left",
-      });
-    }
-    this.anims.play("up-left", true);
-    this.setVelocity(-SPEED * diagonalFactor, -SPEED * diagonalFactor);
-  }
-
-  public moveUpRight(emitAlert = true) {
-    if (emitAlert) {
-      this.gameMaster.send("move", {
-        id: this.id,
-        direction: "up-right",
-      });
-    }
-
-    this.anims.play("up-right", true);
-    this.setVelocity(SPEED * diagonalFactor, -SPEED * diagonalFactor);
-  }
-
-  public moveDownLeft(emitAlert = true) {
-    if (emitAlert) {
-      this.gameMaster.send("move", {
-        id: this.id,
-        direction: "down-left",
-      });
-    }
-
-    this.anims.play("down-left", true);
-    this.setVelocity(-SPEED * diagonalFactor, SPEED * diagonalFactor);
-  }
-
-  public moveDownRight(emitAlert = true) {
-    if (emitAlert) {
-      this.gameMaster.send("move", {
-        id: this.id,
-        direction: "down-right",
-      });
-    }
-
-    this.anims.play("down-right", true);
-    this.setVelocity(SPEED * diagonalFactor, SPEED * diagonalFactor);
   }
 
   public getState(): PlayerState {
@@ -228,7 +169,7 @@ export class Player extends Sprite {
     if (this.anims.currentAnim && this.anims.currentFrame) {
       currentAnimation = {
         key: this.anims.currentAnim.key,
-        frame: this.anims.currentFrame.index,
+        frame: this.anims.currentFrame.index
       };
     }
     this.setDepth(this.y);
@@ -236,35 +177,131 @@ export class Player extends Sprite {
       id: this.id,
       position: {
         x: this.x,
-        y: this.y,
+        y: this.y
       },
       velocity: {
         x: this.body.velocity.x,
-        y: this.body.velocity.y,
+        y: this.body.velocity.y
       },
       rotation: this.rotation,
       animation: currentAnimation,
+      health: this.health
     };
   }
 
   public stopMovement(emitAlert = true) {
-    if (this.body.velocity.x !== 0 || this.body.velocity.y !== 0) {
-      if (emitAlert) {
-        this.gameMaster.send("stop", { id: this.id });
-      }
+    if (this.isMoving() && emitAlert) {
+      this.gameMaster.send("player", {
+        id: this.id,
+        payload: {
+          type: "stop"
+        }
+      });
     }
-    if (this.body.velocity.x > 0) {
-      this.anims.play("right-idle", true);
-      this.setVelocity(0, 0);
-    } else if (this.body.velocity.x < 0) {
-      this.anims.play("left-idle", true);
-      this.setVelocity(0, 0);
-    } else if (this.body.velocity.y > 0) {
-      this.anims.play("down-idle", true);
-      this.setVelocity(0, 0);
-    } else if (this.body.velocity.y < 0) {
-      this.anims.play("up-idle", true);
-      this.setVelocity(0, 0);
+    this.playIdleAnimation(this.facing);
+    this.setVelocity(0, 0);
+  }
+
+  public handleMessage(message: BaseMessage) {
+    switch (message.type) {
+      case "move":
+        this.move(message.direction, false);
+        break;
+      case "stop":
+        this.stopMovement(false);
+        break;
+      case "shoot":
+        this.shoot(false);
+        break;
+    }
+  }
+
+  private syncDepth(y: number) {
+    if (Math.abs(this.y - y) > SYNC_DEPTH_TOLERANCE) {
+      this.setDepth(y);
+    }
+  }
+
+  private syncVelocity(velocity: { x: number; y: number }) {
+    if (
+      Math.abs(this.body.velocity.x - velocity.x) > SYNC_DIFF_TOLERANCE ||
+      Math.abs(this.body.velocity.y - velocity.y) > SYNC_DIFF_TOLERANCE
+    ) {
+      this.setVelocity(velocity.x, velocity.y);
+    }
+  }
+
+  private syncPosition(position: { x: number; y: number }) {
+    const diffX = Math.abs(this.x - position.x);
+    const diffY = Math.abs(this.y - position.y);
+    if (diffX > SYNC_DIFF_TOLERANCE || diffY > SYNC_DIFF_TOLERANCE) {
+      this.setPosition(position.x, position.y);
+    }
+  }
+
+  private isMoving(): boolean {
+    return this.body.velocity.x !== 0 || this.body.velocity.y !== 0;
+  }
+
+  private playIdleAnimation(direction: Direction) {
+    const animationName = `${AnimationActor.Player}-${direction}-${AnimationSuffix.Idle}`;
+    this.anims.play(animationName, true);
+  }
+
+  private sendMovementMessage(direction: Direction) {
+    this.gameMaster.send("player", {
+      id: this.id,
+      payload: {
+        type: "move",
+        direction
+      }
+    });
+  }
+
+  private getGunPosition(): { x: number; y: number } {
+    // We should change this logic so that the bullet receives the position and angle
+    // of shooting, so that the bullet travels parallel to the player's gun
+    switch (this.facing) {
+      case Direction.Up:
+        return {
+          x: this.x + 15,
+          y: this.y - 120
+        };
+      case Direction.Down:
+        return {
+          x: this.x - 16,
+          y: this.y
+        };
+      case Direction.Left:
+        return {
+          x: this.x - 95,
+          y: this.y - 75
+        };
+      case Direction.Right:
+        return {
+          x: this.x + 95,
+          y: this.y - 65
+        };
+      case Direction.UpLeft:
+        return {
+          x: this.x - 75,
+          y: this.y - 120
+        };
+      case Direction.UpRight:
+        return {
+          x: this.x + 95,
+          y: this.y - 120
+        };
+      case Direction.DownLeft:
+        return {
+          x: this.x - 35,
+          y: this.y - 40
+        };
+      case Direction.DownRight:
+        return {
+          x: this.x + 45,
+          y: this.y - 10
+        };
     }
   }
 }

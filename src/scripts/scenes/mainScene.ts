@@ -1,15 +1,44 @@
 import { MultiplayerGame } from "../game/multiplayerGame";
 import { World, WorldState } from "../objects/world";
-import { GameMaster } from "../gameMaster";
-import { HostMaster } from "../hostMaster";
+import { GameMaster } from "../gameMaster/gameMaster";
+import { Direction } from "../objects/player";
+import Sprite = Phaser.Physics.Arcade.Sprite;
 
 const IDLE_FRAMERATE = 1;
 const RUN_FRAMERATE = 10;
+const ATTACK_FRAMERATE = 10;
+const DEATH_FRAMERATE = 10;
+const ZOMBIE_WALK_FRAMERATE = 8;
+const ZOMBIE_RUN_FRAMERATE = 8;
+
+const SYNC_COUNTDOWN = 100;
+
+export enum AnimationActor {
+  Player = "player",
+  Zombie = "zombie",
+}
+
+export enum AnimationSuffix {
+  Idle = "idle",
+  Run = "run",
+  Walk = "walk",
+  Attack = "atk",
+  Die = "die",
+}
+
+export function playAnimation(sprite: Sprite, actor: AnimationActor, direction: Direction, suffix: AnimationSuffix, startFrame?: number) {
+  sprite.anims.play({
+    key: `${actor}-${direction}-${suffix}`,
+    startFrame: startFrame || 0
+  }, true);
+}
 
 export default class MainScene extends Phaser.Scene {
   game: MultiplayerGame;
   world: World;
   gameMaster: GameMaster;
+  syncCountdown = SYNC_COUNTDOWN;
+  tileSprite: Phaser.GameObjects.TileSprite;
 
   protected constructor() {
     super({ key: "MainScene" });
@@ -17,19 +46,14 @@ export default class MainScene extends Phaser.Scene {
 
   create() {
     this.createAnimations();
+    this.add.tileSprite(0, 0, 7680, 4320, "tiles").setDepth(-9999);
 
     // FIXME: Need a way to get the ids
 
     this.world = new World(this, this.game.gameMaster);
+    this.scene.launch("UIScene", this.world.players[0]);
 
     this.gameMaster = this.game.gameMaster;
-
-    // FIXME: :(
-    if (this.gameMaster instanceof HostMaster) {
-      setInterval(() => {
-        this.gameMaster.send("sync", this.world.getState());
-      }, 500);
-    }
   }
 
   public getState(): WorldState {
@@ -41,180 +65,95 @@ export default class MainScene extends Phaser.Scene {
   }
 
   update() {
+    if (this.syncCountdown == 0) {
+      if (this.gameMaster.shouldSendSync()) {
+        this.gameMaster.send("sync", this.world.getState());
+        this.syncCountdown = SYNC_COUNTDOWN;
+      }
+    } else {
+      this.syncCountdown--;
+    }
     this.world.update();
   }
 
   preload() {
-    this.load.image("bullet", "assets/bullet.png");
+    this.load.image("tiles", "assets/Floor.png");
+    this.load.image("bullet", "assets/strip.png");
     this.load.spritesheet("player", "assets/Player/rifle_map.png", {
       frameWidth: 512,
-      frameHeight: 512,
+      frameHeight: 512
     });
-    this.load.spritesheet("player-idle", "assets/idle.png", {
-      frameWidth: 32,
-      frameHeight: 32,
+    this.load.spritesheet("zombie", "assets/Mobs/zombie_map_big.png", {
+      frameWidth: 512,
+      frameHeight: 512
     });
   }
 
   createAnimations() {
-    this.anims.create({
-      key: "up",
-      frames: this.anims.generateFrameNumbers("player", {
-        start: 34,
-        end: 39,
-      }),
-      frameRate: RUN_FRAMERATE,
-      repeat: -1,
+    const directions = [
+      Direction.Down,
+      Direction.DownRight,
+      Direction.Right,
+      Direction.UpRight,
+      Direction.Up,
+      Direction.UpLeft,
+      Direction.Left,
+      Direction.DownLeft
+    ];
+
+    directions.forEach((direction, index) => {
+      this.createAnimation(AnimationActor.Player, direction, AnimationSuffix.Idle, index * 8, index * 8 + 1);
+      this.createAnimation(AnimationActor.Player, direction, AnimationSuffix.Run, index * 8 + 2, index * 8 + 7);
+
+      this.createAnimation(AnimationActor.Zombie, direction, AnimationSuffix.Walk, index * 16, index * 16 + 3, ZOMBIE_RUN_FRAMERATE);
+      this.createAnimation(AnimationActor.Zombie, direction, AnimationSuffix.Run, index * 16 + 4, index * 16 + 7, ZOMBIE_RUN_FRAMERATE);
+      this.createAnimation(AnimationActor.Zombie, direction, AnimationSuffix.Attack, index * 16 + 8, index * 16 + 11, ZOMBIE_WALK_FRAMERATE);
     });
 
-    this.anims.create({
-      key: "right",
-      frames: this.anims.generateFrameNumbers("player", {
-        start: 18,
-        end: 23,
-      }),
-      frameRate: RUN_FRAMERATE,
-      repeat: -1,
+    const directionsDie = [
+      Direction.Left,
+      Direction.DownLeft,
+      Direction.Down,
+      Direction.DownRight,
+      Direction.Right,
+      Direction.UpRight,
+      Direction.Up,
+      Direction.UpLeft
+    ];
+
+    directionsDie.forEach((direction, index) => {
+      this.createAnimation(AnimationActor.Zombie, direction, AnimationSuffix.Die, index * 16 + 12, index * 16 + 15, DEATH_FRAMERATE);
     });
 
-    this.anims.create({
-      key: "down",
-      frames: this.anims.generateFrameNumbers("player", {
-        start: 2,
-        end: 7,
-      }),
-      frameRate: RUN_FRAMERATE,
-      repeat: -1,
-    });
+  }
+
+  private createAnimation(actor: AnimationActor, direction: Direction, suffix: AnimationSuffix, startFrame: number, endFrame: number, frameRate?: number) {
+    let frameRateToUse = frameRate;
+    if (!frameRateToUse) {
+      switch (suffix) {
+        case AnimationSuffix.Idle:
+          frameRateToUse = IDLE_FRAMERATE;
+          break;
+        case AnimationSuffix.Run:
+          frameRateToUse = RUN_FRAMERATE;
+          break;
+        case AnimationSuffix.Attack:
+          frameRateToUse = ATTACK_FRAMERATE;
+          break;
+        case AnimationSuffix.Die:
+          frameRateToUse = DEATH_FRAMERATE;
+          break;
+      }
+    }
 
     this.anims.create({
-      key: "left",
-      frames: this.anims.generateFrameNumbers("player", {
-        start: 50,
-        end: 55,
+      key: `${actor}-${direction}-${suffix}`,
+      frames: this.anims.generateFrameNumbers(actor, {
+        start: startFrame,
+        end: endFrame
       }),
-      frameRate: RUN_FRAMERATE,
-      repeat: -1,
-    });
-
-    this.anims.create({
-      key: "up-right",
-      frames: this.anims.generateFrameNumbers("player", {
-        start: 26,
-        end: 31,
-      }),
-      frameRate: RUN_FRAMERATE,
-      repeat: -1,
-    });
-
-    this.anims.create({
-      key: "up-left",
-      frames: this.anims.generateFrameNumbers("player", {
-        start: 43,
-        end: 47,
-      }),
-      frameRate: RUN_FRAMERATE,
-      repeat: -1,
-    });
-
-    this.anims.create({
-      key: "down-right",
-      frames: this.anims.generateFrameNumbers("player", {
-        start: 10,
-        end: 15,
-      }),
-      frameRate: RUN_FRAMERATE,
-      repeat: -1,
-    });
-
-    this.anims.create({
-      key: "down-left",
-      frames: this.anims.generateFrameNumbers("player", {
-        start: 58,
-        end: 63,
-      }),
-      frameRate: RUN_FRAMERATE,
-      repeat: -1,
-    });
-
-    this.anims.create({
-      key: "up-idle",
-      frames: this.anims.generateFrameNumbers("player", {
-        start: 32,
-        end: 33,
-      }),
-      frameRate: IDLE_FRAMERATE,
-      repeat: -1,
-    });
-
-    this.anims.create({
-      key: "right-idle",
-      frames: this.anims.generateFrameNumbers("player", {
-        start: 16,
-        end: 17,
-      }),
-      frameRate: IDLE_FRAMERATE,
-      repeat: -1,
-    });
-
-    this.anims.create({
-      key: "down-idle",
-      frames: this.anims.generateFrameNumbers("player", {
-        start: 0,
-        end: 1,
-      }),
-      frameRate: IDLE_FRAMERATE,
-      repeat: -1,
-    });
-
-    this.anims.create({
-      key: "left-idle",
-      frames: this.anims.generateFrameNumbers("player", {
-        start: 48,
-        end: 49,
-      }),
-      frameRate: IDLE_FRAMERATE,
-      repeat: -1,
-    });
-
-    this.anims.create({
-      key: "up-right-idle",
-      frames: this.anims.generateFrameNumbers("player", {
-        start: 24,
-        end: 25,
-      }),
-      frameRate: IDLE_FRAMERATE,
-      repeat: -1,
-    });
-
-    this.anims.create({
-      key: "up-left-idle",
-      frames: this.anims.generateFrameNumbers("player", {
-        start: 41,
-        end: 42,
-      }),
-      frameRate: IDLE_FRAMERATE,
-      repeat: -1,
-    });
-
-    this.anims.create({
-      key: "down-right-idle",
-      frames: this.anims.generateFrameNumbers("player", {
-        start: 8,
-        end: 9,
-      }),
-      frameRate: IDLE_FRAMERATE,
-      repeat: -1,
-    });
-
-    this.anims.create({
-      key: "down-left-idle",
-      frames: this.anims.generateFrameNumbers("player", {
-        start: 56,
-        end: 57,
-      }),
-      frameRate: IDLE_FRAMERATE,
-      repeat: -1,
+      frameRate: frameRateToUse,
+      repeat: suffix == AnimationSuffix.Die ? 0 : -1
     });
   }
 }

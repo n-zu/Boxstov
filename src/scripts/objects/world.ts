@@ -1,15 +1,20 @@
 import { Player, PlayerState } from "./player";
-import { BulletGroup, BulletGroupState } from "./bulletGroup";
-import { GameMaster } from "../gameMaster";
-import { PlayerControls } from "./playerControls";
+import { BulletGroup, BulletGroupState } from "../groups/bulletGroup";
+import { GameMaster } from "../gameMaster/gameMaster";
+import { PlayerControls } from "../controls/playerControls";
+import { Enemy } from "./enemy";
+import { Bullet } from "./bullet";
+import { Difficulty, EnemyGroup, EnemyGroupState } from "../groups/enemyGroup";
 
 export type WorldState = {
   players: PlayerState[];
   bullets: BulletGroupState;
+  enemies: EnemyGroupState;
 };
 
 export class World {
   players: Player[];
+  enemies: EnemyGroup;
   playerControls: PlayerControls;
   bulletGroup: BulletGroup;
   gameMaster: GameMaster;
@@ -22,10 +27,31 @@ export class World {
     this.scene = scene;
 
     this.setupGameMaster(gameMaster);
+
+    const spawnPoins = [
+      { x: 100, y: 100 },
+      { x: 100, y: 900 },
+      { x: 1800, y: 100 },
+      { x: 1800, y: 900 }
+    ];
+
+    this.enemies = new EnemyGroup(scene, 50, Difficulty.Hard, spawnPoins);
+
+    scene.physics.add.overlap(this.enemies, this.bulletGroup, (e, b) => {
+      const bullet = b as Bullet;
+      const enemy = e as Enemy;
+      if (bullet.active && enemy.active) {
+        bullet.collideWith(enemy);
+      }
+    });
+
+    // Enemies repel each other
+    scene.physics.add.collider(this.enemies, this.enemies);
   }
 
   public update() {
     this.playerControls.update();
+    this.enemies.update(this.players);
   }
 
   public sync(worldState: WorldState) {
@@ -33,6 +59,7 @@ export class World {
       const player = this.getOrCreatePlayer(playerState.id);
       player.sync(playerState);
     });
+    this.enemies.sync(worldState.enemies);
 
     this.bulletGroup.sync(worldState.bullets);
   }
@@ -41,6 +68,7 @@ export class World {
     return {
       players: this.players.map((player) => player.getState()),
       bullets: this.bulletGroup.getState(),
+      enemies: this.enemies.getState()
     };
   }
 
@@ -50,8 +78,8 @@ export class World {
     const playerId = Math.random().toString(36).substring(7);
     const player = new Player(
       scene,
-      100,
-      100,
+      800,
+      500,
       playerId,
       gameMaster,
       this.bulletGroup
@@ -60,8 +88,10 @@ export class World {
 
     this.players = [player];
 
-    scene.input.on("pointerdown", (pointer) => {
-      player.shoot(pointer.x, pointer.y);
+    scene.cameras.main.startFollow(player);
+
+    scene.input.on("wheel", (pointer, gameObjects, deltaX, deltaY) => {
+      scene.cameras.main.zoom -= deltaY * 0.001;
     });
   }
 
@@ -77,21 +107,15 @@ export class World {
         this.bulletGroup
       );
       this.players.push(player);
+      this.gameMaster.send("sync", this.getState());
     }
     return player;
   }
 
   private setupGameMaster(gameMaster: GameMaster) {
-    gameMaster.addAction("move", (data: any) => {
-      this.getOrCreatePlayer(data.id).move(data.direction);
-    });
-
-    gameMaster.addAction("shoot", (data: any) => {
-      this.getOrCreatePlayer(data.id).shoot(data.x, data.y, false);
-    });
-
-    gameMaster.addAction("stop", (data: any) => {
-      this.getOrCreatePlayer(data.id).stopMovement(false);
+    gameMaster.addAction("player", (data: any) => {
+      const player = this.getOrCreatePlayer(data.id);
+      player.handleMessage(data.payload);
     });
 
     gameMaster.addAction("sync", (data: any) => {
