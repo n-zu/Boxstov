@@ -7,7 +7,8 @@ import {
   playAnimation,
 } from "../scenes/mainScene";
 import Sprite = Phaser.Physics.Arcade.Sprite;
-import { Direction, PlayerUpdatePayload } from "../../typings/action";
+import { PlayerUpdatePayload } from "../../typings/action";
+import { Direction } from "../../typings/direction";
 
 const SPEED = 200;
 const diagonalFactor = Math.sqrt(2) / 2;

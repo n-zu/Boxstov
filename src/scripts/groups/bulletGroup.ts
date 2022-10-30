@@ -1,4 +1,4 @@
-import { Direction } from "../../typings/action";
+import { Direction } from "../../typings/direction";
 import { Bullet, BulletState } from "../objects/bullet";
 
 export type BulletGroupState = BulletState[];

@@ -4,13 +4,15 @@ import { GameMaster } from "../gameMaster/gameMaster";
 import { PlayerControls } from "../controls/playerControls";
 import { Enemy } from "./enemy";
 import { Bullet } from "./bullet";
-import { Difficulty, EnemyGroup, EnemyGroupState } from "../groups/enemyGroup";
-import { EnemyUpdate, PlayerUpdate, SyncUpdate } from "../../typings/action";
+import { EnemyGroup } from "../groups/enemyGroup";
+import { PlayerUpdate, SyncUpdate } from "../../typings/action";
+import { EnemyGroupState } from "../../typings/state";
+import EnemyGroupServer from "./logic/server/enemyGroup";
 
 export type WorldState = {
   players: PlayerState[];
   bullets: BulletGroupState;
-  enemies: EnemyGroupState;
+  enemies?: EnemyGroupState;
 };
 
 export class World {
@@ -20,6 +22,7 @@ export class World {
   bulletGroup: BulletGroup;
   gameMaster: GameMaster;
   scene: Phaser.Scene;
+  enemyServer?: EnemyGroupServer;
 
   constructor(scene: Phaser.Scene, gameMaster: GameMaster) {
     this.setupFirstPlayer(scene, gameMaster);
@@ -29,20 +32,10 @@ export class World {
 
     this.setupGameMaster(gameMaster);
 
-    const spawnPoints = [
-      { x: 100, y: 100 },
-      { x: 100, y: 900 },
-      { x: 1800, y: 100 },
-      { x: 1800, y: 900 },
-    ];
-
-    this.enemies = new EnemyGroup(
-      scene,
-      50,
-      Difficulty.Hard,
-      spawnPoints,
-      gameMaster
-    );
+    this.enemies = new EnemyGroup(scene, 50);
+    if (gameMaster.shouldSendSync()) {
+      this.enemyServer = new EnemyGroupServer(this.enemies);
+    }
 
     scene.physics.add.overlap(this.enemies, this.bulletGroup, (e, b) => {
       const bullet = b as Bullet;
@@ -57,8 +50,11 @@ export class World {
   }
 
   public update() {
+    //this.sync();
+    this.enemyServer?.process(this.players);
+
     this.playerControls.update();
-    this.enemies.update(this.players);
+    this.enemies.update();
   }
 
   public sync(worldState: WorldState) {
@@ -66,7 +62,7 @@ export class World {
       const player = this.getOrCreatePlayer(playerState.id);
       player.sync(playerState);
     });
-    this.enemies.sync(worldState.enemies);
+    this.enemies.nextState = worldState.enemies;
 
     this.bulletGroup.sync(worldState.bullets);
   }
@@ -75,7 +71,7 @@ export class World {
     return {
       players: this.players.map((player) => player.getState()),
       bullets: this.bulletGroup.getState(),
-      enemies: this.enemies.getState(),
+      enemies: this.enemies.nextState,
     };
   }
 
@@ -127,10 +123,6 @@ export class World {
 
     gameMaster.addAction("sync", (data: SyncUpdate) => {
       this.sync(data);
-    });
-
-    gameMaster.addAction("enemy", (data: EnemyUpdate) => {
-      this.enemies.handleMessage(data);
     });
   }
 }

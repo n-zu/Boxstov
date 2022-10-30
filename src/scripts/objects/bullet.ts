@@ -1,7 +1,7 @@
 import Sprite = Phaser.Physics.Arcade.Sprite;
 import { getUnitVector } from "./player";
 import { Enemy } from "./enemy";
-import { Direction } from "../../typings/action";
+import { Direction } from "../../typings/direction";
 
 export type BulletState = {
   x: number;

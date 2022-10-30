@@ -1,49 +1,63 @@
 import CursorKeys = Phaser.Types.Input.Keyboard.CursorKeys;
 import { Player } from "../objects/player";
-import { Direction } from "../../typings/action";
+import { Direction } from "../../typings/direction";
 
 let lasShot = 0;
 
+interface LetterKeys {
+  W: Phaser.Input.Keyboard.Key;
+  A: Phaser.Input.Keyboard.Key;
+  S: Phaser.Input.Keyboard.Key;
+  D: Phaser.Input.Keyboard.Key;
+}
+
 export class PlayerControls {
   cursorKeys: CursorKeys;
+  letterKeys: LetterKeys;
   player: Player;
 
   constructor(player: Player) {
     this.cursorKeys = player.scene.input.keyboard.createCursorKeys();
+    this.letterKeys = player.scene.input.keyboard.addKeys(
+      "W,A,S,D"
+    ) as LetterKeys;
     this.player = player;
   }
 
+  private down(): boolean {
+    return this.cursorKeys.down.isDown || this.letterKeys.S.isDown;
+  }
+
+  private up(): boolean {
+    return this.cursorKeys.up.isDown || this.letterKeys.W.isDown;
+  }
+
+  private left(): boolean {
+    return this.cursorKeys.left.isDown || this.letterKeys.A.isDown;
+  }
+
+  private right(): boolean {
+    return this.cursorKeys.right.isDown || this.letterKeys.D.isDown;
+  }
+
   update() {
-    const amountOfArrowsDown = this.getAmountOfArrowsDown();
-    if (amountOfArrowsDown === 1) {
-      if (this.cursorKeys.up.isDown) {
-        this.player.move(Direction.Up, true);
-      }
-      if (this.cursorKeys.down.isDown) {
-        this.player.move(Direction.Down, true);
-      }
-      if (this.cursorKeys.left.isDown) {
-        this.player.move(Direction.Left, true);
-      }
-      if (this.cursorKeys.right.isDown) {
-        this.player.move(Direction.Right, true);
-      }
-    }
-    if (amountOfArrowsDown === 2) {
-      if (this.cursorKeys.up.isDown && this.cursorKeys.left.isDown) {
-        this.player.move(Direction.UpLeft, true);
-      }
-      if (this.cursorKeys.up.isDown && this.cursorKeys.right.isDown) {
-        this.player.move(Direction.UpRight, true);
-      }
-      if (this.cursorKeys.down.isDown && this.cursorKeys.left.isDown) {
-        this.player.move(Direction.DownLeft, true);
-      }
-      if (this.cursorKeys.down.isDown && this.cursorKeys.right.isDown) {
-        this.player.move(Direction.DownRight, true);
-      }
-    }
-    if (amountOfArrowsDown === 0) {
+    if (this.down() && this.left()) {
+      this.player.move(Direction.DownLeft);
+    } else if (this.down() && this.right()) {
+      this.player.move(Direction.DownRight);
+    } else if (this.up() && this.left()) {
+      this.player.move(Direction.UpLeft);
+    } else if (this.up() && this.right()) {
+      this.player.move(Direction.UpRight);
+    } else if (this.down()) {
+      this.player.move(Direction.Down);
+    } else if (this.up()) {
+      this.player.move(Direction.Up);
+    } else if (this.left()) {
+      this.player.move(Direction.Left);
+    } else if (this.right()) {
+      this.player.move(Direction.Right);
+    } else {
       this.player.stopMovement(true);
     }
 
@@ -62,22 +76,5 @@ export class PlayerControls {
         this.player.shoot(true);
       }
     }
-  }
-
-  private getAmountOfArrowsDown() {
-    let count = 0;
-    if (this.cursorKeys.up.isDown) {
-      count++;
-    }
-    if (this.cursorKeys.down.isDown) {
-      count++;
-    }
-    if (this.cursorKeys.left.isDown) {
-      count++;
-    }
-    if (this.cursorKeys.right.isDown) {
-      count++;
-    }
-    return count;
   }
 }

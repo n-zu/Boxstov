@@ -1,15 +1,5 @@
 import { WorldState } from "../scripts/objects/world";
-
-export enum Direction {
-  Up = "up",
-  Down = "down",
-  Left = "left",
-  Right = "right",
-  UpLeft = "upLeft",
-  UpRight = "upRight",
-  DownLeft = "downLeft",
-  DownRight = "downRight",
-}
+import { Direction } from "./direction";
 
 export interface PlayerUpdate {
   id: string;
@@ -29,19 +19,12 @@ export interface PlayerUpdateOther {
 
 export type SyncUpdate = WorldState;
 
-export interface EnemyUpdate {
-  id: number;
-  type: "die";
-}
-
-export type Update = PlayerUpdate | SyncUpdate | EnemyUpdate;
-export type MessageType = "player" | "sync" | "enemy";
+export type Update = PlayerUpdate | SyncUpdate;
+export type MessageType = "player" | "sync";
 export type UpdateFor<T extends MessageType> = T extends "player"
   ? PlayerUpdate
   : T extends "sync"
   ? SyncUpdate
-  : T extends "enemy"
-  ? EnemyUpdate
   : never;
 
 export interface ActionI<T extends MessageType = MessageType> {

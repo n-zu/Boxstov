@@ -2,7 +2,7 @@ import { MultiplayerGame } from "../game/multiplayerGame";
 import { World, WorldState } from "../objects/world";
 import { GameMaster } from "../gameMaster/gameMaster";
 import Sprite = Phaser.Physics.Arcade.Sprite;
-import { Direction } from "../../typings/action";
+import { Direction } from "../../typings/direction";
 
 const IDLE_FRAMERATE = 1;
 const RUN_FRAMERATE = 10;
@@ -11,7 +11,7 @@ const DEATH_FRAMERATE = 10;
 const ZOMBIE_WALK_FRAMERATE = 8;
 const ZOMBIE_RUN_FRAMERATE = 8;
 
-const SYNC_COUNTDOWN = 100;
+const SYNC_MS = 50;
 
 export enum AnimationActor {
   Player = "player",
@@ -46,7 +46,6 @@ export default class MainScene extends Phaser.Scene {
   game: MultiplayerGame;
   world: World;
   gameMaster: GameMaster;
-  syncCountdown = SYNC_COUNTDOWN;
   lastUpdated = Date.now();
 
   protected constructor() {
@@ -56,8 +55,6 @@ export default class MainScene extends Phaser.Scene {
   create() {
     this.createAnimations();
     this.add.tileSprite(0, 0, 7680, 4320, "tiles").setDepth(-9999);
-
-    // FIXME: Need a way to get the ids
 
     this.world = new World(this, this.game.gameMaster);
     this.scene.launch("UIScene", this.world.players[0]);
@@ -73,12 +70,19 @@ export default class MainScene extends Phaser.Scene {
     this.world.sync(worldState);
   }
 
+  private updateHost() {
+    const now = Date.now();
+    if (now - this.lastUpdated < SYNC_MS) return;
+
+    this.gameMaster.send("sync", this.world.getState());
+    this.lastUpdated = now;
+  }
+
   update() {
+    this.world.update();
+
     if (this.gameMaster.shouldSendSync()) {
-      this.world.update();
-      this.gameMaster.send("sync", this.world.getState());
-    } else {
-      this.world.playerControls.update();
+      this.updateHost();
     }
   }
 
