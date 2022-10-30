@@ -1,6 +1,7 @@
 import { Enemy, EnemyState } from "../objects/enemy";
 import { Player } from "../objects/player";
 import { GameMaster } from "../gameMaster/gameMaster";
+import { EnemyUpdate } from "../../typings/action";
 
 const TIME_BETWEEN_HORDES = 1000;
 
@@ -8,7 +9,7 @@ export type EnemyGroupState = {
   enemies: EnemyState[];
   timeUntilNextHorde: number;
   spawnPoints: SpawnPoint[];
-}
+};
 
 export enum Difficulty {
   Easy = "easy",
@@ -19,14 +20,20 @@ export enum Difficulty {
 export type SpawnPoint = {
   x: number;
   y: number;
-}
+};
 
 export class EnemyGroup extends Phaser.Physics.Arcade.Group {
   difficulty: Difficulty;
   timeUntilNextHorde = 0;
   spawnPoints: SpawnPoint[];
 
-  constructor(scene: Phaser.Scene, maxEnemies: number, difficulty: Difficulty, spawnPoints: SpawnPoint[], gameMaster: GameMaster) {
+  constructor(
+    scene: Phaser.Scene,
+    maxEnemies: number,
+    difficulty: Difficulty,
+    spawnPoints: SpawnPoint[],
+    gameMaster: GameMaster
+  ) {
     super(scene.physics.world, scene);
 
     const enemies: Enemy[] = [];
@@ -61,7 +68,7 @@ export class EnemyGroup extends Phaser.Physics.Arcade.Group {
     return {
       enemies: enemyInfo,
       timeUntilNextHorde: this.timeUntilNextHorde,
-      spawnPoints: this.spawnPoints
+      spawnPoints: this.spawnPoints,
     };
   }
 
@@ -74,7 +81,7 @@ export class EnemyGroup extends Phaser.Physics.Arcade.Group {
     });
   }
 
-  public handleMessage(message: any) {
+  public handleMessage(message: EnemyUpdate) {
     const enemy = this.children.entries[message.id] as Enemy;
     enemy.handleMessage(message);
   }
@@ -96,7 +103,8 @@ export class EnemyGroup extends Phaser.Physics.Arcade.Group {
     for (let i = 0; i < enemiesToSpawn; i++) {
       const enemy = this.getFirstDead(false) as Enemy;
       if (enemy) {
-        const spawnPoint = this.spawnPoints[Math.floor(Math.random() * this.spawnPoints.length)];
+        const spawnPoint =
+          this.spawnPoints[Math.floor(Math.random() * this.spawnPoints.length)];
         const xPosition = spawnPoint.x + Math.floor(Math.random() * 100) - 50;
         const yPosition = spawnPoint.y + Math.floor(Math.random() * 100) - 50;
 

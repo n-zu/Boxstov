@@ -1,8 +1,8 @@
 import { MultiplayerGame } from "../game/multiplayerGame";
 import { World, WorldState } from "../objects/world";
 import { GameMaster } from "../gameMaster/gameMaster";
-import { Direction } from "../objects/player";
 import Sprite = Phaser.Physics.Arcade.Sprite;
+import { Direction } from "../../typings/action";
 
 const IDLE_FRAMERATE = 1;
 const RUN_FRAMERATE = 10;
@@ -26,11 +26,20 @@ export enum AnimationSuffix {
   Die = "die",
 }
 
-export function playAnimation(sprite: Sprite, actor: AnimationActor, direction: Direction, suffix: AnimationSuffix, startFrame?: number) {
-  sprite.anims.play({
-    key: `${actor}-${direction}-${suffix}`,
-    startFrame: startFrame || 0
-  }, true);
+export function playAnimation(
+  sprite: Sprite,
+  actor: AnimationActor,
+  direction: Direction,
+  suffix: AnimationSuffix,
+  startFrame?: number
+) {
+  sprite.anims.play(
+    {
+      key: `${actor}-${direction}-${suffix}`,
+      startFrame: startFrame || 0,
+    },
+    true
+  );
 }
 
 export default class MainScene extends Phaser.Scene {
@@ -78,11 +87,11 @@ export default class MainScene extends Phaser.Scene {
     this.load.image("bullet", "assets/strip.png");
     this.load.spritesheet("player", "assets/Player/rifle_map.png", {
       frameWidth: 512,
-      frameHeight: 512
+      frameHeight: 512,
     });
     this.load.spritesheet("zombie", "assets/Mobs/zombie_map_big.png", {
       frameWidth: 512,
-      frameHeight: 512
+      frameHeight: 512,
     });
   }
 
@@ -95,16 +104,49 @@ export default class MainScene extends Phaser.Scene {
       Direction.Up,
       Direction.UpLeft,
       Direction.Left,
-      Direction.DownLeft
+      Direction.DownLeft,
     ];
 
     directions.forEach((direction, index) => {
-      this.createAnimation(AnimationActor.Player, direction, AnimationSuffix.Idle, index * 8, index * 8 + 1);
-      this.createAnimation(AnimationActor.Player, direction, AnimationSuffix.Run, index * 8 + 2, index * 8 + 7);
+      this.createAnimation(
+        AnimationActor.Player,
+        direction,
+        AnimationSuffix.Idle,
+        index * 8,
+        index * 8 + 1
+      );
+      this.createAnimation(
+        AnimationActor.Player,
+        direction,
+        AnimationSuffix.Run,
+        index * 8 + 2,
+        index * 8 + 7
+      );
 
-      this.createAnimation(AnimationActor.Zombie, direction, AnimationSuffix.Walk, index * 16, index * 16 + 3, ZOMBIE_RUN_FRAMERATE);
-      this.createAnimation(AnimationActor.Zombie, direction, AnimationSuffix.Run, index * 16 + 4, index * 16 + 7, ZOMBIE_RUN_FRAMERATE);
-      this.createAnimation(AnimationActor.Zombie, direction, AnimationSuffix.Attack, index * 16 + 8, index * 16 + 11, ZOMBIE_WALK_FRAMERATE);
+      this.createAnimation(
+        AnimationActor.Zombie,
+        direction,
+        AnimationSuffix.Walk,
+        index * 16,
+        index * 16 + 3,
+        ZOMBIE_RUN_FRAMERATE
+      );
+      this.createAnimation(
+        AnimationActor.Zombie,
+        direction,
+        AnimationSuffix.Run,
+        index * 16 + 4,
+        index * 16 + 7,
+        ZOMBIE_RUN_FRAMERATE
+      );
+      this.createAnimation(
+        AnimationActor.Zombie,
+        direction,
+        AnimationSuffix.Attack,
+        index * 16 + 8,
+        index * 16 + 11,
+        ZOMBIE_WALK_FRAMERATE
+      );
     });
 
     const directionsDie = [
@@ -115,16 +157,29 @@ export default class MainScene extends Phaser.Scene {
       Direction.Right,
       Direction.UpRight,
       Direction.Up,
-      Direction.UpLeft
+      Direction.UpLeft,
     ];
 
     directionsDie.forEach((direction, index) => {
-      this.createAnimation(AnimationActor.Zombie, direction, AnimationSuffix.Die, index * 16 + 12, index * 16 + 15, DEATH_FRAMERATE);
+      this.createAnimation(
+        AnimationActor.Zombie,
+        direction,
+        AnimationSuffix.Die,
+        index * 16 + 12,
+        index * 16 + 15,
+        DEATH_FRAMERATE
+      );
     });
-
   }
 
-  private createAnimation(actor: AnimationActor, direction: Direction, suffix: AnimationSuffix, startFrame: number, endFrame: number, frameRate?: number) {
+  private createAnimation(
+    actor: AnimationActor,
+    direction: Direction,
+    suffix: AnimationSuffix,
+    startFrame: number,
+    endFrame: number,
+    frameRate?: number
+  ) {
     let frameRateToUse = frameRate;
     if (!frameRateToUse) {
       switch (suffix) {
@@ -147,10 +202,10 @@ export default class MainScene extends Phaser.Scene {
       key: `${actor}-${direction}-${suffix}`,
       frames: this.anims.generateFrameNumbers(actor, {
         start: startFrame,
-        end: endFrame
+        end: endFrame,
       }),
       frameRate: frameRateToUse,
-      repeat: suffix == AnimationSuffix.Die ? 0 : -1
+      repeat: suffix == AnimationSuffix.Die ? 0 : -1,
     });
   }
 }

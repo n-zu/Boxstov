@@ -5,6 +5,7 @@ import { PlayerControls } from "../controls/playerControls";
 import { Enemy } from "./enemy";
 import { Bullet } from "./bullet";
 import { Difficulty, EnemyGroup, EnemyGroupState } from "../groups/enemyGroup";
+import { EnemyUpdate, PlayerUpdate, SyncUpdate } from "../../typings/action";
 
 export type WorldState = {
   players: PlayerState[];
@@ -32,10 +33,16 @@ export class World {
       { x: 100, y: 100 },
       { x: 100, y: 900 },
       { x: 1800, y: 100 },
-      { x: 1800, y: 900 }
+      { x: 1800, y: 900 },
     ];
 
-    this.enemies = new EnemyGroup(scene, 50, Difficulty.Hard, spawnPoints, gameMaster);
+    this.enemies = new EnemyGroup(
+      scene,
+      50,
+      Difficulty.Hard,
+      spawnPoints,
+      gameMaster
+    );
 
     scene.physics.add.overlap(this.enemies, this.bulletGroup, (e, b) => {
       const bullet = b as Bullet;
@@ -68,7 +75,7 @@ export class World {
     return {
       players: this.players.map((player) => player.getState()),
       bullets: this.bulletGroup.getState(),
-      enemies: this.enemies.getState()
+      enemies: this.enemies.getState(),
     };
   }
 
@@ -113,16 +120,16 @@ export class World {
   }
 
   private setupGameMaster(gameMaster: GameMaster) {
-    gameMaster.addAction("player", (data: any) => {
+    gameMaster.addAction("player", (data: PlayerUpdate) => {
       const player = this.getOrCreatePlayer(data.id);
       player.handleMessage(data.payload);
     });
 
-    gameMaster.addAction("sync", (data: any) => {
+    gameMaster.addAction("sync", (data: SyncUpdate) => {
       this.sync(data);
     });
 
-    gameMaster.addAction("enemy", (data: any) => {
+    gameMaster.addAction("enemy", (data: EnemyUpdate) => {
       this.enemies.handleMessage(data);
     });
   }

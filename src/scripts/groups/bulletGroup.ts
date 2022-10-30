@@ -1,5 +1,5 @@
+import { Direction } from "../../typings/action";
 import { Bullet, BulletState } from "../objects/bullet";
-import { Direction } from "../objects/player";
 
 export type BulletGroupState = BulletState[];
 
@@ -12,7 +12,7 @@ export class BulletGroup extends Phaser.Physics.Arcade.Group {
       key: "bullet",
       active: false,
       visible: false,
-      classType: Bullet
+      classType: Bullet,
     });
   }
 

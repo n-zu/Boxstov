@@ -1,13 +1,7 @@
 import { GameMaster } from "./gameMaster";
-import Peer, { DataConnection } from "peerjs";
+import { DataConnection } from "peerjs";
 import { addUrl } from "../play";
-
-export type BaseMessage = { [id: number | string]: any };
-
-export type Message = {
-  type: string;
-  payload: Message | BaseMessage;
-} | BaseMessage;
+import { MessageType, Message, Update } from "../../typings/action";
 
 export class HostMaster extends GameMaster {
   guest_sockets: DataConnection[] = [];
@@ -27,18 +21,10 @@ export class HostMaster extends GameMaster {
     });
   }
 
-  createPeer(socketId?: string): Peer {
-    if (socketId) {
-      return new Peer(socketId);
-    } else {
-      return new Peer();
-    }
-  }
-
-  public send(type: string, payload: Message) {
+  public send(type: MessageType, payload: Update) {
     const msg = {
       type,
-      payload
+      payload,
     } as Message;
 
     this.guest_sockets.forEach((socket) => {
@@ -46,12 +32,11 @@ export class HostMaster extends GameMaster {
     });
   }
 
-  public broadcast(type: string, payload: Message) {
+  public broadcast(type: string, payload: Update) {
     const msg = {
       type,
-      payload
+      payload,
     } as Message;
-
 
     this.guest_sockets.forEach((socket) => {
       this.send_async(socket, msg);

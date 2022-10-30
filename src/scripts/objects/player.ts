@@ -1,30 +1,23 @@
 import { GameMaster } from "../gameMaster/gameMaster";
 import * as Phaser from "phaser";
 import { BulletGroup } from "../groups/bulletGroup";
-import { AnimationActor, AnimationSuffix, playAnimation } from "../scenes/mainScene";
-import { BaseMessage } from "../gameMaster/hostMaster";
+import {
+  AnimationActor,
+  AnimationSuffix,
+  playAnimation,
+} from "../scenes/mainScene";
 import Sprite = Phaser.Physics.Arcade.Sprite;
+import { Direction, PlayerUpdatePayload } from "../../typings/action";
 
 const SPEED = 200;
 const diagonalFactor = Math.sqrt(2) / 2;
 const SYNC_DIFF_TOLERANCE = 0.01;
 const SYNC_DEPTH_TOLERANCE = 0.01;
 
-export enum Direction {
-  Up = "up",
-  Down = "down",
-  Left = "left",
-  Right = "right",
-  UpLeft = "upLeft",
-  UpRight = "upRight",
-  DownLeft = "downLeft",
-  DownRight = "downRight",
-}
-
 export type PlayerMessage = {
   id: string;
   payload: PlayerState;
-}
+};
 
 export function getUnitVector(direction: Direction): [number, number] {
   switch (direction) {
@@ -92,7 +85,12 @@ export class Player extends Sprite {
     this.setDisplayOrigin(250, 320);
     this.setOffset(160, 240);
 
-    playAnimation(this, AnimationActor.Player, Direction.Down, AnimationSuffix.Idle);
+    playAnimation(
+      this,
+      AnimationActor.Player,
+      Direction.Down,
+      AnimationSuffix.Idle
+    );
   }
 
   public getId() {
@@ -112,16 +110,14 @@ export class Player extends Sprite {
       this.gameMaster.send("player", {
         id: this.id,
         payload: {
-          type: "shoot"
-        }
+          type: "shoot",
+        },
       });
     }
     this.bulletGroup.shootBullet(xGun, yGun, this.facing);
   }
 
-  public move(
-    direction: Direction, emitAlert = true
-  ) {
+  public move(direction: Direction, emitAlert = true) {
     if (this.gameMaster.shouldSendSync()) {
       const [x, y] = getUnitVector(direction);
       this.setVelocity(x * SPEED, y * SPEED);
@@ -146,13 +142,13 @@ export class Player extends Sprite {
       id: this.id,
       position: {
         x: this.x,
-        y: this.y
+        y: this.y,
       },
       velocity: {
         x: this.body.velocity.x,
-        y: this.body.velocity.y
+        y: this.body.velocity.y,
       },
-      health: this.health
+      health: this.health,
     };
   }
 
@@ -162,15 +158,15 @@ export class Player extends Sprite {
       this.gameMaster.send("player", {
         id: this.id,
         payload: {
-          type: "stop"
-        }
+          type: "stop",
+        },
       });
     }
     this.playIdleAnimation(this.facing);
     this.setVelocity(0, 0);
   }
 
-  public handleMessage(message: BaseMessage) {
+  public handleMessage(message: PlayerUpdatePayload) {
     switch (message.type) {
       case "move":
         this.move(message.direction, false);
@@ -225,8 +221,8 @@ export class Player extends Sprite {
       id: this.id,
       payload: {
         type: "move",
-        direction
-      }
+        direction,
+      },
     });
   }
 
@@ -237,42 +233,42 @@ export class Player extends Sprite {
       case Direction.Up:
         return {
           x: this.x + 15,
-          y: this.y - 120
+          y: this.y - 120,
         };
       case Direction.Down:
         return {
           x: this.x - 16,
-          y: this.y
+          y: this.y,
         };
       case Direction.Left:
         return {
           x: this.x - 95,
-          y: this.y - 75
+          y: this.y - 75,
         };
       case Direction.Right:
         return {
           x: this.x + 95,
-          y: this.y - 65
+          y: this.y - 65,
         };
       case Direction.UpLeft:
         return {
           x: this.x - 75,
-          y: this.y - 120
+          y: this.y - 120,
         };
       case Direction.UpRight:
         return {
           x: this.x + 95,
-          y: this.y - 120
+          y: this.y - 120,
         };
       case Direction.DownLeft:
         return {
           x: this.x - 35,
-          y: this.y - 40
+          y: this.y - 40,
         };
       case Direction.DownRight:
         return {
           x: this.x + 45,
-          y: this.y - 10
+          y: this.y - 10,
         };
     }
   }

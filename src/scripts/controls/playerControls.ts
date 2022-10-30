@@ -1,5 +1,6 @@
 import CursorKeys = Phaser.Types.Input.Keyboard.CursorKeys;
-import { Direction, Player } from "../objects/player";
+import { Player } from "../objects/player";
+import { Direction } from "../../typings/action";
 
 let lasShot = 0;
 

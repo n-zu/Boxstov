@@ -1,11 +1,5 @@
 import Peer from "peerjs";
-import { Message } from "./hostMaster";
-
-
-export type Action = {
-  type: string;
-  action: (any?) => void;
-};
+import { Action, MessageType, Update, UpdateFor } from "../../typings/action";
 
 export abstract class GameMaster {
   actions: Action[] = [];
@@ -15,13 +9,9 @@ export abstract class GameMaster {
     this.peer = this.createPeer(peerId);
   }
 
-  public addAction(type: string, action: (any) => void) {
-    this.actions.push({ type, action });
-  }
+  public abstract send(type: string, message: Update): void;
 
-  public abstract send(type: string, message: Message): void;
-
-  createPeer(socketId?: string): Peer {
+  protected createPeer(socketId?: string): Peer {
     if (socketId) {
       return new Peer(socketId);
     } else {
@@ -29,7 +19,14 @@ export abstract class GameMaster {
     }
   }
 
+  public addAction<T extends MessageType>(
+    type: T,
+    action: (arg: UpdateFor<T>) => void
+  ) {
+    this.actions.push({ type, action } as Action);
+  }
+
   public abstract shouldSendSync(): boolean;
 
-  public abstract broadcast(type: string, message: Message): void;
+  public abstract broadcast(type: string, message: Update): void;
 }

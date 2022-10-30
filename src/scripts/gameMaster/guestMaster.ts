@@ -1,6 +1,6 @@
 import { DataConnection } from "peerjs";
-import { Action, GameMaster } from "./gameMaster";
-import { Message } from "./hostMaster";
+import { Action, Message, Update } from "../../typings/action";
+import { GameMaster } from "./gameMaster";
 
 export class GuestMaster extends GameMaster {
   hostId: string;
@@ -25,19 +25,15 @@ export class GuestMaster extends GameMaster {
     });
   }
 
-  public addAction(type: string, action: (any) => void) {
-    this.actions.push({ type, action });
-  }
-
-  public send(type: string, payload: Message) {
+  public send(type: string, payload: Update) {
     const msg = {
       type,
-      payload
+      payload,
     } as Message;
     this.send_async(msg);
   }
 
-  public broadcast(type: string, payload: Message) {
+  public broadcast(_type: string, _payload: Update) {
     // Do nothing because this is a guest
   }
 

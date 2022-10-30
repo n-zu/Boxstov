@@ -1,6 +1,7 @@
 import Sprite = Phaser.Physics.Arcade.Sprite;
-import { Direction, getUnitVector } from "./player";
+import { getUnitVector } from "./player";
 import { Enemy } from "./enemy";
+import { Direction } from "../../typings/action";
 
 export type BulletState = {
   x: number;
@@ -39,7 +40,7 @@ export class Bullet extends Sprite {
       callback: () => {
         this.setActive(false);
         this.setVisible(false);
-      }
+      },
     });
   }
 
@@ -61,7 +62,7 @@ export class Bullet extends Sprite {
       y: this.y,
       rotation: this.rotation,
       active: this.active,
-      visible: this.visible
+      visible: this.visible,
     };
   }
 

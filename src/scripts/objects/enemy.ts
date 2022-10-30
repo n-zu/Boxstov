@@ -1,7 +1,12 @@
 import Sprite = Phaser.Physics.Arcade.Sprite;
-import { Direction, Player } from "./player";
-import { AnimationActor, AnimationSuffix, playAnimation } from "../scenes/mainScene";
+import { Player } from "./player";
+import {
+  AnimationActor,
+  AnimationSuffix,
+  playAnimation,
+} from "../scenes/mainScene";
 import { GameMaster } from "../gameMaster/gameMaster";
+import { Direction, EnemyUpdate } from "../../typings/action";
 
 const SPEED = 50;
 const HEALTH = 100;
@@ -31,7 +36,13 @@ export class Enemy extends Sprite {
   cooldown = Math.random() * 100;
   cooldownCount = this.cooldown;
 
-  constructor(scene: Phaser.Scene, x: number, y: number, gameMaster: GameMaster, id: number) {
+  constructor(
+    scene: Phaser.Scene,
+    x: number,
+    y: number,
+    gameMaster: GameMaster,
+    id: number
+  ) {
     super(scene, x, y, "zombie");
     scene.add.existing(this);
     scene.physics.add.existing(this);
@@ -45,7 +56,6 @@ export class Enemy extends Sprite {
     this.gameMaster = gameMaster;
     this.id = id;
   }
-
 
   public update(players: Player[]) {
     // This allows random movement and improves performance by not updating
@@ -123,18 +133,18 @@ export class Enemy extends Sprite {
     return {
       position: {
         x: this.x,
-        y: this.y
+        y: this.y,
       },
       velocity: {
         x: this.body.velocity.x,
-        y: this.body.velocity.y
+        y: this.body.velocity.y,
       },
       health: this.health,
       active: this.active,
       visible: this.visible,
       bodyEnabled: this.body.enable,
       cooldown: this.cooldown,
-      cooldownCount: this.cooldownCount
+      cooldownCount: this.cooldownCount,
     };
   }
 
@@ -158,7 +168,8 @@ export class Enemy extends Sprite {
     this.body.enable = true;
   }
 
-  public handleMessage(payload: any) {
+  public handleMessage(payload: EnemyUpdate) {
+    // @ts-ignore
     if (payload.type === "die") {
       this.die();
     }
@@ -221,10 +232,12 @@ export class Enemy extends Sprite {
     this.setVelocity(0, 0);
     this.setDepth(this.y - 100);
     this.body.enable = false;
-    this.gameMaster.broadcast("enemy", {
+    const update: EnemyUpdate = {
+      type: "die",
       id: this.id,
-      type: "die"
-    });
+    };
+
+    this.gameMaster.broadcast("enemy", update);
 
     playAnimation(
       this,
