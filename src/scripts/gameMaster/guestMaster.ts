@@ -34,10 +34,11 @@ export class GuestMaster extends GameMaster {
       type,
       payload
     } as Message;
+    this.send_async(msg);
+  }
 
-    if (this.socket) {
-      this.socket.send(msg);
-    }
+  public broadcast(type: string, payload: Message) {
+    // Do nothing because this is a guest
   }
 
   shouldSendSync(): boolean {
@@ -53,5 +54,11 @@ export class GuestMaster extends GameMaster {
         }
       });
     });
+  }
+
+  private async send_async(msg: Message) {
+    if (this.socket) {
+      this.socket.send(msg);
+    }
   }
 }

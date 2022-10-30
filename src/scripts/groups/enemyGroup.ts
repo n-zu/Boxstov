@@ -1,5 +1,6 @@
 import { Enemy, EnemyState } from "../objects/enemy";
 import { Player } from "../objects/player";
+import { GameMaster } from "../gameMaster/gameMaster";
 
 const TIME_BETWEEN_HORDES = 1000;
 
@@ -25,15 +26,16 @@ export class EnemyGroup extends Phaser.Physics.Arcade.Group {
   timeUntilNextHorde = 0;
   spawnPoints: SpawnPoint[];
 
-  constructor(scene: Phaser.Scene, maxEnemies: number, difficulty: Difficulty, spawnPoints: SpawnPoint[]) {
+  constructor(scene: Phaser.Scene, maxEnemies: number, difficulty: Difficulty, spawnPoints: SpawnPoint[], gameMaster: GameMaster) {
     super(scene.physics.world, scene);
-    this.createMultiple({
-      frameQuantity: maxEnemies,
-      key: "enemy",
-      active: false,
-      visible: false,
-      classType: Enemy
-    });
+
+    const enemies: Enemy[] = [];
+    for (let i = 0; i < maxEnemies; i++) {
+      enemies.push(new Enemy(scene, 0, 0, gameMaster, i));
+    }
+
+    this.addMultiple(enemies);
+
     this.difficulty = difficulty;
     this.spawnPoints = spawnPoints;
   }
@@ -70,6 +72,11 @@ export class EnemyGroup extends Phaser.Physics.Arcade.Group {
       const enemy = this.children.entries[i] as Enemy;
       enemy.sync(enemyState);
     });
+  }
+
+  public handleMessage(message: any) {
+    const enemy = this.children.entries[message.id] as Enemy;
+    enemy.handleMessage(message);
   }
 
   private getEnemiesToSpawn() {

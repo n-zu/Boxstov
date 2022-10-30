@@ -30,4 +30,6 @@ export abstract class GameMaster {
   }
 
   public abstract shouldSendSync(): boolean;
+
+  public abstract broadcast(type: string, message: Message): void;
 }

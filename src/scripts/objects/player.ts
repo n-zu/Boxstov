@@ -7,8 +7,8 @@ import Sprite = Phaser.Physics.Arcade.Sprite;
 
 const SPEED = 200;
 const diagonalFactor = Math.sqrt(2) / 2;
-const SYNC_DIFF_TOLERANCE = 1;
-const SYNC_DEPTH_TOLERANCE = 0.1;
+const SYNC_DIFF_TOLERANCE = 0.01;
+const SYNC_DEPTH_TOLERANCE = 0.01;
 
 export enum Direction {
   Up = "up",
@@ -56,11 +56,6 @@ export type PlayerState = {
   velocity: {
     x: number;
     y: number;
-  };
-  rotation: number;
-  animation?: {
-    key: string;
-    frame: number;
   };
   health: number;
 };
@@ -127,51 +122,25 @@ export class Player extends Sprite {
   public move(
     direction: Direction, emitAlert = true
   ) {
-    const [x, y] = getUnitVector(direction);
-    this.setVelocity(x * SPEED, y * SPEED);
-    this.facing = direction;
-    playAnimation(this, AnimationActor.Player, direction, AnimationSuffix.Run);
+    if (this.gameMaster.shouldSendSync()) {
+      const [x, y] = getUnitVector(direction);
+      this.setVelocity(x * SPEED, y * SPEED);
+    }
     if (emitAlert) {
       this.sendMovementMessage(direction);
     }
+    this.facing = direction;
+    playAnimation(this, AnimationActor.Player, direction, AnimationSuffix.Run);
   }
 
   public sync(state: PlayerState) {
     this.syncPosition(state.position);
-    this.syncVelocity(state.velocity);
+    // this.syncVelocity(state.velocity);
     this.syncDepth(state.position.y);
-    this.setRotation(state.rotation);
     this.health = state.health;
-    if (state.animation) {
-      // There is a bug here, probably
-      // If I set ignoreIfPlaying to false, and then move the guest player, when it
-      // receives a sync message, I get the following error:
-      // Uncaught TypeError: Cannot read properties of undefined (reading 'duration')
-      // It seems that ignoreIfPlaying to true makes the bug less reproducible
-      try {
-        if (this.anims.currentFrame) {
-          this.anims.play(
-            {
-              key: state.animation.key,
-              startFrame: state.animation.frame
-            },
-            true
-          );
-        }
-      } catch (e) {
-        console.log(e);
-      }
-    }
   }
 
   public getState(): PlayerState {
-    let currentAnimation: { key: string; frame: number } | undefined;
-    if (this.anims.currentAnim && this.anims.currentFrame) {
-      currentAnimation = {
-        key: this.anims.currentAnim.key,
-        frame: this.anims.currentFrame.index
-      };
-    }
     this.setDepth(this.y);
     return {
       id: this.id,
@@ -183,14 +152,13 @@ export class Player extends Sprite {
         x: this.body.velocity.x,
         y: this.body.velocity.y
       },
-      rotation: this.rotation,
-      animation: currentAnimation,
       health: this.health
     };
   }
 
   public stopMovement(emitAlert = true) {
-    if (this.isMoving() && emitAlert) {
+    if (emitAlert) {
+      //if (this.isMoving() && emitAlert) {
       this.gameMaster.send("player", {
         id: this.id,
         payload: {
@@ -228,6 +196,8 @@ export class Player extends Sprite {
       Math.abs(this.body.velocity.y - velocity.y) > SYNC_DIFF_TOLERANCE
     ) {
       this.setVelocity(velocity.x, velocity.y);
+    } else {
+      console.log("Not syncing velocity because it is too close");
     }
   }
 
@@ -236,6 +206,8 @@ export class Player extends Sprite {
     const diffY = Math.abs(this.y - position.y);
     if (diffX > SYNC_DIFF_TOLERANCE || diffY > SYNC_DIFF_TOLERANCE) {
       this.setPosition(position.x, position.y);
+    } else {
+      console.log("Not syncing position because it is too close");
     }
   }
 

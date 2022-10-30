@@ -38,7 +38,7 @@ export default class MainScene extends Phaser.Scene {
   world: World;
   gameMaster: GameMaster;
   syncCountdown = SYNC_COUNTDOWN;
-  tileSprite: Phaser.GameObjects.TileSprite;
+  lastUpdated = Date.now();
 
   protected constructor() {
     super({ key: "MainScene" });
@@ -65,15 +65,12 @@ export default class MainScene extends Phaser.Scene {
   }
 
   update() {
-    if (this.syncCountdown == 0) {
-      if (this.gameMaster.shouldSendSync()) {
-        this.gameMaster.send("sync", this.world.getState());
-        this.syncCountdown = SYNC_COUNTDOWN;
-      }
+    if (this.gameMaster.shouldSendSync()) {
+      this.world.update();
+      this.gameMaster.send("sync", this.world.getState());
     } else {
-      this.syncCountdown--;
+      this.world.playerControls.update();
     }
-    this.world.update();
   }
 
   preload() {

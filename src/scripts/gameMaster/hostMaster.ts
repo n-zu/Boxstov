@@ -46,6 +46,18 @@ export class HostMaster extends GameMaster {
     });
   }
 
+  public broadcast(type: string, payload: Message) {
+    const msg = {
+      type,
+      payload
+    } as Message;
+
+
+    this.guest_sockets.forEach((socket) => {
+      this.send_async(socket, msg);
+    });
+  }
+
   shouldSendSync(): boolean {
     return true;
   }
@@ -59,10 +71,12 @@ export class HostMaster extends GameMaster {
         }
       });
       this.guest_sockets.forEach((otherSocket) => {
-        if (socket !== otherSocket) {
-          otherSocket.send(msg);
-        }
+        this.send_async(otherSocket, msg);
       });
     });
+  }
+
+  private async send_async(socket: DataConnection, msg: Message) {
+    socket.send(msg);
   }
 }

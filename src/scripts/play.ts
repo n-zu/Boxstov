@@ -30,6 +30,9 @@ const gameConfig = {
   transparent: true
 };
 
+const hostConfig = gameConfig;
+hostConfig.type = Phaser.WEBGL;
+
 export function addUrl(id: string) {
   const loc = window.location.href;
   const url = `${loc.split("play")[0]}play?id=${id}`;
@@ -73,6 +76,6 @@ window.addEventListener("load", () => {
     gameMaster = new HostMaster();
   }
   gameMaster.start();
-  new MultiplayerGame(gameConfig, gameMaster);
+  new MultiplayerGame(hostConfig, gameMaster);
   addUrl(host_with ?? "");
 });

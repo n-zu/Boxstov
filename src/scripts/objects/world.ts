@@ -28,14 +28,14 @@ export class World {
 
     this.setupGameMaster(gameMaster);
 
-    const spawnPoins = [
+    const spawnPoints = [
       { x: 100, y: 100 },
       { x: 100, y: 900 },
       { x: 1800, y: 100 },
       { x: 1800, y: 900 }
     ];
 
-    this.enemies = new EnemyGroup(scene, 50, Difficulty.Hard, spawnPoins);
+    this.enemies = new EnemyGroup(scene, 50, Difficulty.Hard, spawnPoints, gameMaster);
 
     scene.physics.add.overlap(this.enemies, this.bulletGroup, (e, b) => {
       const bullet = b as Bullet;
@@ -100,8 +100,8 @@ export class World {
     if (player === undefined) {
       player = new Player(
         this.scene,
-        100,
-        100,
+        800,
+        500,
         id,
         this.gameMaster,
         this.bulletGroup
@@ -120,6 +120,10 @@ export class World {
 
     gameMaster.addAction("sync", (data: any) => {
       this.sync(data);
+    });
+
+    gameMaster.addAction("enemy", (data: any) => {
+      this.enemies.handleMessage(data);
     });
   }
 }
