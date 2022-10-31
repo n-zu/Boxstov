@@ -80,14 +80,14 @@ export class Enemy extends Sprite {
       const suffix = isFar == 0 ? AnimationSuffix.Attack : AnimationSuffix.Walk;
       playAnimation(this, AnimationActor.Zombie, this.facing, suffix);
     }
-    this.setDepth(this.y);
+    this.setDepth(this.y - (this.active ? 0 : 100));
   }
 
   public sync(state: EnemyState) {
     this.setPosition(state.position.x, state.position.y);
     this.setVelocity(state.velocity.x, state.velocity.y);
     this.setRotation(state.rotation);
-    this.setDepth(this.y);
+    this.setDepth(this.y - (state.active ? 0 : 100));
     if (state.animation) {
       this.anims.play(state.animation.key, true);
     }
