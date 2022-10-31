@@ -17,17 +17,17 @@ const gameConfig = {
     mode: Phaser.Scale.FIT,
     autoCenter: Phaser.Scale.CENTER_BOTH,
     width: DEFAULT_WIDTH,
-    height: DEFAULT_HEIGHT
+    height: DEFAULT_HEIGHT,
   },
   scene: [MainScene, UIScene],
   antialias: true,
   physics: {
     default: "arcade",
     arcade: {
-      debug: false
-    }
+      debug: true,
+    },
   },
-  transparent: true
+  transparent: true,
 };
 
 export function addUrl(id: string) {

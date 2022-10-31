@@ -35,9 +35,7 @@ export class Enemy extends Sprite {
     super(scene, x, y, "zombie");
     scene.add.existing(this);
     scene.physics.add.existing(this);
-
-    this.scale = 0.75;
-    this.setBodySize(80, 180);
+    this.setBodySize(100, 100);
   }
 
   public update(players: Player[]) {
@@ -62,7 +60,7 @@ export class Enemy extends Sprite {
       closestPlayer.x,
       closestPlayer.y
     );
-    const isFar = distance > 70 ? 1 : 0;
+    const isFar = distance > 150 ? 1 : 0;
     let xUnit = Math.cos(angle);
     let yUnit = Math.sin(angle);
 

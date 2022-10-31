@@ -1,7 +1,11 @@
 import { GameMaster } from "../gameMaster/gameMaster";
 import * as Phaser from "phaser";
 import { BulletGroup } from "../groups/bulletGroup";
-import { AnimationActor, AnimationSuffix, playAnimation } from "../scenes/mainScene";
+import {
+  AnimationActor,
+  AnimationSuffix,
+  playAnimation,
+} from "../scenes/mainScene";
 import { BaseMessage } from "../gameMaster/hostMaster";
 import Sprite = Phaser.Physics.Arcade.Sprite;
 
@@ -24,7 +28,7 @@ export enum Direction {
 export type PlayerMessage = {
   id: string;
   payload: PlayerState;
-}
+};
 
 export function getUnitVector(direction: Direction): [number, number] {
   switch (direction) {
@@ -92,12 +96,12 @@ export class Player extends Sprite {
     this.gameMaster = gameMaster;
     this.bulletGroup = bulletGroup;
 
-    this.setBodySize(180, 220);
-    this.setDisplaySize(250, 250);
-    this.setDisplayOrigin(250, 320);
-    this.setOffset(160, 240);
-
-    playAnimation(this, AnimationActor.Player, Direction.Down, AnimationSuffix.Idle);
+    playAnimation(
+      this,
+      AnimationActor.Player,
+      Direction.Down,
+      AnimationSuffix.Idle
+    );
   }
 
   public getId() {
@@ -117,16 +121,14 @@ export class Player extends Sprite {
       this.gameMaster.send("player", {
         id: this.id,
         payload: {
-          type: "shoot"
-        }
+          type: "shoot",
+        },
       });
     }
     this.bulletGroup.shootBullet(xGun, yGun, this.facing);
   }
 
-  public move(
-    direction: Direction, emitAlert = true
-  ) {
+  public move(direction: Direction, emitAlert = true) {
     const [x, y] = getUnitVector(direction);
     this.setVelocity(x * SPEED, y * SPEED);
     this.facing = direction;
@@ -153,7 +155,7 @@ export class Player extends Sprite {
           this.anims.play(
             {
               key: state.animation.key,
-              startFrame: state.animation.frame
+              startFrame: state.animation.frame,
             },
             true
           );
@@ -169,7 +171,7 @@ export class Player extends Sprite {
     if (this.anims.currentAnim && this.anims.currentFrame) {
       currentAnimation = {
         key: this.anims.currentAnim.key,
-        frame: this.anims.currentFrame.index
+        frame: this.anims.currentFrame.index,
       };
     }
     this.setDepth(this.y);
@@ -177,15 +179,15 @@ export class Player extends Sprite {
       id: this.id,
       position: {
         x: this.x,
-        y: this.y
+        y: this.y,
       },
       velocity: {
         x: this.body.velocity.x,
-        y: this.body.velocity.y
+        y: this.body.velocity.y,
       },
       rotation: this.rotation,
       animation: currentAnimation,
-      health: this.health
+      health: this.health,
     };
   }
 
@@ -194,8 +196,8 @@ export class Player extends Sprite {
       this.gameMaster.send("player", {
         id: this.id,
         payload: {
-          type: "stop"
-        }
+          type: "stop",
+        },
       });
     }
     this.playIdleAnimation(this.facing);
@@ -253,8 +255,8 @@ export class Player extends Sprite {
       id: this.id,
       payload: {
         type: "move",
-        direction
-      }
+        direction,
+      },
     });
   }
 
@@ -265,42 +267,42 @@ export class Player extends Sprite {
       case Direction.Up:
         return {
           x: this.x + 15,
-          y: this.y - 120
+          y: this.y - 120,
         };
       case Direction.Down:
         return {
           x: this.x - 16,
-          y: this.y
+          y: this.y,
         };
       case Direction.Left:
         return {
           x: this.x - 95,
-          y: this.y - 75
+          y: this.y - 75,
         };
       case Direction.Right:
         return {
           x: this.x + 95,
-          y: this.y - 65
+          y: this.y - 65,
         };
       case Direction.UpLeft:
         return {
           x: this.x - 75,
-          y: this.y - 120
+          y: this.y - 120,
         };
       case Direction.UpRight:
         return {
           x: this.x + 95,
-          y: this.y - 120
+          y: this.y - 120,
         };
       case Direction.DownLeft:
         return {
           x: this.x - 35,
-          y: this.y - 40
+          y: this.y - 40,
         };
       case Direction.DownRight:
         return {
           x: this.x + 45,
-          y: this.y - 10
+          y: this.y - 10,
         };
     }
   }
