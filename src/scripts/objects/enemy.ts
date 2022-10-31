@@ -11,8 +11,8 @@ export class Enemy extends Sprite {
   id: number;
   health: number;
   died: boolean;
+  isFar: boolean;
   facing: Direction = Direction.Down;
-  nextState?: EnemyState;
 
   constructor(scene: Phaser.Scene, x: number, y: number, id: number) {
     super(scene, x, y, "zombie");
@@ -24,27 +24,25 @@ export class Enemy extends Sprite {
     this.visible = false;
     this.active = false;
     this.id = id;
+    this.isFar = false;
   }
 
   public update() {
-    this.sync();
+    if (!this.active) return;
 
-    const state = this.nextState;
-    if (!state || !state.active) return;
-
-    if (state.health <= 0) {
+    if (this.health <= 0) {
       if (!this.died) this.die();
       return;
     }
 
     const direction = this.getMovementDirection(
-      state.velocity.x,
-      state.velocity.y
+      this.body.velocity.x,
+      this.body.velocity.y
     );
 
     if (direction) {
       this.facing = direction;
-      const suffix = !state.isFar
+      const suffix = !this.isFar
         ? AnimationSuffix.Attack
         : AnimationSuffix.Walk;
       playAnimation(this, AnimationActor.Zombie, this.facing, suffix);
@@ -52,12 +50,12 @@ export class Enemy extends Sprite {
     this.setDepth(this.y);
   }
 
-  private sync() {
+  public sync(state?: EnemyState) {
     // There is a bug in this method
     // If the zombie is dead in the guest and revives with a sync
     // it won't play the movement animation until update() is called with this.cooldownCount = 0
-    const state = this.nextState;
     if (!state) return;
+
     if (state.active) {
       this.setPosition(state.position.x, state.position.y);
       this.setVelocity(state.velocity.x, state.velocity.y);
@@ -69,9 +67,28 @@ export class Enemy extends Sprite {
     this.active = state.active;
     this.body.enable = state.bodyEnabled;
     this.health = state.health;
-    if (state.health > 0) {
+    this.isFar = state.isFar;
+    if (state.active && state.health > 0) {
       this.died = false;
     }
+  }
+
+  public getState(): EnemyState {
+    return {
+      position: {
+        x: this.x,
+        y: this.y,
+      },
+      velocity: {
+        x: this.body.velocity.x,
+        y: this.body.velocity.y,
+      },
+      health: this.health,
+      active: this.active,
+      visible: this.visible,
+      bodyEnabled: this.body.enable,
+      isFar: this.isFar,
+    };
   }
 
   public receiveDamage(damage: number) {

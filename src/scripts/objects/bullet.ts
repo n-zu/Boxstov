@@ -1,7 +1,6 @@
 import Sprite = Phaser.Physics.Arcade.Sprite;
-import { getUnitVector } from "./player";
 import { Enemy } from "./enemy";
-import { Direction } from "../../typings/direction";
+import DirectionVector from "../controls/direction";
 
 export type BulletState = {
   x: number;
@@ -11,6 +10,8 @@ export type BulletState = {
   visible: boolean;
 };
 
+const SPEED = 2000;
+
 export class Bullet extends Sprite {
   damage = 50;
 
@@ -18,9 +19,8 @@ export class Bullet extends Sprite {
     super(scene, x, y, "bullet");
   }
 
-  public fire(x: number, y: number, direction: Direction) {
-    const speed = 2000;
-    const [velocityX, velocityY] = this.getVelocity(direction, speed);
+  public fire(x: number, y: number, direction: DirectionVector) {
+    const [velocityX, velocityY] = direction.getSpeed(SPEED);
     const rotation = Math.atan2(velocityY, velocityX);
 
     this.setScale(0.5);
@@ -73,8 +73,7 @@ export class Bullet extends Sprite {
     this.setVisible(bulletState.visible);
   }
 
-  private getVelocity(direction: Direction, speed: number) {
-    const [x, y] = getUnitVector(direction);
+  private getVelocity([x, y]: [number, number], speed: number) {
     return [x * speed, y * speed];
   }
 }

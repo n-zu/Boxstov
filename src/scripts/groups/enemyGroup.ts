@@ -2,7 +2,6 @@ import { Enemy } from "../objects/enemy";
 import { EnemyGroupState } from "../../typings/state";
 
 export class EnemyGroup extends Phaser.Physics.Arcade.Group {
-  nextState?: EnemyGroupState;
   constructor(scene: Phaser.Scene, maxEnemies: number) {
     super(scene.physics.world, scene);
 
@@ -15,20 +14,24 @@ export class EnemyGroup extends Phaser.Physics.Arcade.Group {
   }
 
   public update() {
-    this.sync();
-
     this.children.entries.forEach((e) => {
       const enemy = e as Enemy;
       enemy.update();
     });
   }
 
-  public sync() {
-    if (!this.nextState) return;
+  public sync(nextState?: EnemyGroupState) {
+    if (!nextState) return;
 
-    this.nextState.enemies.forEach((enemyState, i) => {
+    nextState.enemies.forEach((enemyState, i) => {
       const enemy = this.children.entries[i] as Enemy;
-      enemy.nextState = enemyState;
+      enemy.sync(enemyState);
     });
+  }
+
+  public getState(): EnemyGroupState {
+    return {
+      enemies: this.children.entries.map((e) => (e as Enemy).getState()),
+    };
   }
 }

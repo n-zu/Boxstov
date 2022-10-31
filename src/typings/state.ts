@@ -17,3 +17,16 @@ export type EnemyState = {
 export type EnemyGroupState = {
   enemies: EnemyState[];
 };
+
+export type PlayerState = {
+  id: string;
+  position: {
+    x: number;
+    y: number;
+  };
+  velocity: {
+    x: number;
+    y: number;
+  };
+  health: number;
+};

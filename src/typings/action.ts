@@ -1,5 +1,4 @@
 import { WorldState } from "../scripts/objects/world";
-import { Direction } from "./direction";
 
 export interface PlayerUpdate {
   id: string;
@@ -10,7 +9,7 @@ export type PlayerUpdatePayload = PlayerUpdateMove | PlayerUpdateOther;
 
 export interface PlayerUpdateMove {
   type: "move";
-  direction: Direction;
+  direction: [number, number];
 }
 
 export interface PlayerUpdateOther {

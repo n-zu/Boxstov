@@ -1,6 +1,6 @@
 import CursorKeys = Phaser.Types.Input.Keyboard.CursorKeys;
 import { Player } from "../objects/player";
-import { Direction } from "../../typings/direction";
+import DirectionVector from "./direction";
 
 let lasShot = 0;
 
@@ -24,42 +24,24 @@ export class PlayerControls {
     this.player = player;
   }
 
-  private down(): boolean {
+  public down(): boolean {
     return this.cursorKeys.down.isDown || this.letterKeys.S.isDown;
   }
 
-  private up(): boolean {
+  public up(): boolean {
     return this.cursorKeys.up.isDown || this.letterKeys.W.isDown;
   }
 
-  private left(): boolean {
+  public left(): boolean {
     return this.cursorKeys.left.isDown || this.letterKeys.A.isDown;
   }
 
-  private right(): boolean {
+  public right(): boolean {
     return this.cursorKeys.right.isDown || this.letterKeys.D.isDown;
   }
 
   update() {
-    if (this.down() && this.left()) {
-      this.player.move(Direction.DownLeft);
-    } else if (this.down() && this.right()) {
-      this.player.move(Direction.DownRight);
-    } else if (this.up() && this.left()) {
-      this.player.move(Direction.UpLeft);
-    } else if (this.up() && this.right()) {
-      this.player.move(Direction.UpRight);
-    } else if (this.down()) {
-      this.player.move(Direction.Down);
-    } else if (this.up()) {
-      this.player.move(Direction.Up);
-    } else if (this.left()) {
-      this.player.move(Direction.Left);
-    } else if (this.right()) {
-      this.player.move(Direction.Right);
-    } else {
-      this.player.stopMovement(true);
-    }
+    this.player.move(DirectionVector.fromControls(this));
 
     if (this.cursorKeys.space.isDown) {
       if (Date.now() - lasShot > 100) {

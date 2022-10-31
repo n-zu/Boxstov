@@ -1,4 +1,4 @@
-import { Player, PlayerState } from "./player";
+import { Player } from "./player";
 import { BulletGroup, BulletGroupState } from "../groups/bulletGroup";
 import { GameMaster } from "../gameMaster/gameMaster";
 import { PlayerControls } from "../controls/playerControls";
@@ -6,8 +6,8 @@ import { Enemy } from "./enemy";
 import { Bullet } from "./bullet";
 import { EnemyGroup } from "../groups/enemyGroup";
 import { PlayerUpdate, SyncUpdate } from "../../typings/action";
-import { EnemyGroupState } from "../../typings/state";
-import EnemyGroupServer from "./logic/server/enemyGroup";
+import { EnemyGroupState, PlayerState } from "../../typings/state";
+import EnemyGroupServer from "./server/enemyGroup";
 
 export type WorldState = {
   players: PlayerState[];
@@ -50,11 +50,16 @@ export class World {
   }
 
   public update() {
-    //this.sync();
-    this.enemyServer?.process(this.players);
+    this.updateServers();
 
     this.playerControls.update();
     this.enemies.update();
+  }
+
+  private updateServers() {
+    if (!this.enemyServer) return;
+
+    this.enemies.sync(this.enemyServer.process(this.players));
   }
 
   public sync(worldState: WorldState) {
@@ -62,8 +67,7 @@ export class World {
       const player = this.getOrCreatePlayer(playerState.id);
       player.sync(playerState);
     });
-    this.enemies.nextState = worldState.enemies;
-
+    this.enemies.sync(worldState.enemies);
     this.bulletGroup.sync(worldState.bullets);
   }
 
@@ -71,7 +75,7 @@ export class World {
     return {
       players: this.players.map((player) => player.getState()),
       bullets: this.bulletGroup.getState(),
-      enemies: this.enemies.nextState,
+      enemies: this.enemies.getState(),
     };
   }
 
@@ -121,8 +125,11 @@ export class World {
       player.handleMessage(data.payload);
     });
 
-    gameMaster.addAction("sync", (data: SyncUpdate) => {
-      this.sync(data);
-    });
+    if (!gameMaster.shouldSendSync()) {
+      // only sync if we should not send sync
+      gameMaster.addAction("sync", (data: SyncUpdate) => {
+        this.sync(data);
+      });
+    }
   }
 }

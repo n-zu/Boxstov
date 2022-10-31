@@ -5,53 +5,26 @@ import {
   AnimationActor,
   AnimationSuffix,
   playAnimation,
+  SYNC_MS,
 } from "../scenes/mainScene";
 import Sprite = Phaser.Physics.Arcade.Sprite;
 import { PlayerUpdatePayload } from "../../typings/action";
 import { Direction } from "../../typings/direction";
+import { PlayerState } from "../../typings/state";
+import DirectionVector from "../controls/direction";
 
 const SPEED = 200;
-const diagonalFactor = Math.sqrt(2) / 2;
-const SYNC_DIFF_TOLERANCE = 0.01;
-const SYNC_DEPTH_TOLERANCE = 0.01;
 
-export type PlayerMessage = {
-  id: string;
-  payload: PlayerState;
-};
+// Cuantas unidades tiene que estar desviado para corregir
+// en 1 ciclo de SYNC_MS. Si esta desviado menos, la correccion
+// sera menor. Si esta desviado mas, la correccion sera mayor.
+// Usa una fórmula exponencial.
+const CORRECT_AVG = 5;
+const ACCEPTABLE_DEVIATION = 0.1; // Si diff es menor a esto, no se corrige
 
-export function getUnitVector(direction: Direction): [number, number] {
-  switch (direction) {
-    case Direction.Up:
-      return [0, -1];
-    case Direction.Down:
-      return [0, 1];
-    case Direction.Left:
-      return [-1, 0];
-    case Direction.Right:
-      return [1, 0];
-    case Direction.UpLeft:
-      return [-diagonalFactor, -diagonalFactor];
-    case Direction.UpRight:
-      return [diagonalFactor, -diagonalFactor];
-    case Direction.DownLeft:
-      return [-diagonalFactor, diagonalFactor];
-    case Direction.DownRight:
-      return [diagonalFactor, diagonalFactor];
-  }
-}
-
-export type PlayerState = {
-  id: string;
-  position: {
-    x: number;
-    y: number;
-  };
-  velocity: {
-    x: number;
-    y: number;
-  };
-  health: number;
+type VelocityCorrection = {
+  x: number;
+  y: number;
 };
 
 export class Player extends Sprite {
@@ -59,9 +32,11 @@ export class Player extends Sprite {
   gameMaster: GameMaster;
   bulletGroup: BulletGroup;
   id: string;
-  facing: Direction = Direction.Down;
+  facing: DirectionVector;
   maxHealth = 100;
   health = 100;
+  velocityCorrection: VelocityCorrection;
+  readonly CORRECTION_FACTOR = (SYNC_MS / 1000 + 1) ** (1 / CORRECT_AVG);
 
   constructor(
     scene: Phaser.Scene,
@@ -80,6 +55,8 @@ export class Player extends Sprite {
     this.scene = scene;
     this.gameMaster = gameMaster;
     this.bulletGroup = bulletGroup;
+    this.facing = new DirectionVector();
+    this.velocityCorrection = { x: 0, y: 0 };
 
     this.setBodySize(180, 220);
     this.setDisplaySize(250, 250);
@@ -118,23 +95,48 @@ export class Player extends Sprite {
     this.bulletGroup.shootBullet(xGun, yGun, this.facing);
   }
 
-  public move(direction: Direction, emitAlert = true) {
-    if (this.gameMaster.shouldSendSync()) {
-      const [x, y] = getUnitVector(direction);
-      this.setVelocity(x * SPEED, y * SPEED);
-    }
+  public move(dir: DirectionVector, emitAlert = true) {
+    const [x, y] = dir.getSpeed(SPEED);
+    this.setVelocity(x, y);
     if (emitAlert) {
-      this.sendMovementMessage(direction);
+      this.sendMovementMessage(dir);
     }
-    this.facing = direction;
+
+    if (x === 0 && y === 0) {
+      this.stopMovement();
+      return;
+    }
+
+    this.facing = dir;
+    const direction = dir.getDirection();
     playAnimation(this, AnimationActor.Player, direction, AnimationSuffix.Run);
   }
 
+  public stopMovement(emitAlert = true) {
+    if (emitAlert)
+      this.gameMaster.send("player", {
+        id: this.id,
+        payload: {
+          type: "stop",
+        },
+      });
+    this.playIdleAnimation();
+    this.setVelocity(0, 0);
+  }
+
   public sync(state: PlayerState) {
-    this.syncPosition(state.position);
-    // this.syncVelocity(state.velocity);
-    this.syncDepth(state.position.y);
+    this.setVelocity(state.velocity.x, state.velocity.y);
+    this.updateVelocityCorrection(state);
+    this.setDepth(state.position.y);
     this.health = state.health;
+  }
+
+  public setVelocity(x: number, y?: number): this {
+    super.setVelocity(
+      x + this.velocityCorrection.x,
+      (y || 0) + this.velocityCorrection.y
+    );
+    return this;
   }
 
   public getState(): PlayerState {
@@ -153,24 +155,10 @@ export class Player extends Sprite {
     };
   }
 
-  public stopMovement(emitAlert = true) {
-    if (emitAlert) {
-      //if (this.isMoving() && emitAlert) {
-      this.gameMaster.send("player", {
-        id: this.id,
-        payload: {
-          type: "stop",
-        },
-      });
-    }
-    this.playIdleAnimation(this.facing);
-    this.setVelocity(0, 0);
-  }
-
   public handleMessage(message: PlayerUpdatePayload) {
     switch (message.type) {
       case "move":
-        this.move(message.direction, false);
+        this.move(new DirectionVector(...message.direction), false);
         break;
       case "stop":
         this.stopMovement(false);
@@ -181,48 +169,45 @@ export class Player extends Sprite {
     }
   }
 
-  private syncDepth(y: number) {
-    if (Math.abs(this.y - y) > SYNC_DEPTH_TOLERANCE) {
-      this.setDepth(y);
-    }
+  private updateVelocityCorrection(updatedState: PlayerState) {
+    const x = this.getVelocityCorrection(this.x, updatedState.position.x);
+    const y = this.getVelocityCorrection(this.y, updatedState.position.y);
+    console.log("Correction: ", x, y);
+    this.velocityCorrection = { x, y };
   }
 
-  private syncVelocity(velocity: { x: number; y: number }) {
-    if (
-      Math.abs(this.body.velocity.x - velocity.x) > SYNC_DIFF_TOLERANCE ||
-      Math.abs(this.body.velocity.y - velocity.y) > SYNC_DIFF_TOLERANCE
-    ) {
-      this.setVelocity(velocity.x, velocity.y);
-    } else {
-      console.log("Not syncing velocity because it is too close");
+  private getVelocityCorrection(old_pos: number, new_pos: number) {
+    const diff = new_pos - old_pos;
+    const abs = Math.abs(diff);
+    console.log("Diff: ", diff);
+    if (abs < ACCEPTABLE_DEVIATION) {
+      return 0;
     }
+    return (this.CORRECTION_FACTOR ** abs + 1) * Math.sign(diff);
   }
-
+  /*
   private syncPosition(position: { x: number; y: number }) {
     const diffX = Math.abs(this.x - position.x);
     const diffY = Math.abs(this.y - position.y);
     if (diffX > SYNC_DIFF_TOLERANCE || diffY > SYNC_DIFF_TOLERANCE) {
       this.setPosition(position.x, position.y);
     } else {
-      console.log("Not syncing position because it is too close");
+      console.log("Not syncing player position because it is too close");
     }
   }
-
-  private isMoving(): boolean {
-    return this.body.velocity.x !== 0 || this.body.velocity.y !== 0;
-  }
-
-  private playIdleAnimation(direction: Direction) {
-    const animationName = `${AnimationActor.Player}-${direction}-${AnimationSuffix.Idle}`;
+*/
+  private playIdleAnimation() {
+    const dir = this.facing.getDirection();
+    const animationName = `${AnimationActor.Player}-${dir}-${AnimationSuffix.Idle}`;
     this.anims.play(animationName, true);
   }
 
-  private sendMovementMessage(direction: Direction) {
+  private sendMovementMessage(direction: DirectionVector) {
     this.gameMaster.send("player", {
       id: this.id,
       payload: {
         type: "move",
-        direction,
+        direction: direction.getUnitVector(),
       },
     });
   }
@@ -230,7 +215,7 @@ export class Player extends Sprite {
   private getGunPosition(): { x: number; y: number } {
     // We should change this logic so that the bullet receives the position and angle
     // of shooting, so that the bullet travels parallel to the player's gun
-    switch (this.facing) {
+    switch (this.facing.getDirection()) {
       case Direction.Up:
         return {
           x: this.x + 15,
