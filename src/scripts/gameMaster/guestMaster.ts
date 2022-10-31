@@ -24,16 +24,19 @@ export class GuestMaster extends GameMaster {
     this.hostId = idToConnect;
 
     this.addAction("sync", () => {
-      const now = Date.now();
-      const last_rtt = now - this.lastUpdate;
-      this.lastUpdate = now;
-      this.rtt = 0.9 * this.rtt + 0.1 * last_rtt;
-      this.send("sync-request", undefined);
+      this.request_sync();
     });
   }
 
   public request_sync() {
     clearTimeout(this.syncTimeout);
+
+    const now = Date.now();
+    const last_rtt = now - this.lastUpdate;
+    this.lastUpdate = now;
+    this.rtt = 0.9 * this.rtt + 0.1 * last_rtt;
+    console.log("RTT: ", this.rtt);
+
     this.send("sync-request", undefined);
     this.syncTimeout = setTimeout(() => {
       this.request_sync();
