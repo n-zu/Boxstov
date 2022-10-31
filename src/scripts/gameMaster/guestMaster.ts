@@ -1,16 +1,47 @@
 import { DataConnection } from "peerjs";
-import { Action, Message, Update } from "../../typings/action";
+import {
+  Action,
+  Message,
+  MessageType,
+  Update,
+  UpdateFor,
+} from "../../typings/action";
 import { GameMaster } from "./gameMaster";
+
+const SYNC_TIMEOUT = 500;
 
 export class GuestMaster extends GameMaster {
   hostId: string;
   socket: DataConnection | undefined;
   actions: Action[] = [];
+  rtt: number = 50;
+  lastUpdate = Date.now();
+  syncTimeout: NodeJS.Timeout | undefined;
 
   constructor(idToConnect: string, id?: string) {
     super();
     this.peer = this.createPeer(id);
     this.hostId = idToConnect;
+
+    this.addAction("sync", () => {
+      const now = Date.now();
+      const last_rtt = now - this.lastUpdate;
+      this.lastUpdate = now;
+      this.rtt = 0.9 * this.rtt + 0.1 * last_rtt;
+      this.send("sync-request", undefined);
+    });
+  }
+
+  public request_sync() {
+    clearTimeout(this.syncTimeout);
+    this.send("sync-request", undefined);
+    this.syncTimeout = setTimeout(() => {
+      this.request_sync();
+    }, SYNC_TIMEOUT);
+  }
+
+  public getRTT() {
+    return this.rtt;
   }
 
   public start() {
@@ -25,11 +56,11 @@ export class GuestMaster extends GameMaster {
     });
   }
 
-  public send(type: string, payload: Update) {
-    const msg = {
+  public send<T extends MessageType>(type: T, payload: UpdateFor<T>) {
+    const msg: Message = {
       type,
       payload,
-    } as Message;
+    };
     this.send_async(msg);
   }
 

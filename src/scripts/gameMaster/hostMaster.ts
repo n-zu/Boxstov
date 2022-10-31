@@ -1,10 +1,12 @@
 import { GameMaster } from "./gameMaster";
 import { DataConnection } from "peerjs";
 import { addUrl } from "../play";
-import { MessageType, Message, Update } from "../../typings/action";
+import { MessageType, Message, Update, UpdateFor } from "../../typings/action";
+import { WorldState } from "../objects/world";
 
 export class HostMaster extends GameMaster {
   guest_sockets: DataConnection[] = [];
+  latest_state?: WorldState;
 
   constructor(hostId?: string) {
     super(hostId);
@@ -21,11 +23,11 @@ export class HostMaster extends GameMaster {
     });
   }
 
-  public send(type: MessageType, payload: Update) {
-    const msg = {
+  public send<T extends MessageType>(type: T, payload: UpdateFor<T>) {
+    const msg: Message = {
       type,
       payload,
-    } as Message;
+    };
 
     this.guest_sockets.forEach((socket) => {
       socket.send(msg);
@@ -54,6 +56,10 @@ export class HostMaster extends GameMaster {
         if (action.type === msg.type) {
           action.action(msg.payload);
         }
+        if (msg.type === "sync-request") {
+          console.log("Got sync request from ", socket.label);
+          this.send_sync(socket);
+        }
       });
       this.guest_sockets.forEach((otherSocket) => {
         this.send_async(otherSocket, msg);
@@ -61,7 +67,21 @@ export class HostMaster extends GameMaster {
     });
   }
 
+  private send_sync(socket: DataConnection) {
+    if (!this.latest_state) return;
+
+    const msg: Message = {
+      type: "sync",
+      payload: this.latest_state,
+    };
+    socket.send(msg);
+  }
+
   private async send_async(socket: DataConnection, msg: Message) {
     socket.send(msg);
+  }
+
+  public updateState(state: WorldState) {
+    this.latest_state = state;
   }
 }

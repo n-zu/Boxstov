@@ -166,7 +166,7 @@ export class Player extends Sprite {
     const diffX = Math.abs(this.x - position.x);
     const diffY = Math.abs(this.y - position.y);
     if (diffX > SYNC_DIFF_TOLERANCE || diffY > SYNC_DIFF_TOLERANCE) {
-      this.setPosition(position.x, position.y);
+      this.setPosition(position.x, positioSn.y);
     } else {
       console.log("Not syncing player position because it is too close");
     }
