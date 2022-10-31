@@ -62,6 +62,8 @@ export class Enemy extends Physics.Arcade.Sprite {
       this.cooldownCount--;
       return;
     }
+    if (players.length === 0) return;
+
     this.cooldownCount = this.cooldown;
     const closestPlayer = this.getClosestPlayer(players);
     const angle = Phaser.Math.Angle.Between(

@@ -77,33 +77,23 @@ export class Player extends Physics.Arcade.Sprite {
     gameMaster: GameMaster,
     bulletGroup: BulletGroup
   ) {
-    super(scene, x, y, "player");
+    console.log("Creating player");
+    console.log(x, y, id);
 
-    scene.add.existing(this);
+    super(scene, x, y, '');
+    console.log("done super");
+    // scene.add.existing(this);
+    console.log("done add existing");
     scene.physics.add.existing(this);
+    console.log("done physics add existing");
 
     this.id = id;
     this.scene = scene;
     this.gameMaster = gameMaster;
     this.bulletGroup = bulletGroup;
-
-    this.setBodySize(180, 220);
-    this.setDisplaySize(250, 250);
-    this.setDisplayOrigin(250, 320);
-    this.setOffset(160, 240);
-  }
-
-  public getId() {
-    return this.id;
   }
 
   public shoot(emitAlert = true) {
-    {
-      const aud = new Audio("/assets/shoot.mp3");
-      aud.volume = 0.1;
-      aud.play();
-    }
-
     const { x: xGun, y: yGun } = this.getGunPosition();
 
     this.bulletGroup.shootBullet(xGun, yGun, this.facing);
@@ -115,13 +105,6 @@ export class Player extends Physics.Arcade.Sprite {
     const [x, y] = getUnitVector(direction);
     this.setVelocity(x * SPEED, y * SPEED);
     this.facing = direction;
-  }
-
-  public sync(state: PlayerState) {
-    this.syncPosition(state.position);
-    // this.syncVelocity(state.velocity);
-    this.syncDepth(state.position.y);
-    this.health = state.health;
   }
 
   public getState(): PlayerState {

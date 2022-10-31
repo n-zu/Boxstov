@@ -42,8 +42,4 @@ app.get('/play', (req: Request, res: Response) => {
   res.sendFile(path.resolve('./play.html'));
 });
 
-app.get('/getState', (req: Request, res: Response) => {
-
-});
-
 server.listen(port);

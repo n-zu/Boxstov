@@ -16,11 +16,8 @@ export default class MainScene extends Phaser.Scene {
 
   create() {
     this.world = new World(this, this.game.gameMaster);
+    this.world.create();
     this.gameMaster = this.game.gameMaster;
-  }
-
-  public sync(worldState: WorldState) {
-    this.world.sync(worldState);
   }
 
   update() {

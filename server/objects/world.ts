@@ -13,6 +13,7 @@ export type WorldState = {
 
 export class World {
   players: Player[];
+  // @ts-ignore
   enemies: EnemyGroup;
   bulletGroup: BulletGroup;
   gameMaster: GameMaster;
@@ -23,9 +24,9 @@ export class World {
     this.bulletGroup = new BulletGroup(scene);
     this.gameMaster = gameMaster;
     this.scene = scene;
+  }
 
-    this.setupGameMaster(gameMaster);
-
+  public create() {
     const spawnPoints = [
       { x: 100, y: 100 },
       { x: 100, y: 900 },
@@ -33,9 +34,9 @@ export class World {
       { x: 1800, y: 900 }
     ];
 
-    this.enemies = new EnemyGroup(scene, 50, Difficulty.Hard, spawnPoints, gameMaster);
+    this.enemies = new EnemyGroup(this.scene, 50, Difficulty.Hard, spawnPoints, this.gameMaster);
 
-    scene.physics.add.overlap(this.enemies, this.bulletGroup, (e, b) => {
+    this.scene.physics.add.overlap(this.enemies, this.bulletGroup, (e, b) => {
       const bullet = b as Bullet;
       const enemy = e as Enemy;
       if (bullet.active && enemy.active) {
@@ -44,21 +45,12 @@ export class World {
     });
 
     // Enemies repel each other
-    scene.physics.add.collider(this.enemies, this.enemies);
+    this.scene.physics.add.collider(this.enemies, this.enemies);
+    this.setupGameMaster(this.gameMaster);
   }
 
   public update() {
     this.enemies.update(this.players);
-  }
-
-  public sync(worldState: WorldState) {
-    worldState.players.forEach((playerState) => {
-      const player = this.getOrCreatePlayer(playerState.id);
-      player.sync(playerState);
-    });
-    this.enemies.sync(worldState.enemies);
-
-    this.bulletGroup.sync(worldState.bullets);
   }
 
   public getState(): WorldState {
@@ -89,10 +81,6 @@ export class World {
     gameMaster.addAction("player", (data: any) => {
       const player = this.getOrCreatePlayer(data.id);
       player.handleMessage(data.payload);
-    });
-
-    gameMaster.addAction("sync", (data: any) => {
-      this.sync(data);
     });
 
     gameMaster.addAction("enemy", (data: any) => {

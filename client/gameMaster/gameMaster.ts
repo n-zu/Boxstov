@@ -1,6 +1,8 @@
 import geckos, {ClientChannel} from "@geckos.io/client";
 
 export type BaseMessage = { [id: number | string]: any };
+// Signaling server
+const SERVER_URL = "127.0.0.1:5000";
 
 export type Message = {
   type: string;
@@ -17,7 +19,10 @@ export abstract class GameMaster {
   channel: ClientChannel;
 
   protected constructor() {
-    this.channel = geckos({port: 5000});
+    this.channel = geckos({
+      url: SERVER_URL,
+    });
+
     this.channel.onConnect(error => {
       if (error) console.error(error.message)
 
@@ -25,7 +30,6 @@ export abstract class GameMaster {
         console.log('ready')
       })
       this.channel.on('msg', (msg: any) => {
-        console.log("Received message:", msg)
         const message = msg as Message;
         this.actions.find((action) => action.type === message.type)?.action(
           message.payload

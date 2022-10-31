@@ -20,7 +20,7 @@ export abstract class GameMaster {
 
   protected constructor(server: http.Server) {
     this.io = geckos({
-      iceServers: iceServers
+      iceServers: iceServers,
     })
     this.io.addServer(server)
 
@@ -30,7 +30,6 @@ export abstract class GameMaster {
 
       // @ts-ignore
       channel.on('msg', (msg: any) => {
-        console.log("Received message:", msg)
         const message = msg as Message;
         this.actions.find((action) => action.type === message.type)?.action(
           message.payload

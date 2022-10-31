@@ -117,18 +117,21 @@ export class Player extends Sprite {
     this.bulletGroup.shootBullet(xGun, yGun, this.facing);
   }
 
+  public doMove(direction: Direction) {
+    const [x, y] = getUnitVector(direction);
+    this.setVelocity(x * SPEED, y * SPEED);
+  }
+
   public move(
     direction: Direction, emitAlert = true
   ) {
-    if (this.gameMaster.shouldSendSync()) {
-      const [x, y] = getUnitVector(direction);
-      this.setVelocity(x * SPEED, y * SPEED);
-    }
     if (emitAlert) {
+      console.log("Sending move alert");
       this.sendMovementMessage(direction);
     }
     this.facing = direction;
     playAnimation(this, AnimationActor.Player, direction, AnimationSuffix.Run);
+    this.doMove(direction);
   }
 
   public sync(state: PlayerState) {
@@ -136,22 +139,6 @@ export class Player extends Sprite {
     // this.syncVelocity(state.velocity);
     this.syncDepth(state.position.y);
     this.health = state.health;
-  }
-
-  public getState(): PlayerState {
-    this.setDepth(this.y);
-    return {
-      id: this.id,
-      position: {
-        x: this.x,
-        y: this.y
-      },
-      velocity: {
-        x: this.body.velocity.x,
-        y: this.body.velocity.y
-      },
-      health: this.health
-    };
   }
 
   public stopMovement(emitAlert = true) {
@@ -171,7 +158,7 @@ export class Player extends Sprite {
   public handleMessage(message: BaseMessage) {
     switch (message.type) {
       case "move":
-        this.move(message.direction, false);
+        this.doMove(message.direction);
         break;
       case "stop":
         this.stopMovement(false);

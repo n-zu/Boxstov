@@ -49,7 +49,6 @@ export class World {
   }
 
   private setupFirstPlayer(scene: Phaser.Scene, gameMaster: GameMaster) {
-    console.log(scene);
     this.bulletGroup = new BulletGroup(scene);
 
     const playerId = Math.random().toString(36).substring(7);
