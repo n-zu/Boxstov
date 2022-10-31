@@ -12,7 +12,7 @@ const DEATH_FRAMERATE = 10;
 const ZOMBIE_WALK_FRAMERATE = 8;
 const ZOMBIE_RUN_FRAMERATE = 8;
 
-export const SYNC_MS = 100;
+export let rtt = 50;
 
 export enum AnimationActor {
   Player = "player",

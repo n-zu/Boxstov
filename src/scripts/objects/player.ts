@@ -5,13 +5,13 @@ import {
   AnimationActor,
   AnimationSuffix,
   playAnimation,
-  SYNC_MS,
 } from "../scenes/mainScene";
 import Sprite = Phaser.Physics.Arcade.Sprite;
 import { PlayerUpdatePayload } from "../../typings/action";
 import { Direction } from "../../typings/direction";
 import { PlayerState } from "../../typings/state";
 import DirectionVector from "../controls/direction";
+import { GuestMaster } from "../gameMaster/guestMaster";
 
 const SPEED = 200;
 
@@ -36,7 +36,6 @@ export class Player extends Sprite {
   maxHealth = 100;
   health = 100;
   velocityCorrection: VelocityCorrection;
-  readonly CORRECTION_FACTOR = (SYNC_MS / 1000 + 1) ** (1 / CORRECT_AVG);
 
   constructor(
     scene: Phaser.Scene,
@@ -176,14 +175,17 @@ export class Player extends Sprite {
     this.velocityCorrection = { x, y };
   }
 
-  private getVelocityCorrection(old_pos: number, new_pos: number) {
+  private getVelocityCorrection(old_pos: number, new_pos: number): number {
+    if (!(this.gameMaster instanceof GuestMaster)) return 0;
+    
+    const factor = (this.gameMaster.rtt / 1000 + 1) ** (1 / CORRECT_AVG);
     const diff = new_pos - old_pos;
     const abs = Math.abs(diff);
     console.log("Diff: ", diff);
     if (abs < ACCEPTABLE_DEVIATION) {
       return 0;
     }
-    return (this.CORRECTION_FACTOR ** abs + 1) * Math.sign(diff);
+    return (factor ** abs + 1) * Math.sign(diff);
   }
   /*
   private syncPosition(position: { x: number; y: number }) {
