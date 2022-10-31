@@ -14,7 +14,7 @@ export class Bullet extends Sprite {
   damage = 50;
 
   constructor(scene: Phaser.Scene, x: number, y: number) {
-    super(scene, x, y, "bullet");
+    super(scene, x, y, "");
   }
 
   public fire(x: number, y: number, direction: Direction) {

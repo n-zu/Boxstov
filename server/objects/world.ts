@@ -1,7 +1,6 @@
 import { Player, PlayerState } from "./player.js";
 import { BulletGroup, BulletGroupState } from "../groups/bulletGroup.js";
 import { GameMaster } from "../gameMaster/gameMaster.js";
-import { PlayerControls } from "../controls/playerControls.js";
 import { Enemy } from "./enemy.js";
 import { Bullet } from "./bullet.js";
 import { Difficulty, EnemyGroup, EnemyGroupState } from "../groups/enemyGroup.js";
@@ -13,19 +12,15 @@ export type WorldState = {
 };
 
 export class World {
-  // @ts-ignore
   players: Player[];
   enemies: EnemyGroup;
-  // @ts-ignore
-  playerControls: PlayerControls;
-  // @ts-ignore
   bulletGroup: BulletGroup;
   gameMaster: GameMaster;
   scene: Phaser.Scene;
 
   constructor(scene: Phaser.Scene, gameMaster: GameMaster) {
-    this.setupFirstPlayer(scene, gameMaster);
-
+    this.players = [];
+    this.bulletGroup = new BulletGroup(scene);
     this.gameMaster = gameMaster;
     this.scene = scene;
 
@@ -40,7 +35,6 @@ export class World {
 
     this.enemies = new EnemyGroup(scene, 50, Difficulty.Hard, spawnPoints, gameMaster);
 
-    // @ts-ignore
     scene.physics.add.overlap(this.enemies, this.bulletGroup, (e, b) => {
       const bullet = b as Bullet;
       const enemy = e as Enemy;
@@ -54,7 +48,6 @@ export class World {
   }
 
   public update() {
-    this.playerControls.update();
     this.enemies.update(this.players);
   }
 
@@ -76,30 +69,6 @@ export class World {
     };
   }
 
-  private setupFirstPlayer(scene: Phaser.Scene, gameMaster: GameMaster) {
-    this.bulletGroup = new BulletGroup(scene);
-
-    const playerId = Math.random().toString(36).substring(7);
-    const player = new Player(
-      scene,
-      800,
-      500,
-      playerId,
-      gameMaster,
-      this.bulletGroup
-    );
-    this.playerControls = new PlayerControls(player);
-
-    this.players = [player];
-
-    scene.cameras.main.startFollow(player);
-
-    // @ts-ignore
-    scene.input.on("wheel", (pointer, gameObjects, deltaX, deltaY) => {
-      scene.cameras.main.zoom -= deltaY * 0.001;
-    });
-  }
-
   private getOrCreatePlayer(id: string): Player {
     let player = this.players.find((p) => p.id === id);
     if (player === undefined) {
@@ -112,7 +81,6 @@ export class World {
         this.bulletGroup
       );
       this.players.push(player);
-      this.gameMaster.send("sync", this.getState());
     }
     return player;
   }

@@ -2,7 +2,8 @@ import { GameMaster } from "../gameMaster/gameMaster.js";
 import * as Phaser from "phaser";
 import { BulletGroup } from "../groups/bulletGroup.js";
 import { BaseMessage } from "../gameMaster/hostMaster.js";
-import Sprite = Phaser.Physics.Arcade.Sprite;
+import pkg from "phaser";
+const { Physics } = pkg;
 
 const SPEED = 200;
 const diagonalFactor = Math.sqrt(2) / 2;
@@ -59,7 +60,7 @@ export type PlayerState = {
   health: number;
 };
 
-export class Player extends Sprite {
+export class Player extends Physics.Arcade.Sprite {
   scene: Phaser.Scene;
   gameMaster: GameMaster;
   bulletGroup: BulletGroup;
@@ -76,11 +77,10 @@ export class Player extends Sprite {
     gameMaster: GameMaster,
     bulletGroup: BulletGroup
   ) {
-    super(scene, x, y, "");
+    super(scene, x, y, "player");
 
     scene.add.existing(this);
     scene.physics.add.existing(this);
-    this.setBodySize(80, 180);
 
     this.id = id;
     this.scene = scene;
@@ -106,27 +106,14 @@ export class Player extends Sprite {
 
     const { x: xGun, y: yGun } = this.getGunPosition();
 
-    if (emitAlert) {
-      this.gameMaster.send("player", {
-        id: this.id,
-        payload: {
-          type: "shoot"
-        }
-      });
-    }
     this.bulletGroup.shootBullet(xGun, yGun, this.facing);
   }
 
   public move(
     direction: Direction, emitAlert = true
   ) {
-    if (this.gameMaster.shouldSendSync()) {
-      const [x, y] = getUnitVector(direction);
-      this.setVelocity(x * SPEED, y * SPEED);
-    }
-    if (emitAlert) {
-      this.sendMovementMessage(direction);
-    }
+    const [x, y] = getUnitVector(direction);
+    this.setVelocity(x * SPEED, y * SPEED);
     this.facing = direction;
   }
 
@@ -154,14 +141,6 @@ export class Player extends Sprite {
   }
 
   public stopMovement(emitAlert = true) {
-    if (emitAlert) {
-      this.gameMaster.send("player", {
-        id: this.id,
-        payload: {
-          type: "stop"
-        }
-      });
-    }
     this.setVelocity(0, 0);
   }
 
@@ -204,20 +183,6 @@ export class Player extends Sprite {
     } else {
       console.log("Not syncing position because it is too close");
     }
-  }
-
-  private isMoving(): boolean {
-    return this.body.velocity.x !== 0 || this.body.velocity.y !== 0;
-  }
-
-  private sendMovementMessage(direction: Direction) {
-    this.gameMaster.send("player", {
-      id: this.id,
-      payload: {
-        type: "move",
-        direction
-      }
-    });
   }
 
   private getGunPosition(): { x: number; y: number } {

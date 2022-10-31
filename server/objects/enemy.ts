@@ -1,4 +1,5 @@
-import Sprite = Phaser.Physics.Arcade.Sprite;
+import pkg from "phaser";
+const {Physics} = pkg;
 import { Direction, Player } from "./player.js";
 import { GameMaster } from "../gameMaster/gameMaster.js";
 
@@ -22,7 +23,7 @@ export type EnemyState = {
   cooldownCount: number;
 };
 
-export class Enemy extends Sprite {
+export class Enemy extends Physics.Arcade.Sprite {
   id: number;
   health = HEALTH;
   facing: Direction = Direction.Down;
@@ -31,7 +32,7 @@ export class Enemy extends Sprite {
   cooldownCount = this.cooldown;
 
   constructor(scene: Phaser.Scene, x: number, y: number, gameMaster: GameMaster, id: number) {
-    super(scene, x, y, "");
+    super(scene, x, y, "zombie");
     scene.add.existing(this);
     scene.physics.add.existing(this);
 
@@ -62,7 +63,6 @@ export class Enemy extends Sprite {
       return;
     }
     this.cooldownCount = this.cooldown;
-
     const closestPlayer = this.getClosestPlayer(players);
     const angle = Phaser.Math.Angle.Between(
       this.x,

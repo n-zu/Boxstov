@@ -11,8 +11,6 @@ const DEATH_FRAMERATE = 10;
 const ZOMBIE_WALK_FRAMERATE = 8;
 const ZOMBIE_RUN_FRAMERATE = 8;
 
-const SYNC_COUNTDOWN = 100;
-
 export enum AnimationActor {
   Player = "player",
   Zombie = "zombie",
@@ -34,8 +32,7 @@ export function playAnimation(sprite: Sprite, actor: AnimationActor, direction: 
 }
 
 export default class MainScene extends Phaser.Scene {
-  // @ts-ignore
-  game: MultiplayerGame;
+  declare game: MultiplayerGame;
   // @ts-ignore
   world: World;
   // @ts-ignore
@@ -46,19 +43,12 @@ export default class MainScene extends Phaser.Scene {
   }
 
   create() {
+    this.game = this.game as MultiplayerGame;
+    this.gameMaster = this.game.gameMaster;
+    this.world = new World(this, this.game.gameMaster);
+
     this.createAnimations();
     this.add.tileSprite(0, 0, 7680, 4320, "tiles").setDepth(-9999);
-
-    // FIXME: Need a way to get the ids
-
-    this.world = new World(this, this.game.gameMaster);
-    this.scene.launch("UIScene", this.world.players[0]);
-
-    this.gameMaster = this.game.gameMaster;
-  }
-
-  public getState(): WorldState {
-    return this.world.getState();
   }
 
   public sync(worldState: WorldState) {
@@ -66,7 +56,6 @@ export default class MainScene extends Phaser.Scene {
   }
 
   update() {
-    this.world.update();
     this.world.playerControls.update();
   }
 

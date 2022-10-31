@@ -1,6 +1,11 @@
-import {Peer} from "peerjs";
-import {Message} from "../../server/gameMaster/hostMaster.js";
+import geckos, {ClientChannel} from "@geckos.io/client";
 
+export type BaseMessage = { [id: number | string]: any };
+
+export type Message = {
+  type: string;
+  payload: Message | BaseMessage;
+} | BaseMessage;
 
 export type Action = {
   type: string;
@@ -9,10 +14,25 @@ export type Action = {
 
 export abstract class GameMaster {
   actions: Action[] = [];
-  peer: Peer;
+  channel: ClientChannel;
 
-  protected constructor(peerId?: string) {
-    this.peer = this.createPeer(peerId);
+  protected constructor() {
+    this.channel = geckos({port: 5000});
+    this.channel.onConnect(error => {
+      if (error) console.error(error.message)
+
+      this.channel?.on('ready', () => {
+        console.log('ready')
+      })
+      this.channel.on('msg', (msg: any) => {
+        console.log("Received message:", msg)
+        const message = msg as Message;
+        this.actions.find((action) => action.type === message.type)?.action(
+          message.payload
+        );
+      });
+    })
+
   }
 
   public addAction(type: string, action: (arg?: any) => void) {
@@ -20,14 +40,6 @@ export abstract class GameMaster {
   }
 
   public abstract send(type: string, message: Message): void;
-
-  createPeer(socketId?: string): Peer {
-    if (socketId) {
-      return new Peer(socketId);
-    } else {
-      return new Peer();
-    }
-  }
 
   public abstract shouldSendSync(): boolean;
 

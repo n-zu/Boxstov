@@ -49,22 +49,6 @@ export class Bullet extends Sprite {
     this.body.enable = false;
   }
 
-  // We should use an interface for this
-  public collideWith(enemy: Enemy) {
-    enemy.receiveDamage(this.damage);
-    this.die();
-  }
-
-  public getState(): BulletState {
-    return {
-      x: this.x,
-      y: this.y,
-      rotation: this.rotation,
-      active: this.active,
-      visible: this.visible
-    };
-  }
-
   public sync(bulletState: BulletState) {
     this.setPosition(bulletState.x, bulletState.y);
     this.setRotation(bulletState.rotation);

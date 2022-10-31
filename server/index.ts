@@ -1,39 +1,31 @@
 import express, { Express, Request, Response } from 'express';
 import dotenv from 'dotenv';
 import path from "path";
-import * as http from "http";
-import cors from "cors";
-
-import geckos from '@geckos.io/server';
-
-import {iceServers} from "@geckos.io/server";
+import http from "http";
+import geckos from '@geckos.io/server'
+import { iceServers } from '@geckos.io/server'
+import {MultiplayerGame} from "./game/multiplayerGame.js";
+import {HostMaster} from "./gameMaster/hostMaster.js";
 
 dotenv.config();
 
-const hostId = "efoppiano";
 const app: Express = express();
 const server = http.createServer(app)
 const port = process.env.PORT;
-//const game = new MultiplayerGame(server, new HostMaster(hostId));
+const game = new MultiplayerGame(server, new HostMaster(server));
 
 const io = geckos({
-  iceServers: iceServers,
-
-});
-
-io.addServer(server);
+  iceServers: iceServers
+})
+io.addServer(server)
 
 io.onConnection(channel => {
-  console.log("onConnection");
-  channel.onDisconnect(() => {
-    console.log("onDisconnect");
+  console.log('new connection')
+  // @ts-ignore
+  channel.on('join', (id: string) => {
+    console.log('join', id)
   });
-});
-
-app.use(cors())
-
-app.use("/id", (req: Request, res: Response) => {
-
+  channel.emit("msg", "Hello from server");
 });
 
 app.use('/', express.static('./dist'))
@@ -54,6 +46,4 @@ app.get('/getState', (req: Request, res: Response) => {
 
 });
 
-app.listen(port, () => {
-  console.log(`⚡️[server]: Server is running at http://localhost:${port} with hostId ${hostId}`);
-});
+server.listen(port);

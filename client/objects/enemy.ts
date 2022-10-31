@@ -19,20 +19,16 @@ export type EnemyState = {
   active: boolean;
   visible: boolean;
   bodyEnabled: boolean;
-  cooldown: number;
-  cooldownCount: number;
 };
 
 export class Enemy extends Sprite {
   id: number;
   health = HEALTH;
   facing: Direction = Direction.Down;
-  gameMaster: GameMaster;
-  cooldown = Math.random() * 100;
-  cooldownCount = this.cooldown;
 
-  constructor(scene: Phaser.Scene, x: number, y: number, gameMaster: GameMaster, id: number) {
+  constructor(scene: Phaser.Scene, x: number, y: number, id: number) {
     super(scene, x, y, "zombie");
+    console.log("constructed enemy");
     scene.add.existing(this);
     scene.physics.add.existing(this);
 
@@ -42,7 +38,6 @@ export class Enemy extends Sprite {
     this.visible = false;
     this.active = false;
 
-    this.gameMaster = gameMaster;
     this.id = id;
   }
 
@@ -57,12 +52,6 @@ export class Enemy extends Sprite {
       this.die();
       return;
     }
-
-    if (this.cooldownCount > 0) {
-      this.cooldownCount--;
-      return;
-    }
-    this.cooldownCount = this.cooldown;
 
     const closestPlayer = this.getClosestPlayer(players);
     const angle = Phaser.Math.Angle.Between(
@@ -115,27 +104,6 @@ export class Enemy extends Sprite {
     this.active = state.active;
     this.body.enable = state.bodyEnabled;
     this.health = state.health;
-    this.cooldown = state.cooldown;
-    this.cooldownCount = state.cooldownCount;
-  }
-
-  public getState(): EnemyState {
-    return {
-      position: {
-        x: this.x,
-        y: this.y
-      },
-      velocity: {
-        x: this.body.velocity.x,
-        y: this.body.velocity.y
-      },
-      health: this.health,
-      active: this.active,
-      visible: this.visible,
-      bodyEnabled: this.body.enable,
-      cooldown: this.cooldown,
-      cooldownCount: this.cooldownCount
-    };
   }
 
   public receiveDamage(damage: number) {
@@ -221,10 +189,6 @@ export class Enemy extends Sprite {
     this.setVelocity(0, 0);
     this.setDepth(this.y - 100);
     this.body.enable = false;
-    this.gameMaster.broadcast("enemy", {
-      id: this.id,
-      type: "die"
-    });
 
     playAnimation(
       this,

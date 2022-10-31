@@ -1,7 +1,8 @@
-import Phaser from 'phaser'
+import '@geckos.io/phaser-on-nodejs'
 
-import GameConfig = Phaser.Types.Core.GameConfig;
+import Phaser from 'phaser'
 import MainScene from "./scenes/mainScene.js";
+import GameConfig = Phaser.Types.Core.GameConfig;
 
 export const config = {
   type: Phaser.HEADLESS,

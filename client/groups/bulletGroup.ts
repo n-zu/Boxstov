@@ -23,13 +23,6 @@ export class BulletGroup extends Phaser.Physics.Arcade.Group {
     }
   }
 
-  public getState(): BulletGroupState {
-    return this.children.entries.map((bullet) => {
-      const b = bullet as Bullet;
-      return b.getState();
-    });
-  }
-
   public sync(bulletGroupState: BulletGroupState) {
     bulletGroupState.forEach((bulletState, i) => {
       const bullet = this.children.entries[i] as Bullet;

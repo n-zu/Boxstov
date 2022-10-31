@@ -1,10 +1,8 @@
 import "phaser";
-import { MultiplayerGame } from "./game/multiplayerGame";
+import geckos from '@geckos.io/client'
 import MainScene from "./scenes/mainScene";
-import { GuestMaster } from "./gameMaster/guestMaster";
-import { UIScene } from "./scenes/uiScene";
-import BootScene from "./scenes/bootScene";
-import Peer from "peerjs";
+import {MultiplayerGame} from "./game/multiplayerGame";
+import {GuestMaster} from "./gameMaster/guestMaster";
 
 const DEFAULT_WIDTH = 1280;
 const DEFAULT_HEIGHT = 720;
@@ -19,7 +17,7 @@ const gameConfig = {
     width: DEFAULT_WIDTH,
     height: DEFAULT_HEIGHT
   },
-  scene: [BootScene, MainScene, UIScene],
+  scene: [MainScene],
   antialias: true,
   physics: {
     default: "arcade",
@@ -58,19 +56,8 @@ window.addEventListener("load", () => {
   body.style.backgroundColor = "#ffffff";
   */
 
-
-  const peer = new Peer();
-  peer.on("open", (id) => {
-    console.log("My peer ID is: " + id);
-    const conn = peer.connect("efoppiano");
-    conn.on("open", () => {
-      console.log("Connected to peer");
-      conn.send("Hello");
-    });
-    conn.on("data", (data) => {
-      console.log(data);
-    });
-  });
+  const gameMaster = new GuestMaster();
+  const game = new MultiplayerGame(gameConfig, gameMaster);
 });
 
 console.log("Hello");

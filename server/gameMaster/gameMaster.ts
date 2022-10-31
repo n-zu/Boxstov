@@ -1,6 +1,12 @@
-import {Peer} from "peerjs";
-import {HostMaster, Message} from "./hostMaster.js";
+import geckos, {iceServers, ServerChannel} from "@geckos.io/server";
+import http from "http";
 
+export type BaseMessage = { [id: number | string]: any };
+
+export type Message = {
+  type: string;
+  payload: Message | BaseMessage;
+} | BaseMessage;
 
 export type Action = {
   type: string;
@@ -9,40 +15,33 @@ export type Action = {
 
 export abstract class GameMaster {
   actions: Action[] = [];
-  peer: Peer;
+  io: any;
+  channels: ServerChannel[] = [];
 
-  protected constructor(peerId?: string) {
-    console.log("GameMaster", this);
-    this.peer = this.createPeer(peerId);
-    console.log("createPeer")
-    if (this instanceof HostMaster) {
-      console.log("HostMaster")
-      this.peer = new Peer("efoppiano");
-    } else {
-      console.log("GuestMaster")
-      this.peer = new Peer();
-    }
-    this.peer.on("open", (id) => {
-      console.log("My peer ID is: " + id);
+  protected constructor(server: http.Server) {
+    this.io = geckos({
+      iceServers: iceServers
+    })
+    this.io.addServer(server)
+
+    this.io.onConnection((channel: ServerChannel) => {
+      console.log('new connection')
+      this.channels.push(channel)
+
+      // @ts-ignore
+      channel.on('msg', (msg: any) => {
+        console.log("Received message:", msg)
+        const message = msg as Message;
+        this.actions.find((action) => action.type === message.type)?.action(
+          message.payload
+        );
+      });
     });
   }
 
   public addAction(type: string, action: (arg?: any) => void) {
     this.actions.push({ type, action });
   }
-
-  public abstract send(type: string, message: Message): void;
-
-  createPeer(socketId?: string): Peer {
-    console.log("createPeer")
-    if (socketId) {
-      return new Peer(socketId);
-    } else {
-      return new Peer();
-    }
-  }
-
-  public abstract shouldSendSync(): boolean;
 
   public abstract broadcast(type: string, message: Message): void;
 }

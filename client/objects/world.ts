@@ -24,38 +24,18 @@ export class World {
   scene: Phaser.Scene;
 
   constructor(scene: Phaser.Scene, gameMaster: GameMaster) {
-    this.setupFirstPlayer(scene, gameMaster);
-
     this.gameMaster = gameMaster;
     this.scene = scene;
+    this.enemies = new EnemyGroup(scene, 50);
 
     this.setupGameMaster(gameMaster);
-
-    const spawnPoints = [
-      { x: 100, y: 100 },
-      { x: 100, y: 900 },
-      { x: 1800, y: 100 },
-      { x: 1800, y: 900 }
-    ];
-
-    this.enemies = new EnemyGroup(scene, 50, Difficulty.Hard, spawnPoints, gameMaster);
-
-    // @ts-ignore
-    scene.physics.add.overlap(this.enemies, this.bulletGroup, (e, b) => {
-      const bullet = b as Bullet;
-      const enemy = e as Enemy;
-      if (bullet.active && enemy.active) {
-        bullet.collideWith(enemy);
-      }
-    });
-
-    // Enemies repel each other
-    scene.physics.add.collider(this.enemies, this.enemies);
+    console.log("setting up first player");
+    this.setupFirstPlayer(scene, gameMaster);
+    console.log("done constructing world");
   }
 
   public update() {
     this.playerControls.update();
-    this.enemies.update(this.players);
   }
 
   public sync(worldState: WorldState) {
@@ -68,15 +48,8 @@ export class World {
     this.bulletGroup.sync(worldState.bullets);
   }
 
-  public getState(): WorldState {
-    return {
-      players: this.players.map((player) => player.getState()),
-      bullets: this.bulletGroup.getState(),
-      enemies: this.enemies.getState()
-    };
-  }
-
   private setupFirstPlayer(scene: Phaser.Scene, gameMaster: GameMaster) {
+    console.log(scene);
     this.bulletGroup = new BulletGroup(scene);
 
     const playerId = Math.random().toString(36).substring(7);
@@ -112,12 +85,12 @@ export class World {
         this.bulletGroup
       );
       this.players.push(player);
-      this.gameMaster.send("sync", this.getState());
     }
     return player;
   }
 
   private setupGameMaster(gameMaster: GameMaster) {
+    console.log("setting up game master");
     gameMaster.addAction("player", (data: any) => {
       const player = this.getOrCreatePlayer(data.id);
       player.handleMessage(data.payload);
@@ -130,5 +103,6 @@ export class World {
     gameMaster.addAction("enemy", (data: any) => {
       this.enemies.handleMessage(data);
     });
+    console.log("done setting up game master");
   }
 }

@@ -1,5 +1,5 @@
 import { Game } from "phaser";
-import { GameMaster } from "../gameMaster/gameMaster.js";
+import { GameMaster } from "../gameMaster/gameMaster";
 import GameConfig = Phaser.Types.Core.GameConfig;
 
 export class MultiplayerGame extends Game {

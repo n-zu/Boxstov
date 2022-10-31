@@ -1,9 +1,8 @@
-import { GameMaster } from "../gameMaster/gameMaster";
+import {BaseMessage, GameMaster} from "../gameMaster/gameMaster";
 import * as Phaser from "phaser";
 import { BulletGroup } from "../groups/bulletGroup";
 import { AnimationActor, AnimationSuffix, playAnimation } from "../scenes/mainScene";
 import Sprite = Phaser.Physics.Arcade.Sprite;
-import {BaseMessage} from "../../server/gameMaster/hostMaster";
 
 const SPEED = 200;
 const diagonalFactor = Math.sqrt(2) / 2;
@@ -78,12 +77,11 @@ export class Player extends Sprite {
     bulletGroup: BulletGroup
   ) {
     super(scene, x, y, "player");
-
+    this.scene = scene;
     scene.add.existing(this);
     scene.physics.add.existing(this);
 
     this.id = id;
-    this.scene = scene;
     this.gameMaster = gameMaster;
     this.bulletGroup = bulletGroup;
 
