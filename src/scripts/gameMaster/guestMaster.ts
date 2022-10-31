@@ -1,5 +1,11 @@
 import { DataConnection } from "peerjs";
-import { Action, Message, Update } from "../../typings/action";
+import {
+  Action,
+  Message,
+  MessageType,
+  Update,
+  UpdateFor,
+} from "../../typings/action";
 import { GameMaster } from "./gameMaster";
 
 export class GuestMaster extends GameMaster {
@@ -11,6 +17,10 @@ export class GuestMaster extends GameMaster {
     super();
     this.peer = this.createPeer(id);
     this.hostId = idToConnect;
+
+    this.addAction("sync", () => {
+      this.send("sync-request", undefined);
+    });
   }
 
   public start() {
@@ -25,11 +35,11 @@ export class GuestMaster extends GameMaster {
     });
   }
 
-  public send(type: string, payload: Update) {
-    const msg = {
+  public send<T extends MessageType>(type: T, payload: UpdateFor<T>) {
+    const msg: Message = {
       type,
       payload,
-    } as Message;
+    };
     this.send_async(msg);
   }
 

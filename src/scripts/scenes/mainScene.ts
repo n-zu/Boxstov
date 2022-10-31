@@ -3,6 +3,7 @@ import { World, WorldState } from "../objects/world";
 import { GameMaster } from "../gameMaster/gameMaster";
 import Sprite = Phaser.Physics.Arcade.Sprite;
 import { Direction } from "../../typings/direction";
+import { HostMaster } from "../gameMaster/hostMaster";
 
 const IDLE_FRAMERATE = 1;
 const RUN_FRAMERATE = 10;
@@ -46,7 +47,6 @@ export default class MainScene extends Phaser.Scene {
   game: MultiplayerGame;
   world: World;
   gameMaster: GameMaster;
-  lastUpdated = Date.now();
 
   protected constructor() {
     super({ key: "MainScene" });
@@ -71,11 +71,9 @@ export default class MainScene extends Phaser.Scene {
   }
 
   private updateHost() {
-    const now = Date.now();
-    if (now - this.lastUpdated < SYNC_MS) return;
-
-    this.gameMaster.send("sync", this.world.getState());
-    this.lastUpdated = now;
+    if (this.gameMaster instanceof HostMaster) {
+      this.gameMaster.updateState(this.getState());
+    }
   }
 
   update() {

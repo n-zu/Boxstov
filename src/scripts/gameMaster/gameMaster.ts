@@ -9,7 +9,10 @@ export abstract class GameMaster {
     this.peer = this.createPeer(peerId);
   }
 
-  public abstract send(type: string, message: Update): void;
+  public abstract send<T extends MessageType>(
+    type: T,
+    payload: UpdateFor<T>
+  ): void;
 
   protected createPeer(socketId?: string): Peer {
     if (socketId) {

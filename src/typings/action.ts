@@ -19,12 +19,12 @@ export interface PlayerUpdateOther {
 export type SyncUpdate = WorldState;
 
 export type Update = PlayerUpdate | SyncUpdate;
-export type MessageType = "player" | "sync";
+export type MessageType = "player" | "sync" | "sync-request";
 export type UpdateFor<T extends MessageType> = T extends "player"
   ? PlayerUpdate
   : T extends "sync"
   ? SyncUpdate
-  : never;
+  : undefined;
 
 export interface ActionI<T extends MessageType = MessageType> {
   type: T;
