@@ -44,11 +44,6 @@ export class Player extends Sprite {
     this.bulletGroup = bulletGroup;
     this.facing = new DirectionVector();
 
-    this.setBodySize(180, 220);
-    this.setDisplaySize(250, 250);
-    this.setDisplayOrigin(250, 320);
-    this.setOffset(160, 240);
-
     playAnimation(
       this,
       AnimationActor.Player,
