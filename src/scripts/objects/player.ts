@@ -11,20 +11,24 @@ import { PlayerUpdatePayload } from "../../typings/action";
 import { Direction } from "../../typings/direction";
 import { PlayerState } from "../../typings/state";
 import DirectionVector from "../controls/direction";
-import { GuestMaster } from "../gameMaster/guestMaster";
 
 const SPEED = 200;
 
-// Cuantas unidades tiene que estar desviado para corregir
-// en 1 ciclo de SYNC_MS. Si esta desviado menos, la correccion
-// sera menor. Si esta desviado mas, la correccion sera mayor.
-// Usa una fórmula exponencial.
-const CORRECT_AVG = 5;
-const ACCEPTABLE_DEVIATION = 0.1; // Si diff es menor a esto, no se corrige
+const lerp = (a: number, b: number, t: number) => a * (1 - t) + b * t;
 
-type VelocityCorrection = {
-  x: number;
-  y: number;
+const stringToColor = (str: string): number => {
+  // TODO: test this. seems to like green.
+  let hash = 0;
+  for (let i = 0; i < str.length; i++) {
+    hash = str.charCodeAt(i) + ((hash << 5) - hash);
+  }
+  let color = "0x";
+  for (let i = 0; i < 3; i++) {
+    const value = (hash >> (i * 8)) & 0xff;
+    const adjustedValue = lerp(value, 0xff, 0.9);
+    color += ("00" + adjustedValue.toString(16)).substr(-2);
+  }
+  return Number(color);
 };
 
 export class Player extends Sprite {
@@ -35,7 +39,6 @@ export class Player extends Sprite {
   facing: DirectionVector;
   maxHealth = 100;
   health = 100;
-  velocityCorrection: VelocityCorrection;
 
   constructor(
     scene: Phaser.Scene,
@@ -55,12 +58,7 @@ export class Player extends Sprite {
     this.gameMaster = gameMaster;
     this.bulletGroup = bulletGroup;
     this.facing = new DirectionVector();
-    this.velocityCorrection = { x: 0, y: 0 };
-
-    this.setBodySize(180, 220);
-    this.setDisplaySize(250, 250);
-    this.setDisplayOrigin(250, 320);
-    this.setOffset(160, 240);
+    this.setTint(stringToColor(id));
 
     playAnimation(
       this,
@@ -124,18 +122,13 @@ export class Player extends Sprite {
   }
 
   public sync(state: PlayerState) {
-    this.setVelocity(state.velocity.x, state.velocity.y);
-    this.updateVelocityCorrection(state);
+    const lerp_factor = 0.1;
+    this.setPosition(
+      lerp(this.x, state.position.x, lerp_factor),
+      lerp(this.y, state.position.y, lerp_factor)
+    );
     this.setDepth(state.position.y);
     this.health = state.health;
-  }
-
-  public setVelocity(x: number, y?: number): this {
-    super.setVelocity(
-      x + this.velocityCorrection.x,
-      (y || 0) + this.velocityCorrection.y
-    );
-    return this;
   }
 
   public getState(): PlayerState {
@@ -168,31 +161,12 @@ export class Player extends Sprite {
     }
   }
 
-  private updateVelocityCorrection(updatedState: PlayerState) {
-    const x = this.getVelocityCorrection(this.x, updatedState.position.x);
-    const y = this.getVelocityCorrection(this.y, updatedState.position.y);
-    console.log("Correction: ", x, y);
-    this.velocityCorrection = { x, y };
-  }
-
-  private getVelocityCorrection(old_pos: number, new_pos: number): number {
-    if (!(this.gameMaster instanceof GuestMaster)) return 0;
-    
-    const factor = (this.gameMaster.rtt / 1000 + 1) ** (1 / CORRECT_AVG);
-    const diff = new_pos - old_pos;
-    const abs = Math.abs(diff);
-    console.log("Diff: ", diff);
-    if (abs < ACCEPTABLE_DEVIATION) {
-      return 0;
-    }
-    return (factor ** abs + 1) * Math.sign(diff);
-  }
   /*
   private syncPosition(position: { x: number; y: number }) {
     const diffX = Math.abs(this.x - position.x);
     const diffY = Math.abs(this.y - position.y);
     if (diffX > SYNC_DIFF_TOLERANCE || diffY > SYNC_DIFF_TOLERANCE) {
-      this.setPosition(position.x, position.y);
+      this.setPosition(position.x, positioSn.y);
     } else {
       console.log("Not syncing player position because it is too close");
     }

@@ -12,8 +12,6 @@ const DEATH_FRAMERATE = 10;
 const ZOMBIE_WALK_FRAMERATE = 8;
 const ZOMBIE_RUN_FRAMERATE = 8;
 
-export let rtt = 50;
-
 export enum AnimationActor {
   Player = "player",
   Zombie = "zombie",
@@ -91,7 +89,7 @@ export default class MainScene extends Phaser.Scene {
       frameWidth: 512,
       frameHeight: 512,
     });
-    this.load.spritesheet("zombie", "assets/Mobs/zombie_map_big.png", {
+    this.load.spritesheet("zombie", "assets/Mobs/zombie_map.png", {
       frameWidth: 512,
       frameHeight: 512,
     });

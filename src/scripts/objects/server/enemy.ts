@@ -34,7 +34,7 @@ export default class EnemyServer {
       closestPlayer.x,
       closestPlayer.y
     );
-    const isFar = distance > 70 ? 1 : 0;
+    const isFar = distance > 150 ? 1 : 0;
     let xUnit = Math.cos(angle);
     let yUnit = Math.sin(angle);
     xUnit = Math.abs(xUnit) < 0.3 ? 0 : xUnit;
