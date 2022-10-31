@@ -46,7 +46,7 @@ export class Enemy extends Sprite {
         : AnimationSuffix.Walk;
       playAnimation(this, AnimationActor.Zombie, this.facing, suffix);
     }
-    this.setDepth(this.y - (this.active ? 0 : 100));
+    this.setDepth(this.y - (this.died ? 100 : 0));
   }
 
   public sync(state?: EnemyState) {
@@ -58,7 +58,7 @@ export class Enemy extends Sprite {
     if (state.active) {
       this.setPosition(state.position.x, state.position.y);
       this.setVelocity(state.velocity.x, state.velocity.y);
-      this.setDepth(this.y - (this.active ? 0 : 100));
+      this.setDepth(this.y - (this.died ? 100 : 0));
     }
 
     this.setActive(state.active);
@@ -106,7 +106,6 @@ export class Enemy extends Sprite {
     this.health = 0;
     this.died = true;
     this.setVelocity(0, 0);
-    this.setDepth(this.y - 100);
     this.body.enable = false;
 
     playAnimation(
