@@ -1,5 +1,5 @@
-import { Bullet, BulletState } from "../objects/bullet.js";
-import { Direction } from "../objects/player.js";
+import { Bullet, BulletState } from "../objects/bullet";
+import { Direction } from "../objects/player";
 
 export type BulletGroupState = BulletState[];
 

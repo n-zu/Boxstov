@@ -1,6 +1,6 @@
-import { Enemy, EnemyState } from "../objects/enemy.js";
-import { Player } from "../objects/player.js";
-import { GameMaster } from "../gameMaster/gameMaster.js";
+import { Enemy, EnemyState } from "../objects/enemy";
+import { Player } from "../objects/player";
+import { GameMaster } from "../gameMaster/gameMaster";
 
 const TIME_BETWEEN_HORDES = 1000;
 

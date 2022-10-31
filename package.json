@@ -2,14 +2,15 @@
   "name": "express",
   "version": "1.0.0",
   "description": "",
+  "type": "module",
   "main": "server/index.ts",
   "scripts": {
     "build": "npx tsc",
     "start": "node dist/index.js",
     "dev:tsc": "npx tsc --watch",
     "dev:server": "nodemon -q dist/server/index.js",
-    "dev:webpack": "webpack --watch -c webpack.config.cjs",
-    "dev": "concurrently \"npx tsc --watch\" \"nodemon -q dist/server/index.js\" \"webpack -c webpack.config.cjs --watch\""
+    "dev:webpack": "webpack --watch -c webpack.config.cjs --mode development",
+    "dev": "concurrently \"npm run dev:server\" \"npm run dev:tsc\" \"npm run dev:webpack\""
   },
   "keywords": [],
   "author": "",
@@ -19,6 +20,7 @@
     "@geckos.io/phaser-on-nodejs": "^1.2.7",
     "@geckos.io/server": "^2.2.3",
     "@types/cors": "^2.8.12",
+    "copy-webpack-plugin": "^11.0.0",
     "cors": "^2.8.5",
     "dotenv": "^16.0.3",
     "express": "^4.18.2",
@@ -26,12 +28,20 @@
     "phaser": "^3.55.2"
   },
   "devDependencies": {
+    "@babel/core": "^7.19.6",
+    "@babel/preset-env": "^7.19.4",
     "@types/express": "^4.17.14",
     "@types/node": "^18.11.7",
+    "babel-loader": "^9.0.0",
     "concurrently": "^7.5.0",
+    "html-webpack-plugin": "^5.5.0",
+    "mini-css-extract-plugin": "^2.6.1",
     "nodemon": "^2.0.20",
+    "ts-loader": "^9.4.1",
     "typescript": "^4.8.4",
     "webpack": "^5.74.0",
-    "webpack-cli": "^4.10.0"
+    "webpack-cli": "^4.10.0",
+    "webpack-merge": "^5.8.0",
+    "workbox-webpack-plugin": "^6.5.4"
   }
 }

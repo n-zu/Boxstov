@@ -1,8 +1,9 @@
-import { GameMaster } from "../gameMaster/gameMaster.js";
+import { GameMaster } from "../gameMaster/gameMaster";
 import * as Phaser from "phaser";
-import { BulletGroup } from "../groups/bulletGroup.js";
-import { BaseMessage } from "../gameMaster/hostMaster.js";
+import { BulletGroup } from "../groups/bulletGroup";
+import { AnimationActor, AnimationSuffix, playAnimation } from "../scenes/mainScene";
 import Sprite = Phaser.Physics.Arcade.Sprite;
+import {BaseMessage} from "../../server/gameMaster/hostMaster";
 
 const SPEED = 200;
 const diagonalFactor = Math.sqrt(2) / 2;
@@ -76,11 +77,10 @@ export class Player extends Sprite {
     gameMaster: GameMaster,
     bulletGroup: BulletGroup
   ) {
-    super(scene, x, y, "");
+    super(scene, x, y, "player");
 
     scene.add.existing(this);
     scene.physics.add.existing(this);
-    this.setBodySize(80, 180);
 
     this.id = id;
     this.scene = scene;
@@ -91,6 +91,8 @@ export class Player extends Sprite {
     this.setDisplaySize(250, 250);
     this.setDisplayOrigin(250, 320);
     this.setOffset(160, 240);
+
+    playAnimation(this, AnimationActor.Player, Direction.Down, AnimationSuffix.Idle);
   }
 
   public getId() {
@@ -128,6 +130,7 @@ export class Player extends Sprite {
       this.sendMovementMessage(direction);
     }
     this.facing = direction;
+    playAnimation(this, AnimationActor.Player, direction, AnimationSuffix.Run);
   }
 
   public sync(state: PlayerState) {
@@ -155,6 +158,7 @@ export class Player extends Sprite {
 
   public stopMovement(emitAlert = true) {
     if (emitAlert) {
+      //if (this.isMoving() && emitAlert) {
       this.gameMaster.send("player", {
         id: this.id,
         payload: {
@@ -162,6 +166,7 @@ export class Player extends Sprite {
         }
       });
     }
+    this.playIdleAnimation(this.facing);
     this.setVelocity(0, 0);
   }
 
@@ -208,6 +213,11 @@ export class Player extends Sprite {
 
   private isMoving(): boolean {
     return this.body.velocity.x !== 0 || this.body.velocity.y !== 0;
+  }
+
+  private playIdleAnimation(direction: Direction) {
+    const animationName = `${AnimationActor.Player}-${direction}-${AnimationSuffix.Idle}`;
+    this.anims.play(animationName, true);
   }
 
   private sendMovementMessage(direction: Direction) {

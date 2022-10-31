@@ -1,8 +1,10 @@
-import { World, WorldState } from "../objects/world";
-import { GameMaster } from "../gameMaster/gameMaster";
-import { Direction } from "../objects/player";
+import { World, WorldState } from "../objects/world.js";
+import { GameMaster } from "../gameMaster/gameMaster.js";
+import { Direction } from "../objects/player.js";
 import Sprite = Phaser.Physics.Arcade.Sprite;
-import {MultiplayerGame} from "../game";
+import {MultiplayerGame} from "../game.js";
+import Peer from "peerjs";
+import {geckos} from "@geckos.io/server";
 
 export default class MainScene extends Phaser.Scene {
   // @ts-ignore
@@ -11,12 +13,22 @@ export default class MainScene extends Phaser.Scene {
   world: World;
   // @ts-ignore
   gameMaster: GameMaster;
+  // @ts-ignore
+  io: GeckosServer;
 
   protected constructor() {
     super({ key: "MainScene" });
+
+    // @ts-ignore
+    const peer = new Peer("efoppiano")
+    // @ts-ignore
+    peer.on('open', (id) => {
+      console.log('My peer ID is: ' + id)
+    });
   }
 
-  preload() {
+  public create() {
+    console.log(this);
     this.game = this.game as MultiplayerGame;
     this.gameMaster = this.game.gameMaster;
     this.world = new World(this, this.game.gameMaster);

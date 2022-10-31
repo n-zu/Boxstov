@@ -1,6 +1,7 @@
 import Sprite = Phaser.Physics.Arcade.Sprite;
-import { Direction, Player } from "./player.js";
-import { GameMaster } from "../gameMaster/gameMaster.js";
+import { Direction, Player } from "./player";
+import { AnimationActor, AnimationSuffix, playAnimation } from "../scenes/mainScene";
+import { GameMaster } from "../gameMaster/gameMaster";
 
 const SPEED = 50;
 const HEALTH = 100;
@@ -31,7 +32,7 @@ export class Enemy extends Sprite {
   cooldownCount = this.cooldown;
 
   constructor(scene: Phaser.Scene, x: number, y: number, gameMaster: GameMaster, id: number) {
-    super(scene, x, y, "");
+    super(scene, x, y, "zombie");
     scene.add.existing(this);
     scene.physics.add.existing(this);
 
@@ -93,6 +94,8 @@ export class Enemy extends Sprite {
 
     if (direction) {
       this.facing = direction;
+      const suffix = isFar == 0 ? AnimationSuffix.Attack : AnimationSuffix.Walk;
+      playAnimation(this, AnimationActor.Zombie, this.facing, suffix);
     }
     this.setDepth(this.y);
   }
@@ -223,6 +226,12 @@ export class Enemy extends Sprite {
       type: "die"
     });
 
+    playAnimation(
+      this,
+      AnimationActor.Zombie,
+      this.facing,
+      AnimationSuffix.Die
+    );
     this.setRotation(Math.random() * 0.4 - 0.2);
 
     this.scene.time.delayedCall(10000, () => {

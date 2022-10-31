@@ -1,5 +1,5 @@
-import { GameMaster } from "./gameMaster";
-import Peer, { DataConnection } from "peerjs";
+import { GameMaster } from "./gameMaster.js";
+import {Peer, DataConnection } from "peerjs";
 
 export type BaseMessage = { [id: number | string]: any };
 
@@ -12,11 +12,15 @@ export class HostMaster extends GameMaster {
   guest_sockets: DataConnection[] = [];
 
   constructor(hostId?: string) {
+    console.log("host master");
     super(hostId);
+    console.log("After super");
   }
 
   public start() {
+    // @ts-ignore
     this.peer.on("connection", (socket) => {
+      console.log("connection with guest");
       this.guest_sockets.push(socket);
       this.setupSocket(socket);
     });

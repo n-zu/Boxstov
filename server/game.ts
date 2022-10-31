@@ -1,7 +1,7 @@
 import '@geckos.io/phaser-on-nodejs';
-import { config } from './config'
+import { config } from './config.js'
 import {Server} from "http";
-import {GameMaster} from "./gameMaster/gameMaster";
+import {GameMaster} from "./gameMaster/gameMaster.js";
 
 export class MultiplayerGame extends Phaser.Game {
   server: Server

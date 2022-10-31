@@ -1,10 +1,10 @@
-import { Player, PlayerState } from "./player.js";
-import { BulletGroup, BulletGroupState } from "../groups/bulletGroup.js";
-import { GameMaster } from "../gameMaster/gameMaster.js";
-import { PlayerControls } from "../controls/playerControls.js";
-import { Enemy } from "./enemy.js";
-import { Bullet } from "./bullet.js";
-import { Difficulty, EnemyGroup, EnemyGroupState } from "../groups/enemyGroup.js";
+import { Player, PlayerState } from "./player";
+import { BulletGroup, BulletGroupState } from "../groups/bulletGroup";
+import { GameMaster } from "../gameMaster/gameMaster";
+import { PlayerControls } from "../controls/playerControls";
+import { Enemy } from "./enemy";
+import { Bullet } from "./bullet";
+import { Difficulty, EnemyGroup, EnemyGroupState } from "../groups/enemyGroup";
 
 export type WorldState = {
   players: PlayerState[];

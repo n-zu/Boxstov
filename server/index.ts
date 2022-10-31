@@ -3,27 +3,51 @@ import dotenv from 'dotenv';
 import path from "path";
 import * as http from "http";
 import cors from "cors";
-import {MultiplayerGame} from "./game";
-import {HostMaster} from "./gameMaster/hostMaster";
+
+import geckos from '@geckos.io/server';
+
+import {iceServers} from "@geckos.io/server";
 
 dotenv.config();
 
-const hostId = Math.random().toString(36).substring(7);
+const hostId = "efoppiano";
 const app: Express = express();
 const server = http.createServer(app)
 const port = process.env.PORT;
-const game = new MultiplayerGame(server, new HostMaster(hostId));
+//const game = new MultiplayerGame(server, new HostMaster(hostId));
+
+const io = geckos({
+  iceServers: iceServers,
+
+});
+
+io.addServer(server);
+
+io.onConnection(channel => {
+  console.log("onConnection");
+  channel.onDisconnect(() => {
+    console.log("onDisconnect");
+  });
+});
 
 app.use(cors())
 
-app.use('/', express.static(path.join(__dirname, '../client')))
+app.use("/id", (req: Request, res: Response) => {
 
-app.get('/health-check', (req: Request, res: Response) => {
+});
+
+app.use('/', express.static('./dist'))
+
+app.get('/health', (req: Request, res: Response) => {
     res.send('OK')
 });
 
 app.get('/', (req: Request, res: Response) => {
-  res.sendFile('index.html', { root: __dirname });
+  res.sendFile(path.resolve('./index.html'));
+});
+
+app.get('/play', (req: Request, res: Response) => {
+  res.sendFile(path.resolve('./play.html'));
 });
 
 app.get('/getState', (req: Request, res: Response) => {

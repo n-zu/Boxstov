@@ -1,5 +1,5 @@
 import {Peer} from "peerjs";
-import {HostMaster, Message} from "./hostMaster.js";
+import {Message} from "../../server/gameMaster/hostMaster.js";
 
 
 export type Action = {
@@ -12,19 +12,7 @@ export abstract class GameMaster {
   peer: Peer;
 
   protected constructor(peerId?: string) {
-    console.log("GameMaster", this);
     this.peer = this.createPeer(peerId);
-    console.log("createPeer")
-    if (this instanceof HostMaster) {
-      console.log("HostMaster")
-      this.peer = new Peer("efoppiano");
-    } else {
-      console.log("GuestMaster")
-      this.peer = new Peer();
-    }
-    this.peer.on("open", (id) => {
-      console.log("My peer ID is: " + id);
-    });
   }
 
   public addAction(type: string, action: (arg?: any) => void) {
@@ -34,7 +22,6 @@ export abstract class GameMaster {
   public abstract send(type: string, message: Message): void;
 
   createPeer(socketId?: string): Peer {
-    console.log("createPeer")
     if (socketId) {
       return new Peer(socketId);
     } else {
