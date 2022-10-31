@@ -16,6 +16,21 @@ const SPEED = 200;
 
 const lerp = (a: number, b: number, t: number) => a * (1 - t) + b * t;
 
+const stringToColor = (str: string): number => {
+  // TODO: test this. seems to like green.
+  let hash = 0;
+  for (let i = 0; i < str.length; i++) {
+    hash = str.charCodeAt(i) + ((hash << 5) - hash);
+  }
+  let color = "0x";
+  for (let i = 0; i < 3; i++) {
+    const value = (hash >> (i * 8)) & 0xff;
+    const adjustedValue = lerp(value, 0xff, 0.9);
+    color += ("00" + adjustedValue.toString(16)).substr(-2);
+  }
+  return Number(color);
+};
+
 export class Player extends Sprite {
   scene: Phaser.Scene;
   gameMaster: GameMaster;
@@ -43,6 +58,7 @@ export class Player extends Sprite {
     this.gameMaster = gameMaster;
     this.bulletGroup = bulletGroup;
     this.facing = new DirectionVector();
+    this.setTint(stringToColor(id));
 
     playAnimation(
       this,
