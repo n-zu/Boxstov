@@ -1,4 +1,4 @@
-import {BaseMessage, GameMaster} from "../gameMaster/gameMaster";
+import { BaseMessage, GuestMaster } from "../gameMaster/guestMaster";
 import * as Phaser from "phaser";
 import { BulletGroup } from "../groups/bulletGroup";
 import { AnimationActor, AnimationSuffix, playAnimation } from "../scenes/mainScene";
@@ -61,7 +61,7 @@ export type PlayerState = {
 
 export class Player extends Sprite {
   scene: Phaser.Scene;
-  gameMaster: GameMaster;
+  gameMaster: GuestMaster;
   bulletGroup: BulletGroup;
   id: string;
   facing: Direction = Direction.Down;
@@ -73,7 +73,7 @@ export class Player extends Sprite {
     x: number,
     y: number,
     id: string,
-    gameMaster: GameMaster,
+    gameMaster: GuestMaster,
     bulletGroup: BulletGroup
   ) {
     super(scene, x, y, "player");
@@ -123,36 +123,30 @@ export class Player extends Sprite {
   }
 
   public move(
-    direction: Direction, emitAlert = true
+    direction: Direction
   ) {
-    if (emitAlert) {
-      console.log("Sending move alert");
-      this.sendMovementMessage(direction);
-    }
+    console.log("move", direction);
     this.facing = direction;
+    this.sendMovementMessage(direction);
     playAnimation(this, AnimationActor.Player, direction, AnimationSuffix.Run);
     this.doMove(direction);
   }
 
   public sync(state: PlayerState) {
     this.syncPosition(state.position);
-    // this.syncVelocity(state.velocity);
     this.syncDepth(state.position.y);
     this.health = state.health;
   }
 
-  public stopMovement(emitAlert = true) {
-    if (emitAlert) {
-      //if (this.isMoving() && emitAlert) {
-      this.gameMaster.send("player", {
-        id: this.id,
-        payload: {
-          type: "stop"
-        }
-      });
-    }
-    this.playIdleAnimation(this.facing);
-    this.setVelocity(0, 0);
+  public stopMovement() {
+    console.log("stop movement");
+    this.gameMaster.send("player", {
+      id: this.id,
+      payload: {
+        type: "stop"
+      }
+    });
+    this.doStopMovement();
   }
 
   public handleMessage(message: BaseMessage) {
@@ -161,12 +155,16 @@ export class Player extends Sprite {
         this.doMove(message.direction);
         break;
       case "stop":
-        this.stopMovement(false);
+        this.doStopMovement();
         break;
       case "shoot":
         this.shoot(false);
         break;
     }
+  }
+
+  private doStopMovement() {
+    this.playIdleAnimation(this.facing);
   }
 
   private syncDepth(y: number) {
@@ -175,29 +173,13 @@ export class Player extends Sprite {
     }
   }
 
-  private syncVelocity(velocity: { x: number; y: number }) {
-    if (
-      Math.abs(this.body.velocity.x - velocity.x) > SYNC_DIFF_TOLERANCE ||
-      Math.abs(this.body.velocity.y - velocity.y) > SYNC_DIFF_TOLERANCE
-    ) {
-      this.setVelocity(velocity.x, velocity.y);
-    } else {
-      console.log("Not syncing velocity because it is too close");
-    }
-  }
-
   private syncPosition(position: { x: number; y: number }) {
     const diffX = Math.abs(this.x - position.x);
     const diffY = Math.abs(this.y - position.y);
     if (diffX > SYNC_DIFF_TOLERANCE || diffY > SYNC_DIFF_TOLERANCE) {
+      console.log(diffX, diffY);
       this.setPosition(position.x, position.y);
-    } else {
-      console.log("Not syncing position because it is too close");
     }
-  }
-
-  private isMoving(): boolean {
-    return this.body.velocity.x !== 0 || this.body.velocity.y !== 0;
   }
 
   private playIdleAnimation(direction: Direction) {

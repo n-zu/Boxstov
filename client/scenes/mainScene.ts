@@ -1,8 +1,7 @@
 import { MultiplayerGame } from "../game/multiplayerGame";
 import { World, WorldState } from "../objects/world";
-import { GameMaster } from "../gameMaster/gameMaster";
 import { Direction } from "../objects/player";
-import Sprite = Phaser.Physics.Arcade.Sprite;
+import Sprite = Phaser.GameObjects.Sprite;
 
 const IDLE_FRAMERATE = 1;
 const RUN_FRAMERATE = 10;

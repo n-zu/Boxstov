@@ -1,8 +1,7 @@
 import "phaser";
-import geckos from '@geckos.io/client'
 import MainScene from "./scenes/mainScene";
-import {MultiplayerGame} from "./game/multiplayerGame";
-import {GuestMaster} from "./gameMaster/guestMaster";
+import { MultiplayerGame } from "./game/multiplayerGame";
+import { GuestMaster } from "./gameMaster/guestMaster";
 
 const DEFAULT_WIDTH = 1280;
 const DEFAULT_HEIGHT = 720;
@@ -47,17 +46,8 @@ export function addUrl(id: string) {
 }
 
 window.addEventListener("load", () => {
-  const join_id = "efoppiano";
-  /*
-  const body = document.getElementsByTagName("body")[0];
-  const p = document.createElement("p");
-  p.innerHTML = "Hello";
-  body.appendChild(p);
-  body.style.backgroundColor = "#ffffff";
-  */
-
   const gameMaster = new GuestMaster();
-  const game = new MultiplayerGame(gameConfig, gameMaster);
+  new MultiplayerGame(gameConfig, gameMaster);
 });
 
 console.log("Hello");

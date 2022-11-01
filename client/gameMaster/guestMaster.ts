@@ -1,9 +1,38 @@
-import {Action, GameMaster, Message} from "./gameMaster";
-import {ClientChannel} from "@geckos.io/client";
+import geckos, { ClientChannel } from "@geckos.io/client";
 
-export class GuestMaster extends GameMaster {
+const SERVER_URL = "127.0.0.1:5000";
+
+export type BaseMessage = { [id: number | string]: any };
+
+export type Message = {
+  type: string;
+  payload: Message | BaseMessage;
+} | BaseMessage;
+
+export type Action = {
+  type: string;
+  action: (arg?: any) => void;
+};
+
+export class GuestMaster {
+  actions: Action[] = [];
+  channel: ClientChannel;
+
   constructor() {
-    super();
+    this.channel = geckos({
+      url: SERVER_URL
+    });
+
+    this.channel.onConnect(error => {
+      if (error) console.error(error.message);
+
+      this.channel.on("msg", (msg: any) => {
+        const message = msg as Message;
+        this.actions.find((action) => action.type === message.type)?.action(
+          message.payload
+        );
+      });
+    });
   }
 
   public addAction(type: string, action: (arg?: any) => void) {

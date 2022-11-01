@@ -34,7 +34,7 @@ export class World {
       { x: 1800, y: 900 }
     ];
 
-    this.enemies = new EnemyGroup(this.scene, 50, Difficulty.Hard, spawnPoints, this.gameMaster);
+    this.enemies = new EnemyGroup(this.scene, 5, Difficulty.Hard, spawnPoints, this.gameMaster);
 
     this.scene.physics.add.overlap(this.enemies, this.bulletGroup, (e, b) => {
       const bullet = b as Bullet;

@@ -1,4 +1,4 @@
-import geckos, {iceServers, ServerChannel} from "@geckos.io/server";
+import geckos, { iceServers, ServerChannel } from "@geckos.io/server";
 import http from "http";
 
 export type BaseMessage = { [id: number | string]: any };
@@ -20,16 +20,16 @@ export abstract class GameMaster {
 
   protected constructor(server: http.Server) {
     this.io = geckos({
-      iceServers: iceServers,
-    })
-    this.io.addServer(server)
+      iceServers: iceServers
+    });
+    this.io.addServer(server);
 
     this.io.onConnection((channel: ServerChannel) => {
-      console.log('new connection')
-      this.channels.push(channel)
+      console.log("new connection");
+      this.channels.push(channel);
 
       // @ts-ignore
-      channel.on('msg', (msg: any) => {
+      channel.on("msg", (msg: any) => {
         const message = msg as Message;
         this.actions.find((action) => action.type === message.type)?.action(
           message.payload

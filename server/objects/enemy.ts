@@ -1,7 +1,8 @@
 import pkg from "phaser";
-const {Physics} = pkg;
 import { Direction, Player } from "./player.js";
 import { GameMaster } from "../gameMaster/gameMaster.js";
+
+const { Physics } = pkg;
 
 const SPEED = 50;
 const HEALTH = 100;
@@ -11,16 +12,10 @@ export type EnemyState = {
     x: number;
     y: number;
   };
-  velocity: {
-    x: number;
-    y: number;
-  };
   health: number;
   active: boolean;
   visible: boolean;
   bodyEnabled: boolean;
-  cooldown: number;
-  cooldownCount: number;
 };
 
 export class Enemy extends Physics.Arcade.Sprite {
@@ -99,41 +94,16 @@ export class Enemy extends Physics.Arcade.Sprite {
     this.setDepth(this.y);
   }
 
-  public sync(state: EnemyState) {
-    // There is a bug in this method
-    // If the zombie is dead in the guest and revives with a sync
-    // it won't play the movement animation until update() is called with this.cooldownCount = 0
-    if (state.active) {
-      this.setPosition(state.position.x, state.position.y);
-      this.setVelocity(state.velocity.x, state.velocity.y);
-      this.setDepth(this.y);
-    }
-
-    this.setActive(state.active);
-    this.setVisible(state.visible);
-    this.active = state.active;
-    this.body.enable = state.bodyEnabled;
-    this.health = state.health;
-    this.cooldown = state.cooldown;
-    this.cooldownCount = state.cooldownCount;
-  }
-
   public getState(): EnemyState {
     return {
       position: {
         x: this.x,
         y: this.y
       },
-      velocity: {
-        x: this.body.velocity.x,
-        y: this.body.velocity.y
-      },
       health: this.health,
       active: this.active,
       visible: this.visible,
-      bodyEnabled: this.body.enable,
-      cooldown: this.cooldown,
-      cooldownCount: this.cooldownCount
+      bodyEnabled: this.body.enable
     };
   }
 
@@ -141,12 +111,6 @@ export class Enemy extends Physics.Arcade.Sprite {
     if (this.health <= 0) return;
 
     this.health -= damage;
-
-    // paint red for a second
-    this.setTint(0xff0000);
-    this.scene.time.delayedCall(100, () => {
-      this && this.clearTint();
-    });
   }
 
   public spawn(x: number, y: number) {

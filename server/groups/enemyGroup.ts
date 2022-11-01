@@ -65,15 +65,6 @@ export class EnemyGroup extends Phaser.Physics.Arcade.Group {
     };
   }
 
-  public sync(enemyGroupState: EnemyGroupState) {
-    this.timeUntilNextHorde = enemyGroupState.timeUntilNextHorde;
-    this.spawnPoints = enemyGroupState.spawnPoints;
-    enemyGroupState.enemies.forEach((enemyState, i) => {
-      const enemy = this.children.entries[i] as Enemy;
-      enemy.sync(enemyState);
-    });
-  }
-
   public handleMessage(message: any) {
     const enemy = this.children.entries[message.id] as Enemy;
     enemy.handleMessage(message);

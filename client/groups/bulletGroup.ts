@@ -3,9 +3,9 @@ import { Direction } from "../objects/player";
 
 export type BulletGroupState = BulletState[];
 
-export class BulletGroup extends Phaser.Physics.Arcade.Group {
+export class BulletGroup extends Phaser.GameObjects.Group {
   constructor(scene: Phaser.Scene) {
-    super(scene.physics.world, scene);
+    super(scene);
 
     this.createMultiple({
       frameQuantity: 30,

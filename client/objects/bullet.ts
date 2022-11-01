@@ -1,6 +1,5 @@
-import Sprite = Phaser.Physics.Arcade.Sprite;
+import Sprite = Phaser.GameObjects.Sprite;
 import { Direction, getUnitVector } from "./player";
-import { Enemy } from "./enemy";
 
 export type BulletState = {
   x: number;
@@ -11,8 +10,6 @@ export type BulletState = {
 };
 
 export class Bullet extends Sprite {
-  damage = 50;
-
   constructor(scene: Phaser.Scene, x: number, y: number) {
     super(scene, x, y, "bullet");
   }
@@ -24,15 +21,11 @@ export class Bullet extends Sprite {
 
     this.setScale(0.5);
     this.setAlpha(0.3);
-    this.setBodySize(70, 70);
 
     this.setPosition(x, y);
     this.setRotation(rotation);
-    this.setVelocityX(velocityX);
-    this.setVelocityY(velocityY);
     this.setActive(true);
     this.setVisible(true);
-    this.body.enable = true;
 
     this.scene.time.addEvent({
       delay: 3000,
@@ -46,7 +39,6 @@ export class Bullet extends Sprite {
   public die() {
     this.setActive(false);
     this.setVisible(false);
-    this.body.enable = false;
   }
 
   public sync(bulletState: BulletState) {

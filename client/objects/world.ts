@@ -1,10 +1,8 @@
 import { Player, PlayerState } from "./player";
 import { BulletGroup, BulletGroupState } from "../groups/bulletGroup";
-import { GameMaster } from "../gameMaster/gameMaster";
+import { GuestMaster } from "../gameMaster/guestMaster";
 import { PlayerControls } from "../controls/playerControls";
-import { Enemy } from "./enemy";
-import { Bullet } from "./bullet";
-import { Difficulty, EnemyGroup, EnemyGroupState } from "../groups/enemyGroup";
+import { EnemyGroup, EnemyGroupState } from "../groups/enemyGroup";
 
 export type WorldState = {
   players: PlayerState[];
@@ -20,18 +18,16 @@ export class World {
   playerControls: PlayerControls;
   // @ts-ignore
   bulletGroup: BulletGroup;
-  gameMaster: GameMaster;
+  gameMaster: GuestMaster;
   scene: Phaser.Scene;
 
-  constructor(scene: Phaser.Scene, gameMaster: GameMaster) {
+  constructor(scene: Phaser.Scene, gameMaster: GuestMaster) {
     this.gameMaster = gameMaster;
     this.scene = scene;
-    this.enemies = new EnemyGroup(scene, 50);
+    this.enemies = new EnemyGroup(scene, 5);
 
     this.setupGameMaster(gameMaster);
-    console.log("setting up first player");
     this.setupFirstPlayer(scene, gameMaster);
-    console.log("done constructing world");
   }
 
   public update() {
@@ -48,7 +44,7 @@ export class World {
     this.bulletGroup.sync(worldState.bullets);
   }
 
-  private setupFirstPlayer(scene: Phaser.Scene, gameMaster: GameMaster) {
+  private setupFirstPlayer(scene: Phaser.Scene, gameMaster: GuestMaster) {
     this.bulletGroup = new BulletGroup(scene);
 
     const playerId = Math.random().toString(36).substring(7);
@@ -88,8 +84,7 @@ export class World {
     return player;
   }
 
-  private setupGameMaster(gameMaster: GameMaster) {
-    console.log("setting up game master");
+  private setupGameMaster(gameMaster: GuestMaster) {
     gameMaster.addAction("player", (data: any) => {
       const player = this.getOrCreatePlayer(data.id);
       player.handleMessage(data.payload);
@@ -102,6 +97,5 @@ export class World {
     gameMaster.addAction("enemy", (data: any) => {
       this.enemies.handleMessage(data);
     });
-    console.log("done setting up game master");
   }
 }

@@ -1,14 +1,14 @@
 import { GameMaster } from "../gameMaster/gameMaster.js";
 import * as Phaser from "phaser";
+import pkg from "phaser";
 import { BulletGroup } from "../groups/bulletGroup.js";
 import { BaseMessage } from "../gameMaster/hostMaster.js";
-import pkg from "phaser";
+
 const { Physics } = pkg;
 
 const SPEED = 200;
 const diagonalFactor = Math.sqrt(2) / 2;
-const SYNC_DIFF_TOLERANCE = 0.01;
-const SYNC_DEPTH_TOLERANCE = 0.01;
+
 
 export enum Direction {
   Up = "up",
@@ -53,10 +53,6 @@ export type PlayerState = {
     x: number;
     y: number;
   };
-  velocity: {
-    x: number;
-    y: number;
-  };
   health: number;
 };
 
@@ -77,15 +73,8 @@ export class Player extends Physics.Arcade.Sprite {
     gameMaster: GameMaster,
     bulletGroup: BulletGroup
   ) {
-    console.log("Creating player");
-    console.log(x, y, id);
-
-    super(scene, x, y, '');
-    console.log("done super");
-    // scene.add.existing(this);
-    console.log("done add existing");
+    super(scene, x, y, "");
     scene.physics.add.existing(this);
-    console.log("done physics add existing");
 
     this.id = id;
     this.scene = scene;
@@ -93,17 +82,20 @@ export class Player extends Physics.Arcade.Sprite {
     this.bulletGroup = bulletGroup;
   }
 
-  public shoot(emitAlert = true) {
+  public shoot() {
     const { x: xGun, y: yGun } = this.getGunPosition();
 
     this.bulletGroup.shootBullet(xGun, yGun, this.facing);
   }
 
   public move(
-    direction: Direction, emitAlert = true
+    direction: Direction
   ) {
+    console.log("player move", direction);
+
     const [x, y] = getUnitVector(direction);
     this.setVelocity(x * SPEED, y * SPEED);
+    this.setDepth(this.y);
     this.facing = direction;
   }
 
@@ -115,56 +107,26 @@ export class Player extends Physics.Arcade.Sprite {
         x: this.x,
         y: this.y
       },
-      velocity: {
-        x: this.body.velocity.x,
-        y: this.body.velocity.y
-      },
       health: this.health
     };
   }
 
-  public stopMovement(emitAlert = true) {
+  public stopMovement() {
+    console.log("player stop movement");
     this.setVelocity(0, 0);
   }
 
   public handleMessage(message: BaseMessage) {
     switch (message.type) {
       case "move":
-        this.move(message.direction, false);
+        this.move(message.direction);
         break;
       case "stop":
-        this.stopMovement(false);
+        this.stopMovement();
         break;
       case "shoot":
-        this.shoot(false);
+        this.shoot();
         break;
-    }
-  }
-
-  private syncDepth(y: number) {
-    if (Math.abs(this.y - y) > SYNC_DEPTH_TOLERANCE) {
-      this.setDepth(y);
-    }
-  }
-
-  private syncVelocity(velocity: { x: number; y: number }) {
-    if (
-      Math.abs(this.body.velocity.x - velocity.x) > SYNC_DIFF_TOLERANCE ||
-      Math.abs(this.body.velocity.y - velocity.y) > SYNC_DIFF_TOLERANCE
-    ) {
-      this.setVelocity(velocity.x, velocity.y);
-    } else {
-      console.log("Not syncing velocity because it is too close");
-    }
-  }
-
-  private syncPosition(position: { x: number; y: number }) {
-    const diffX = Math.abs(this.x - position.x);
-    const diffY = Math.abs(this.y - position.y);
-    if (diffX > SYNC_DIFF_TOLERANCE || diffY > SYNC_DIFF_TOLERANCE) {
-      this.setPosition(position.x, position.y);
-    } else {
-      console.log("Not syncing position because it is too close");
     }
   }
 

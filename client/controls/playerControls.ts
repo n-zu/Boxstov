@@ -16,34 +16,34 @@ export class PlayerControls {
     const amountOfArrowsDown = this.getAmountOfArrowsDown();
     if (amountOfArrowsDown === 1) {
       if (this.cursorKeys.up.isDown) {
-        this.player.move(Direction.Up, true);
+        this.player.move(Direction.Up);
       }
       if (this.cursorKeys.down.isDown) {
-        this.player.move(Direction.Down, true);
+        this.player.move(Direction.Down);
       }
       if (this.cursorKeys.left.isDown) {
-        this.player.move(Direction.Left, true);
+        this.player.move(Direction.Left);
       }
       if (this.cursorKeys.right.isDown) {
-        this.player.move(Direction.Right, true);
+        this.player.move(Direction.Right);
       }
     }
     if (amountOfArrowsDown === 2) {
       if (this.cursorKeys.up.isDown && this.cursorKeys.left.isDown) {
-        this.player.move(Direction.UpLeft, true);
+        this.player.move(Direction.UpLeft);
       }
       if (this.cursorKeys.up.isDown && this.cursorKeys.right.isDown) {
-        this.player.move(Direction.UpRight, true);
+        this.player.move(Direction.UpRight);
       }
       if (this.cursorKeys.down.isDown && this.cursorKeys.left.isDown) {
-        this.player.move(Direction.DownLeft, true);
+        this.player.move(Direction.DownLeft);
       }
       if (this.cursorKeys.down.isDown && this.cursorKeys.right.isDown) {
-        this.player.move(Direction.DownRight, true);
+        this.player.move(Direction.DownRight);
       }
     }
     if (amountOfArrowsDown === 0) {
-      this.player.stopMovement(true);
+      this.player.stopMovement();
     }
 
     if (this.cursorKeys.space.isDown) {
