@@ -26,4 +26,6 @@ app.get("/play", (req: Request, res: Response) => {
   res.sendFile(path.resolve("./play.html"));
 });
 
-server.listen(port);
+server.listen(port, () => {
+  console.log(`Listening on port ${port}`);
+});
