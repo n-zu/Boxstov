@@ -76,6 +76,11 @@ export class Player extends Physics.Arcade.Sprite {
     super(scene, x, y, "");
     scene.physics.add.existing(this);
 
+    this.setBodySize(180, 220);
+    this.setDisplaySize(250, 250);
+    this.setDisplayOrigin(250, 320);
+    this.setOffset(160, 240);
+
     this.id = id;
     this.scene = scene;
     this.gameMaster = gameMaster;
@@ -91,8 +96,6 @@ export class Player extends Physics.Arcade.Sprite {
   public move(
     direction: Direction
   ) {
-    console.log("player move", direction);
-
     const [x, y] = getUnitVector(direction);
     this.setVelocity(x * SPEED, y * SPEED);
     this.setDepth(this.y);
@@ -112,7 +115,6 @@ export class Player extends Physics.Arcade.Sprite {
   }
 
   public stopMovement() {
-    console.log("player stop movement");
     this.setVelocity(0, 0);
   }
 

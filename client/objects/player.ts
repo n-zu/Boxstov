@@ -67,6 +67,7 @@ export class Player extends Sprite {
   facing: Direction = Direction.Down;
   maxHealth = 100;
   health = 100;
+  movementDirection: Direction | null = null;
 
   constructor(
     scene: Phaser.Scene,
@@ -125,27 +126,31 @@ export class Player extends Sprite {
   public move(
     direction: Direction
   ) {
-    console.log("move", direction);
     this.facing = direction;
-    this.sendMovementMessage(direction);
+    if (this.movementDirection !== direction) {
+      this.sendMovementMessage(direction);
+    }
+    this.movementDirection = direction;
     playAnimation(this, AnimationActor.Player, direction, AnimationSuffix.Run);
     this.doMove(direction);
   }
 
   public sync(state: PlayerState) {
-    this.syncPosition(state.position);
+    this.syncPosition(state.position.x, state.position.y);
     this.syncDepth(state.position.y);
     this.health = state.health;
   }
 
   public stopMovement() {
-    console.log("stop movement");
-    this.gameMaster.send("player", {
-      id: this.id,
-      payload: {
-        type: "stop"
-      }
-    });
+    if (this.movementDirection) {
+      this.gameMaster.send("player", {
+        id: this.id,
+        payload: {
+          type: "stop"
+        }
+      });
+    }
+    this.movementDirection = null;
     this.doStopMovement();
   }
 
@@ -164,6 +169,7 @@ export class Player extends Sprite {
   }
 
   private doStopMovement() {
+    this.setVelocity(0, 0);
     this.playIdleAnimation(this.facing);
   }
 
@@ -173,12 +179,11 @@ export class Player extends Sprite {
     }
   }
 
-  private syncPosition(position: { x: number; y: number }) {
-    const diffX = Math.abs(this.x - position.x);
-    const diffY = Math.abs(this.y - position.y);
+  private syncPosition(x: number, y: number) {
+    const diffX = Math.abs(this.x - x);
+    const diffY = Math.abs(this.y - y);
     if (diffX > SYNC_DIFF_TOLERANCE || diffY > SYNC_DIFF_TOLERANCE) {
-      console.log(diffX, diffY);
-      this.setPosition(position.x, position.y);
+      this.setPosition(x, y);
     }
   }
 
