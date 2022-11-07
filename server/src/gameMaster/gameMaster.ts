@@ -1,4 +1,8 @@
-import geckos, { iceServers, ServerChannel } from "@geckos.io/server";
+import geckos, {
+  GeckosServer,
+  iceServers,
+  ServerChannel,
+} from "@geckos.io/server";
 import http from "http";
 import {
   Action,
@@ -12,7 +16,7 @@ export type BaseMessage = { [id: number | string]: any };
 
 export abstract class GameMaster {
   actions: Action[] = [];
-  io: any;
+  io: GeckosServer;
   channels: ServerChannel[] = [];
 
   protected constructor(server: http.Server) {
