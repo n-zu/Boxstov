@@ -1,7 +1,6 @@
 import geckos, { ClientChannel } from "@geckos.io/client";
 
-const SERVER_URL = "http://127.0.0.1";
-const SERVER_PORT = 5000;
+const SERVER_PORT = 9208;
 
 export type BaseMessage = { [id: number | string]: any };
 
@@ -23,7 +22,7 @@ export class GuestMaster {
 
   constructor() {
     this.channel = geckos({
-      url: SERVER_URL,
+      url: process.env.SERVER_URL,
       port: SERVER_PORT,
     });
 

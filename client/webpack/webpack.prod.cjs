@@ -4,6 +4,7 @@ const common = require("./webpack.common.cjs");
 const { InjectManifest } = require("workbox-webpack-plugin");
 const CopyWebpackPlugin = require("copy-webpack-plugin");
 // const WebpackObfuscator = require('webpack-obfuscator')
+const { DefinePlugin } = require("webpack");
 
 const prod = {
   mode: "production",
@@ -41,6 +42,9 @@ const prod = {
         { from: "pwa", to: "" },
         { from: "src/favicon.ico", to: "" },
       ],
+    }),
+    new DefinePlugin({
+      "process.env.SERVER_URL": JSON.stringify("http:/boxstov.fdelu.me"),
     }),
   ],
 };

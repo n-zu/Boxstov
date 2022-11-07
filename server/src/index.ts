@@ -1,6 +1,5 @@
 import express, { Express, Request, Response } from "express";
 import dotenv from "dotenv";
-import path from "path";
 import http from "http";
 import { MultiplayerGame } from "./game/multiplayerGame.js";
 import { HostMaster } from "./gameMaster/hostMaster.js";
