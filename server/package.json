@@ -5,7 +5,7 @@
   "type": "module",
   "main": "server/index.ts",
   "scripts": {
-    "build": "npx tsc -b",
+    "build": "npx --yes tsc -b",
     "start": "node dist/server/src/index.js",
     "dev:tsc": "npx tsc -b --watch",
     "dev:server": "nodemon -q dist/server/src/index.js",
