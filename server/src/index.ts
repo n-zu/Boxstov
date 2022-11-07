@@ -18,14 +18,6 @@ app.get("/health", (req: Request, res: Response) => {
   res.send("OK");
 });
 
-app.get("/", (req: Request, res: Response) => {
-  res.sendFile(path.resolve("./index.html"));
-});
-
-app.get("/play", (req: Request, res: Response) => {
-  res.sendFile(path.resolve("./play.html"));
-});
-
 server.listen(port, () => {
   console.log(`Listening on port ${port}`);
 });

@@ -1,3 +1,5 @@
+import "./styles/menu.css";
+
 function getInputValue(id: string): string {
   const element = document.getElementById(id);
   if (element instanceof HTMLInputElement) {

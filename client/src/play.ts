@@ -2,6 +2,7 @@ import "phaser";
 import MainScene from "./scenes/mainScene";
 import { MultiplayerGame } from "./game/multiplayerGame";
 import { GuestMaster } from "./gameMaster/guestMaster";
+import "./styles/menu.css";
 
 const DEFAULT_WIDTH = 1280;
 const DEFAULT_HEIGHT = 720;
@@ -14,17 +15,17 @@ const gameConfig = {
     mode: Phaser.Scale.FIT,
     autoCenter: Phaser.Scale.CENTER_BOTH,
     width: DEFAULT_WIDTH,
-    height: DEFAULT_HEIGHT
+    height: DEFAULT_HEIGHT,
   },
   scene: [MainScene],
   antialias: true,
   physics: {
     default: "arcade",
     arcade: {
-      debug: false
-    }
+      debug: false,
+    },
   },
-  transparent: true
+  transparent: true,
 };
 
 export function addUrl(id: string) {
