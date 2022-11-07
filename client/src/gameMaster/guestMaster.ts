@@ -1,20 +1,13 @@
 import geckos, { ClientChannel } from "@geckos.io/client";
+import {
+  Action,
+  ActionFnFor,
+  Message,
+  UpdateFor,
+  UpdateType,
+} from "../../../common/types/messages";
 
 const SERVER_PORT = 9208;
-
-export type BaseMessage = { [id: number | string]: any };
-
-export type Message =
-  | {
-      type: string;
-      payload: Message | BaseMessage;
-    }
-  | BaseMessage;
-
-export type Action = {
-  type: string;
-  action: (arg?: any) => void;
-};
 
 export class GuestMaster {
   actions: Action[] = [];
@@ -38,24 +31,17 @@ export class GuestMaster {
     });
   }
 
-  public addAction(type: string, action: (arg?: any) => void) {
+  public addAction<T extends UpdateType>(type: T, action: ActionFnFor<T>) {
     this.actions.push({ type, action });
   }
 
-  public send(type: string, payload: Message) {
+  public send<T extends UpdateType>(type: T, payload: UpdateFor<T>) {
     const msg = {
       type,
       payload,
-    } as Message;
+    };
+
     this.send_async(msg);
-  }
-
-  public broadcast(type: string, payload: Message) {
-    // Do nothing because this is a guest
-  }
-
-  shouldSendSync(): boolean {
-    return false;
   }
 
   private async send_async(msg: Message) {

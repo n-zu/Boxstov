@@ -1,15 +1,5 @@
-import { Enemy, EnemyState } from "../objects/enemy";
-
-export type EnemyGroupState = {
-  enemies: EnemyState[];
-  timeUntilNextHorde: number;
-  spawnPoints: SpawnPoint[];
-}
-
-export type SpawnPoint = {
-  x: number;
-  y: number;
-}
+import { EnemyGroupState } from "../../../common/types/state";
+import { Enemy } from "../objects/enemy";
 
 export class EnemyGroup extends Phaser.Physics.Arcade.Group {
   constructor(scene: Phaser.Scene, maxEnemies: number) {

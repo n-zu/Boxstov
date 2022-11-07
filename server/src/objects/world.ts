@@ -1,15 +1,10 @@
-import { Player, PlayerState } from "./player.js";
-import { BulletGroup, BulletGroupState } from "../groups/bulletGroup.js";
+import { Player } from "./player.js";
+import { BulletGroup } from "../groups/bulletGroup.js";
 import { GameMaster } from "../gameMaster/gameMaster.js";
 import { Enemy } from "./enemy.js";
 import { Bullet } from "./bullet.js";
-import { Difficulty, EnemyGroup, EnemyGroupState } from "../groups/enemyGroup.js";
-
-export type WorldState = {
-  players: PlayerState[];
-  bullets: BulletGroupState;
-  enemies: EnemyGroupState;
-};
+import { Difficulty, EnemyGroup } from "../groups/enemyGroup.js";
+import { WorldState } from "../../../common/types/state.js";
 
 export class World {
   players: Player[];
@@ -31,10 +26,16 @@ export class World {
       { x: 100, y: 100 },
       { x: 100, y: 900 },
       { x: 1800, y: 100 },
-      { x: 1800, y: 900 }
+      { x: 1800, y: 900 },
     ];
 
-    this.enemies = new EnemyGroup(this.scene, 5, Difficulty.Hard, spawnPoints, this.gameMaster);
+    this.enemies = new EnemyGroup(
+      this.scene,
+      5,
+      Difficulty.Hard,
+      spawnPoints,
+      this.gameMaster
+    );
 
     this.scene.physics.add.overlap(this.enemies, this.bulletGroup, (e, b) => {
       const bullet = b as Bullet;
@@ -57,7 +58,7 @@ export class World {
     return {
       players: this.players.map((player) => player.getState()),
       bullets: this.bulletGroup.getState(),
-      enemies: this.enemies.getState()
+      enemies: this.enemies.getState(),
     };
   }
 

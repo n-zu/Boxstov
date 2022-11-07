@@ -1,6 +1,7 @@
 const path = require("path");
 const HtmlWebpackPlugin = require("html-webpack-plugin");
 const MiniCssExtractPlugin = require("mini-css-extract-plugin");
+const ResolveTypeScriptPlugin = require("resolve-typescript-plugin");
 
 module.exports = {
   entry: {
@@ -14,12 +15,18 @@ module.exports = {
   },
   resolve: {
     extensions: [".ts", ".tsx", ".js"],
+    plugins: [new ResolveTypeScriptPlugin()],
   },
   module: {
     rules: [
       {
         test: /\.tsx?$|\.jsx?$/,
         include: path.join(__dirname, "../src"),
+        loader: "ts-loader",
+      },
+      {
+        test: /\.tsx?$|\.jsx?$/,
+        include: path.join(__dirname, "../../common"),
         loader: "ts-loader",
       },
       {

@@ -1,25 +1,22 @@
 import { GameMaster } from "./gameMaster.js";
-import {ServerChannel} from "@geckos.io/server";
+import { ServerChannel } from "@geckos.io/server";
 import http from "http";
-
-export type BaseMessage = { [id: number | string]: any };
-
-export type Message = {
-  type: string;
-  payload: Message | BaseMessage;
-} | BaseMessage;
+import {
+  Message,
+  UpdateType,
+  UpdateFor,
+} from "../../../common/types/messages.js";
 
 export class HostMaster extends GameMaster {
   constructor(server: http.Server) {
     super(server);
   }
 
-  public broadcast(type: string, payload: Message) {
+  public broadcast<T extends UpdateType>(type: T, payload: UpdateFor<T>) {
     const msg = {
       type,
-      payload
-    } as Message;
-
+      payload,
+    };
 
     this.channels.forEach((channel) => {
       this.send_async(channel, msg);

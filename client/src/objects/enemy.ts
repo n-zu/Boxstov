@@ -1,20 +1,14 @@
-import { Direction } from "./player";
-import { AnimationActor, AnimationSuffix, playAnimation } from "../scenes/mainScene";
+import { Direction } from "../../../common/types/direction";
+import {
+  AnimationActor,
+  AnimationSuffix,
+  playAnimation,
+} from "../scenes/mainScene";
+import { EnemyState } from "../../../common/types/state";
 import Sprite = Phaser.GameObjects.Sprite;
 
 const SPEED = 50;
 const HEALTH = 100;
-
-export type EnemyState = {
-  position: {
-    x: number;
-    y: number;
-  };
-  health: number;
-  active: boolean;
-  visible: boolean;
-  bodyEnabled: boolean;
-};
 
 export class Enemy extends Sprite {
   id: number;
@@ -113,7 +107,12 @@ export class Enemy extends Sprite {
     this.health = 0;
     this.setDepth(this.y - 100);
 
-    playAnimation(this, AnimationActor.Zombie, this.facing, AnimationSuffix.Die);
+    playAnimation(
+      this,
+      AnimationActor.Zombie,
+      this.facing,
+      AnimationSuffix.Die
+    );
     this.setRotation(Math.random() * 0.4 - 0.2);
 
     this.scene.time.delayedCall(10000, () => {

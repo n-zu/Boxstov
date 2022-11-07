@@ -1,7 +1,6 @@
-import { Bullet, BulletState } from "../objects/bullet";
-import { Direction } from "../objects/player";
-
-export type BulletGroupState = BulletState[];
+import { Direction } from "../../../common/types/direction";
+import { BulletGroupState } from "../../../common/types/state";
+import { Bullet } from "../objects/bullet";
 
 export class BulletGroup extends Phaser.GameObjects.Group {
   constructor(scene: Phaser.Scene) {
@@ -12,7 +11,7 @@ export class BulletGroup extends Phaser.GameObjects.Group {
       key: "bullet",
       active: false,
       visible: false,
-      classType: Bullet
+      classType: Bullet,
     });
   }
 

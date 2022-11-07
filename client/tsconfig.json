@@ -11,6 +11,6 @@
     "strict": true,
     "skipLibCheck": true
   },
-  "include": ["**/*"],
+  "include": ["**/*", "../common/**/*"],
   "exclude": ["node_modules", "dist"]
 }

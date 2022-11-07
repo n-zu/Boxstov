@@ -1,67 +1,21 @@
 import { GameMaster } from "../gameMaster/gameMaster.js";
 import * as Phaser from "phaser";
 import pkg from "phaser";
-import { BulletGroup } from "../groups/bulletGroup.js";
-import { BaseMessage } from "../gameMaster/hostMaster.js";
-
+import { BulletGroup } from "../groups/bulletGroup";
+import { Direction, UnitVector } from "../../../common/types/direction.js";
+import DirectionVector from "../../../common/controls/direction.js";
+import { PlayerState } from "../../../common/types/state.js";
+import { PlayerUpdatePayload } from "../../../common/types/messages.js";
 const { Physics } = pkg;
-
 const SPEED = 200;
-const diagonalFactor = Math.sqrt(2) / 2;
 
-
-export enum Direction {
-  Up = "up",
-  Down = "down",
-  Left = "left",
-  Right = "right",
-  UpLeft = "upLeft",
-  UpRight = "upRight",
-  DownLeft = "downLeft",
-  DownRight = "downRight",
-}
-
-export type PlayerMessage = {
-  id: string;
-  payload: PlayerState;
-}
-
-export function getUnitVector(direction: Direction): [number, number] {
-  switch (direction) {
-    case Direction.Up:
-      return [0, -1];
-    case Direction.Down:
-      return [0, 1];
-    case Direction.Left:
-      return [-1, 0];
-    case Direction.Right:
-      return [1, 0];
-    case Direction.UpLeft:
-      return [-diagonalFactor, -diagonalFactor];
-    case Direction.UpRight:
-      return [diagonalFactor, -diagonalFactor];
-    case Direction.DownLeft:
-      return [-diagonalFactor, diagonalFactor];
-    case Direction.DownRight:
-      return [diagonalFactor, diagonalFactor];
-  }
-}
-
-export type PlayerState = {
-  id: string;
-  position: {
-    x: number;
-    y: number;
-  };
-  health: number;
-};
-
+// @ts-ignore
 export class Player extends Physics.Arcade.Sprite {
   scene: Phaser.Scene;
   gameMaster: GameMaster;
   bulletGroup: BulletGroup;
   id: string;
-  facing: Direction = Direction.Down;
+  movementDirection: DirectionVector = new DirectionVector(0, 0);
   maxHealth = 100;
   health = 100;
 
@@ -90,16 +44,14 @@ export class Player extends Physics.Arcade.Sprite {
   public shoot() {
     const { x: xGun, y: yGun } = this.getGunPosition();
 
-    this.bulletGroup.shootBullet(xGun, yGun, this.facing);
+    this.bulletGroup.shootBullet(xGun, yGun, this.movementDirection);
   }
 
-  public move(
-    direction: Direction
-  ) {
-    const [x, y] = getUnitVector(direction);
-    this.setVelocity(x * SPEED, y * SPEED);
-    this.setDepth(this.y);
-    this.facing = direction;
+  public move(direction: UnitVector) {
+    const [x, y] = direction;
+    let vector = new DirectionVector(x, y);
+    this.setVelocity(...vector.getSpeed(SPEED));
+    this.movementDirection = vector;
   }
 
   public getState(): PlayerState {
@@ -108,9 +60,9 @@ export class Player extends Physics.Arcade.Sprite {
       id: this.id,
       position: {
         x: this.x,
-        y: this.y
+        y: this.y,
       },
-      health: this.health
+      health: this.health,
     };
   }
 
@@ -118,7 +70,7 @@ export class Player extends Physics.Arcade.Sprite {
     this.setVelocity(0, 0);
   }
 
-  public handleMessage(message: BaseMessage) {
+  public handleMessage(message: PlayerUpdatePayload) {
     switch (message.type) {
       case "move":
         this.move(message.direction);
@@ -135,46 +87,46 @@ export class Player extends Physics.Arcade.Sprite {
   private getGunPosition(): { x: number; y: number } {
     // We should change this logic so that the bullet receives the position and angle
     // of shooting, so that the bullet travels parallel to the player's gun
-    switch (this.facing) {
+    switch (this.movementDirection.getDirection()) {
       case Direction.Up:
         return {
           x: this.x + 15,
-          y: this.y - 120
+          y: this.y - 120,
         };
       case Direction.Down:
         return {
           x: this.x - 16,
-          y: this.y
+          y: this.y,
         };
       case Direction.Left:
         return {
           x: this.x - 95,
-          y: this.y - 75
+          y: this.y - 75,
         };
       case Direction.Right:
         return {
           x: this.x + 95,
-          y: this.y - 65
+          y: this.y - 65,
         };
       case Direction.UpLeft:
         return {
           x: this.x - 75,
-          y: this.y - 120
+          y: this.y - 120,
         };
       case Direction.UpRight:
         return {
           x: this.x + 95,
-          y: this.y - 120
+          y: this.y - 120,
         };
       case Direction.DownLeft:
         return {
           x: this.x - 35,
-          y: this.y - 40
+          y: this.y - 40,
         };
       case Direction.DownRight:
         return {
           x: this.x + 45,
-          y: this.y - 10
+          y: this.y - 10,
         };
     }
   }

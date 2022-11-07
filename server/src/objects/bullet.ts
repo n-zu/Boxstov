@@ -1,14 +1,9 @@
 import Sprite = Phaser.Physics.Arcade.Sprite;
-import { Direction, getUnitVector } from "./player.js";
-import { Enemy } from "./enemy.js";
+import { Enemy } from "./enemy";
+import { BulletState } from "../../../common/types/state.js";
+import DirectionVector from "../../../common/controls/direction.js";
 
-export type BulletState = {
-  x: number;
-  y: number;
-  rotation: number;
-  active: boolean;
-  visible: boolean;
-};
+const SPEED = 2000;
 
 export class Bullet extends Sprite {
   damage = 50;
@@ -17,9 +12,8 @@ export class Bullet extends Sprite {
     super(scene, x, y, "");
   }
 
-  public fire(x: number, y: number, direction: Direction) {
-    const speed = 2000;
-    const [velocityX, velocityY] = this.getVelocity(direction, speed);
+  public fire(x: number, y: number, direction: DirectionVector) {
+    const [velocityX, velocityY] = direction.getSpeed(SPEED);
     const rotation = Math.atan2(velocityY, velocityX);
 
     this.setScale(0.5);
@@ -39,7 +33,7 @@ export class Bullet extends Sprite {
       callback: () => {
         this.setActive(false);
         this.setVisible(false);
-      }
+      },
     });
   }
 
@@ -61,7 +55,7 @@ export class Bullet extends Sprite {
       y: this.y,
       rotation: this.rotation,
       active: this.active,
-      visible: this.visible
+      visible: this.visible,
     };
   }
 
@@ -70,10 +64,5 @@ export class Bullet extends Sprite {
     this.setRotation(bulletState.rotation);
     this.setActive(bulletState.active);
     this.setVisible(bulletState.visible);
-  }
-
-  private getVelocity(direction: Direction, speed: number) {
-    const [x, y] = getUnitVector(direction);
-    return [x * speed, y * speed];
   }
 }

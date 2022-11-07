@@ -1,14 +1,9 @@
-import { Player, PlayerState } from "./player";
-import { BulletGroup, BulletGroupState } from "../groups/bulletGroup";
+import { Player } from "./player";
+import { BulletGroup } from "../groups/bulletGroup";
 import { GuestMaster } from "../gameMaster/guestMaster";
 import { PlayerControls } from "../controls/playerControls";
-import { EnemyGroup, EnemyGroupState } from "../groups/enemyGroup";
-
-export type WorldState = {
-  players: PlayerState[];
-  bullets: BulletGroupState;
-  enemies: EnemyGroupState;
-};
+import { EnemyGroup } from "../groups/enemyGroup";
+import { WorldState } from "../../../common/types/state";
 
 export class World {
   // @ts-ignore

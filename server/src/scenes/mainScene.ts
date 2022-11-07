@@ -1,5 +1,5 @@
 import { MultiplayerGame } from "../game/multiplayerGame.js";
-import { World, WorldState } from "../objects/world.js";
+import { World } from "../objects/world.js";
 import { GameMaster } from "../gameMaster/gameMaster.js";
 
 export default class MainScene extends Phaser.Scene {

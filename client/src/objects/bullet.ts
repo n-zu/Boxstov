@@ -1,13 +1,7 @@
 import Sprite = Phaser.GameObjects.Sprite;
-import { Direction, getUnitVector } from "./player";
-
-export type BulletState = {
-  x: number;
-  y: number;
-  rotation: number;
-  active: boolean;
-  visible: boolean;
-};
+import { getUnitVector } from "./player";
+import { Direction } from "../../../common/types/direction";
+import { BulletState } from "../../../common/types/state";
 
 export class Bullet extends Sprite {
   constructor(scene: Phaser.Scene, x: number, y: number) {
@@ -32,7 +26,7 @@ export class Bullet extends Sprite {
       callback: () => {
         this.setActive(false);
         this.setVisible(false);
-      }
+      },
     });
   }
 

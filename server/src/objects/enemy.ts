@@ -1,23 +1,14 @@
+import * as Phaser from "phaser";
 import pkg from "phaser";
-import { Direction, Player } from "./player.js";
+import { Player } from "./player";
 import { GameMaster } from "../gameMaster/gameMaster.js";
-
+import { Direction } from "../../../common/types/direction.js";
+import { EnemyState } from "../../../common/types/state.js";
 const { Physics } = pkg;
-
 const SPEED = 50;
 const HEALTH = 100;
 
-export type EnemyState = {
-  position: {
-    x: number;
-    y: number;
-  };
-  health: number;
-  active: boolean;
-  visible: boolean;
-  bodyEnabled: boolean;
-};
-
+// @ts-ignore
 export class Enemy extends Physics.Arcade.Sprite {
   id: number;
   health = HEALTH;
@@ -26,7 +17,13 @@ export class Enemy extends Physics.Arcade.Sprite {
   cooldown = Math.random() * 100;
   cooldownCount = this.cooldown;
 
-  constructor(scene: Phaser.Scene, x: number, y: number, gameMaster: GameMaster, id: number) {
+  constructor(
+    scene: Phaser.Scene,
+    x: number,
+    y: number,
+    gameMaster: GameMaster,
+    id: number
+  ) {
     super(scene, x, y, "zombie");
     scene.add.existing(this);
     scene.physics.add.existing(this);
@@ -40,7 +37,6 @@ export class Enemy extends Physics.Arcade.Sprite {
     this.gameMaster = gameMaster;
     this.id = id;
   }
-
 
   public update(players: Player[]) {
     // This allows random movement and improves performance by not updating
@@ -98,12 +94,12 @@ export class Enemy extends Physics.Arcade.Sprite {
     return {
       position: {
         x: this.x,
-        y: this.y
+        y: this.y,
       },
       health: this.health,
       active: this.active,
       visible: this.visible,
-      bodyEnabled: this.body.enable
+      bodyEnabled: this.body.enable,
     };
   }
 
@@ -186,7 +182,7 @@ export class Enemy extends Physics.Arcade.Sprite {
     this.body.enable = false;
     this.gameMaster.broadcast("enemy", {
       id: this.id,
-      type: "die"
+      type: "die",
     });
 
     this.setRotation(Math.random() * 0.4 - 0.2);

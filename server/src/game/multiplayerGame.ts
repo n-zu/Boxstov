@@ -1,11 +1,10 @@
-import "@geckos.io/phaser-on-nodejs"
-import pkg from "phaser";
-const {Game} = pkg;
+import "@geckos.io/phaser-on-nodejs";
+import Phaser from "phaser";
 import { GameMaster } from "../gameMaster/gameMaster.js";
 import http from "http";
-import {config} from "../config.js";
+import { config } from "../config.js";
 
-export class MultiplayerGame extends Game {
+export class MultiplayerGame extends Phaser.Game {
   gameMaster: GameMaster;
 
   constructor(server: http.Server, gameMaster: GameMaster) {
