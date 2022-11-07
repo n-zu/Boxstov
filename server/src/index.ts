@@ -4,11 +4,13 @@ import http from "http";
 import { MultiplayerGame } from "./game/multiplayerGame.js";
 import { HostMaster } from "./gameMaster/hostMaster.js";
 
+const PORT = 9208;
+
 dotenv.config();
 
 const app: Express = express();
 const server = http.createServer(app);
-const port = process.env.PORT;
+const port = PORT;
 const game = new MultiplayerGame(server, new HostMaster(server));
 
 app.use("/", express.static("./dist"));

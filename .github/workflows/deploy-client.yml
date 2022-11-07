@@ -1,0 +1,56 @@
+name: Deploy
+
+on:
+  push:
+    branches:
+      - master
+    paths:
+      - "client/src/**"
+      - "client/webpack/**"
+  workflow_dispatch:
+
+env:
+  CLIENT_PATH: ./client
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v3
+
+      - name: Install Node
+        uses: actions/setup-node@v3
+        with:
+          cache: npm
+          node-version: "16"
+
+      - name: Install Dependencies
+        run: npm ci
+
+      - name: Build
+        run: |
+          cd ${{ env.CLIENT_PATH }}
+          npm run build
+
+      - name: Deploy artifact
+        uses: actions/upload-pages-artifact@v1
+        with:
+          path: ${{ env.CLIENT_PATH }}/docs
+
+  deploy:
+    needs: build
+
+    permissions:
+      pages: write
+      id-token: write
+
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+
+    runs-on: ubuntu-latest
+    steps:
+      - name: Deploy to GitHub Pages
+        uses: actions/deploy-pages@v1
+        id: deployment
