@@ -63,6 +63,15 @@ export class World {
     this.playerControls = new PlayerControls(player);
     this.playerUI = new PlayerUI(scene, player);
 
+    setInterval(() => {
+      this.gameMaster.send("player", {
+        id: playerId,
+        payload: {
+          type: "ping",
+        },
+      });
+    }, 500);
+
     this.players = [player];
 
     scene.cameras.main.startFollow(player);

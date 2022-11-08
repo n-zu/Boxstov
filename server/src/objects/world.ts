@@ -52,6 +52,9 @@ export class World {
   }
 
   public update() {
+    // TODO: 5000ms is a magic number
+    const isActive = (p: Player) => Date.now() - 5000 < p.lastUpdate;
+    this.players = this.players.filter(isActive);
     this.enemies.update(this.players);
   }
 

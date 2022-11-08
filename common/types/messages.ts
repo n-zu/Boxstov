@@ -16,7 +16,7 @@ export type PlayerUpdateMove = {
 };
 
 export type PlayerUpdateOther = {
-  type: "stop" | "shoot";
+  type: "stop" | "shoot" | "ping";
 };
 
 // Enemy

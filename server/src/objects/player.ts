@@ -17,6 +17,7 @@ export class Player extends Phaser.Physics.Arcade.Sprite {
   movementDirection: DirectionVector = new DirectionVector(0, 1);
   maxHealth = 100;
   health = 100;
+  lastUpdate = Date.now();
 
   constructor(
     scene: Phaser.Scene,
@@ -64,6 +65,7 @@ export class Player extends Phaser.Physics.Arcade.Sprite {
   }
 
   public handleMessage(message: PlayerUpdatePayload) {
+    this.lastUpdate = Date.now();
     switch (message.type) {
       case "move":
         this.move(message.direction);
