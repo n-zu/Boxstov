@@ -37,10 +37,17 @@ class HealthBar {
   }
 }
 
+const motivationalMessages = [
+  "GIT GUD",
+  "You've been killed to death",
+  "💀💀💀",
+];
+
 export class PlayerUI {
   scene: Phaser.Scene;
   player: Player;
   healthBar: HealthBar;
+  over = false;
 
   constructor(scene: Phaser.Scene, player: Player) {
     this.scene = scene;
@@ -49,6 +56,19 @@ export class PlayerUI {
   }
 
   public update() {
+    // TODO: player death
+    // - Where should player death & other main player logic go?
+    // - What should happen on death ? -> reloads page rn
+    // - Should the player be responsible for its own death? <- sugerencia de copilot :)
+    if (this.player.health <= 0 && !this.over) {
+      this.over = true;
+      alert(
+        motivationalMessages[
+          Math.floor(Math.random() * motivationalMessages.length)
+        ]
+      );
+      window.location.reload();
+    }
     this.healthBar.draw(this.player);
   }
 }
