@@ -65,7 +65,7 @@ export default class MainScene extends Phaser.Scene {
   }
 
   update() {
-    this.world.playerControls.update();
+    this.world.update();
   }
 
   preload() {

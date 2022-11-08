@@ -9,6 +9,7 @@ import {
   PlayerUpdate,
   SyncUpdate,
 } from "../../../common/types/messages";
+import { PlayerUI } from "../controls/playerUi";
 
 export class World {
   // @ts-ignore
@@ -16,6 +17,8 @@ export class World {
   enemies: EnemyGroup;
   // @ts-ignore
   playerControls: PlayerControls;
+  // @ts-ignore
+  playerUI: PlayerUI;
   // @ts-ignore
   bulletGroup: BulletGroup;
   gameMaster: GuestMaster;
@@ -32,6 +35,7 @@ export class World {
 
   public update() {
     this.playerControls.update();
+    this.playerUI.update();
   }
 
   public sync(worldState: WorldState) {
@@ -57,6 +61,7 @@ export class World {
       this.bulletGroup
     );
     this.playerControls = new PlayerControls(player);
+    this.playerUI = new PlayerUI(scene, player);
 
     this.players = [player];
 
