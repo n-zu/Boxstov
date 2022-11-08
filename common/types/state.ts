@@ -17,6 +17,7 @@ export type EnemyState = {
   active: boolean;
   visible: boolean;
   bodyEnabled: boolean;
+  action: string;
 };
 
 export type EnemyGroupState = {

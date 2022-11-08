@@ -16,6 +16,7 @@ export class Enemy extends Sprite {
   health = HEALTH;
   facing: Direction = Direction.Down;
   redTint = 0;
+  action = "";
 
   constructor(scene: Phaser.Scene, x: number, y: number, id: number) {
     super(scene, x, y, "zombie");
@@ -39,6 +40,7 @@ export class Enemy extends Sprite {
     this.setActive(state.active);
     this.setVisible(state.visible);
     this.active = state.active;
+    this.action = state.action;
   }
 
   public receiveDamage(damage: number) {
@@ -94,7 +96,9 @@ export class Enemy extends Sprite {
         this,
         AnimationActor.Zombie,
         this.facing,
-        AnimationSuffix.Walk
+        this.action === AnimationSuffix.Attack
+          ? AnimationSuffix.Attack
+          : AnimationSuffix.Walk
       );
     }
   }

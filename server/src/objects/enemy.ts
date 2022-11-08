@@ -15,6 +15,7 @@ export class Enemy extends Phaser.Physics.Arcade.Sprite {
   gameMaster: GameMaster;
   cooldown = Math.random() * 100;
   cooldownCount = this.cooldown;
+  action = "walk";
 
   constructor(
     scene: Phaser.Scene,
@@ -67,7 +68,7 @@ export class Enemy extends Phaser.Physics.Arcade.Sprite {
       closestPlayer.x,
       closestPlayer.y
     );
-    const isFar = distance > 70 ? 1 : 0;
+    const isFar = distance > 150 ? 1 : 0;
     let xUnit = Math.cos(angle);
     let yUnit = Math.sin(angle);
 
@@ -85,6 +86,7 @@ export class Enemy extends Phaser.Physics.Arcade.Sprite {
     if (direction) {
       this.facing = direction;
     }
+    this.action = isFar ? "walk" : "atk";
   }
 
   public getState(): EnemyState {
@@ -97,6 +99,7 @@ export class Enemy extends Phaser.Physics.Arcade.Sprite {
       active: this.active,
       visible: this.visible,
       bodyEnabled: this.body.enable,
+      action: this.action,
     };
   }
 
