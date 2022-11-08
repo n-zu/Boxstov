@@ -4,6 +4,11 @@ import { GuestMaster } from "../gameMaster/guestMaster";
 import { PlayerControls } from "../controls/playerControls";
 import { EnemyGroup } from "../groups/enemyGroup";
 import { WorldState } from "../../../common/types/state";
+import {
+  EnemyUpdate,
+  PlayerUpdate,
+  SyncUpdate,
+} from "../../../common/types/messages";
 
 export class World {
   // @ts-ignore
@@ -80,16 +85,16 @@ export class World {
   }
 
   private setupGameMaster(gameMaster: GuestMaster) {
-    gameMaster.addAction("player", (data: any) => {
+    gameMaster.addAction("player", (data: PlayerUpdate) => {
       const player = this.getOrCreatePlayer(data.id);
       player.handleMessage(data.payload);
     });
 
-    gameMaster.addAction("sync", (data: any) => {
+    gameMaster.addAction("sync", (data: SyncUpdate) => {
       this.sync(data);
     });
 
-    gameMaster.addAction("enemy", (data: any) => {
+    gameMaster.addAction("enemy", (data: EnemyUpdate) => {
       this.enemies.handleMessage(data);
     });
   }

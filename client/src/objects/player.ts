@@ -13,45 +13,17 @@ import { PlayerState } from "../../../common/types/state";
 import { PlayerUpdatePayload } from "../../../common/types/messages";
 
 const SPEED = 200;
-const diagonalFactor = Math.sqrt(2) / 2;
 const SYNC_DIFF_TOLERANCE = 0.01;
 const SYNC_DEPTH_TOLERANCE = 0.01;
-
-export type PlayerMessage = {
-  id: string;
-  payload: PlayerState;
-};
-
-export function getUnitVector(direction: Direction): [number, number] {
-  switch (direction) {
-    case Direction.Up:
-      return [0, -1];
-    case Direction.Down:
-      return [0, 1];
-    case Direction.Left:
-      return [-1, 0];
-    case Direction.Right:
-      return [1, 0];
-    case Direction.UpLeft:
-      return [-diagonalFactor, -diagonalFactor];
-    case Direction.UpRight:
-      return [diagonalFactor, -diagonalFactor];
-    case Direction.DownLeft:
-      return [-diagonalFactor, diagonalFactor];
-    case Direction.DownRight:
-      return [diagonalFactor, diagonalFactor];
-  }
-}
 
 export class Player extends Sprite {
   scene: Phaser.Scene;
   gameMaster: GuestMaster;
   bulletGroup: BulletGroup;
   id: string;
-  facing: Direction = Direction.Down;
   maxHealth = 100;
   health = 100;
-  movementDirection: DirectionVector | null = null;
+  movementDirection: DirectionVector = new DirectionVector(0, 1);
 
   constructor(
     scene: Phaser.Scene,
@@ -104,7 +76,7 @@ export class Player extends Sprite {
         },
       });
     }
-    this.bulletGroup.shootBullet(xGun, yGun, this.facing);
+    this.bulletGroup.shootBullet(xGun, yGun, this.movementDirection);
   }
 
   public doMove(unit: UnitVector) {
@@ -115,7 +87,7 @@ export class Player extends Sprite {
   public move(direction: DirectionVector) {
     const [x, y] = direction.getSpeed(SPEED);
     this.setVelocity(x, y);
-    if (this.movementDirection !== direction) {
+    if (this.movementDirection?.getUnitVector() !== direction.getUnitVector()) {
       this.sendMovementMessage(direction);
     }
 
@@ -148,7 +120,6 @@ export class Player extends Sprite {
         },
       });
     }
-    this.movementDirection = null;
     this.doStopMovement();
   }
 
@@ -168,7 +139,7 @@ export class Player extends Sprite {
 
   private doStopMovement() {
     this.setVelocity(0, 0);
-    this.playIdleAnimation(this.facing);
+    this.playIdleAnimation();
   }
 
   private syncDepth(y: number) {
@@ -185,8 +156,10 @@ export class Player extends Sprite {
     }
   }
 
-  private playIdleAnimation(direction: Direction) {
-    const animationName = `${AnimationActor.Player}-${direction}-${AnimationSuffix.Idle}`;
+  private playIdleAnimation() {
+    const animationName = `${
+      AnimationActor.Player
+    }-${this.movementDirection?.getDirection()}-${AnimationSuffix.Idle}`;
     this.anims.play(animationName, true);
   }
 
@@ -203,7 +176,7 @@ export class Player extends Sprite {
   private getGunPosition(): { x: number; y: number } {
     // We should change this logic so that the bullet receives the position and angle
     // of shooting, so that the bullet travels parallel to the player's gun
-    switch (this.facing) {
+    switch (this.movementDirection?.getDirection()) {
       case Direction.Up:
         return {
           x: this.x + 15,
@@ -240,6 +213,7 @@ export class Player extends Sprite {
           y: this.y - 40,
         };
       case Direction.DownRight:
+      default:
         return {
           x: this.x + 45,
           y: this.y - 10,

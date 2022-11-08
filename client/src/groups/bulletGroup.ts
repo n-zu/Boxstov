@@ -1,4 +1,4 @@
-import { Direction } from "../../../common/types/direction";
+import DirectionVector from "../../../common/controls/direction";
 import { BulletGroupState } from "../../../common/types/state";
 import { Bullet } from "../objects/bullet";
 
@@ -15,7 +15,7 @@ export class BulletGroup extends Phaser.GameObjects.Group {
     });
   }
 
-  public shootBullet(x: number, y: number, direction: Direction) {
+  public shootBullet(x: number, y: number, direction: DirectionVector) {
     const bullet = this.getFirstDead(false) as Bullet;
     if (bullet) {
       bullet.fire(x, y, direction);

@@ -6,6 +6,7 @@ import {
 } from "../scenes/mainScene";
 import { EnemyState } from "../../../common/types/state";
 import Sprite = Phaser.GameObjects.Sprite;
+import { EnemyUpdate } from "../../../common/types/messages";
 
 const SPEED = 50;
 const HEALTH = 100;
@@ -56,7 +57,7 @@ export class Enemy extends Sprite {
     }
   }
 
-  public handleMessage(payload: any) {
+  public handleMessage(payload: EnemyUpdate) {
     if (payload.type === "die") {
       this.die();
     }

@@ -12,6 +12,7 @@ module.exports = {
     path: path.resolve(__dirname, "../docs"),
     filename: "[name].bundle.js",
     chunkFilename: "[name].chunk.js",
+    sourceMapFilename: "[name].js.map",
   },
   resolve: {
     extensions: [".ts", ".tsx", ".js"],

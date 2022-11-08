@@ -6,6 +6,7 @@ import {
   EnemyState,
   SpawnPoint,
 } from "../../../common/types/state.js";
+import { EnemyUpdate } from "../../../common/types/messages.js";
 
 const TIME_BETWEEN_HORDES = 1000;
 
@@ -64,7 +65,7 @@ export class EnemyGroup extends Phaser.Physics.Arcade.Group {
     };
   }
 
-  public handleMessage(message: any) {
+  public handleMessage(message: EnemyUpdate) {
     const enemy = this.children.entries[message.id] as Enemy;
     enemy.handleMessage(message);
   }

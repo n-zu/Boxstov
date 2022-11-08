@@ -5,6 +5,7 @@ import { Enemy } from "./enemy.js";
 import { Bullet } from "./bullet.js";
 import { Difficulty, EnemyGroup } from "../groups/enemyGroup.js";
 import { WorldState } from "../../../common/types/state.js";
+import { EnemyUpdate, PlayerUpdate } from "../../../common/types/messages.js";
 
 export class World {
   players: Player[];
@@ -79,12 +80,12 @@ export class World {
   }
 
   private setupGameMaster(gameMaster: GameMaster) {
-    gameMaster.addAction("player", (data: any) => {
+    gameMaster.addAction("player", (data: PlayerUpdate) => {
       const player = this.getOrCreatePlayer(data.id);
       player.handleMessage(data.payload);
     });
 
-    gameMaster.addAction("enemy", (data: any) => {
+    gameMaster.addAction("enemy", (data: EnemyUpdate) => {
       this.enemies.handleMessage(data);
     });
   }

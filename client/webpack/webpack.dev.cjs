@@ -10,6 +10,9 @@ const dev = {
   devServer: {
     open: true,
   },
+  optimization: {
+    minimize: false,
+  },
   plugins: [
     new CopyWebpackPlugin({
       patterns: [

@@ -1,15 +1,14 @@
-import * as Phaser from "phaser";
-import pkg from "phaser";
+import "@geckos.io/phaser-on-nodejs";
+import Phaser from "phaser";
 import { Player } from "./player";
 import { GameMaster } from "../gameMaster/gameMaster.js";
 import { Direction } from "../../../common/types/direction.js";
 import { EnemyState } from "../../../common/types/state.js";
-const { Physics } = pkg;
+import { EnemyUpdate } from "../../../common/types/messages";
 const SPEED = 50;
 const HEALTH = 100;
 
-// @ts-ignore
-export class Enemy extends Physics.Arcade.Sprite {
+export class Enemy extends Phaser.Physics.Arcade.Sprite {
   id: number;
   health = HEALTH;
   facing: Direction = Direction.Down;
@@ -117,7 +116,7 @@ export class Enemy extends Physics.Arcade.Sprite {
     this.body.enable = true;
   }
 
-  public handleMessage(payload: any) {
+  public handleMessage(payload: EnemyUpdate) {
     if (payload.type === "die") {
       this.die();
     }

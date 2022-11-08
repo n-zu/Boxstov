@@ -1,5 +1,4 @@
 import "@geckos.io/phaser-on-nodejs";
-
 import Phaser from "phaser";
 import MainScene from "./scenes/mainScene.js";
 import GameConfig = Phaser.Types.Core.GameConfig;

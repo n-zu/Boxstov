@@ -1,16 +1,16 @@
 import Sprite = Phaser.GameObjects.Sprite;
-import { getUnitVector } from "./player";
-import { Direction } from "../../../common/types/direction";
 import { BulletState } from "../../../common/types/state";
+import DirectionVector from "../../../common/controls/direction";
+
+const SPEED = 2000;
 
 export class Bullet extends Sprite {
   constructor(scene: Phaser.Scene, x: number, y: number) {
     super(scene, x, y, "bullet");
   }
 
-  public fire(x: number, y: number, direction: Direction) {
-    const speed = 2000;
-    const [velocityX, velocityY] = this.getVelocity(direction, speed);
+  public fire(x: number, y: number, direction: DirectionVector) {
+    const [velocityX, velocityY] = direction.getSpeed(SPEED);
     const rotation = Math.atan2(velocityY, velocityX);
 
     this.setScale(0.5);
@@ -40,10 +40,5 @@ export class Bullet extends Sprite {
     this.setRotation(bulletState.rotation);
     this.setActive(bulletState.active);
     this.setVisible(bulletState.visible);
-  }
-
-  private getVelocity(direction: Direction, speed: number) {
-    const [x, y] = getUnitVector(direction);
-    return [x * speed, y * speed];
   }
 }

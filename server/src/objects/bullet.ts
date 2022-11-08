@@ -1,11 +1,12 @@
-import Sprite = Phaser.Physics.Arcade.Sprite;
+import "@geckos.io/phaser-on-nodejs";
+import Phaser from "phaser";
 import { Enemy } from "./enemy";
 import { BulletState } from "../../../common/types/state.js";
 import DirectionVector from "../../../common/controls/direction.js";
 
 const SPEED = 2000;
 
-export class Bullet extends Sprite {
+export class Bullet extends Phaser.Physics.Arcade.Sprite {
   damage = 50;
 
   constructor(scene: Phaser.Scene, x: number, y: number) {

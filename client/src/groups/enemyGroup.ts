@@ -1,3 +1,4 @@
+import { EnemyUpdate } from "../../../common/types/messages";
 import { EnemyGroupState } from "../../../common/types/state";
 import { Enemy } from "../objects/enemy";
 
@@ -20,7 +21,7 @@ export class EnemyGroup extends Phaser.Physics.Arcade.Group {
     });
   }
 
-  public handleMessage(message: any) {
+  public handleMessage(message: EnemyUpdate) {
     const enemy = this.children.entries[message.id] as Enemy;
     enemy.handleMessage(message);
   }

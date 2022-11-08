@@ -1,16 +1,15 @@
+import "@geckos.io/phaser-on-nodejs";
+import Phaser from "phaser";
 import { GameMaster } from "../gameMaster/gameMaster.js";
-import * as Phaser from "phaser";
-import pkg from "phaser";
 import { BulletGroup } from "../groups/bulletGroup";
 import { Direction, UnitVector } from "../../../common/types/direction.js";
 import DirectionVector from "../../../common/controls/direction.js";
 import { PlayerState } from "../../../common/types/state.js";
 import { PlayerUpdatePayload } from "../../../common/types/messages.js";
-const { Physics } = pkg;
 const SPEED = 200;
 
 // @ts-ignore
-export class Player extends Physics.Arcade.Sprite {
+export class Player extends Phaser.Physics.Arcade.Sprite {
   scene: Phaser.Scene;
   gameMaster: GameMaster;
   bulletGroup: BulletGroup;
@@ -51,7 +50,7 @@ export class Player extends Physics.Arcade.Sprite {
     const [x, y] = direction;
     let vector = new DirectionVector(x, y);
     this.setVelocity(...vector.getSpeed(SPEED));
-    this.movementDirection = vector;
+    if (x || y) this.movementDirection = vector;
   }
 
   public getState(): PlayerState {

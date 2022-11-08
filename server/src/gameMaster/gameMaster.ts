@@ -12,8 +12,6 @@ import {
   ActionFnFor,
 } from "../../../common/types/messages.js";
 
-export type BaseMessage = { [id: number | string]: any };
-
 export abstract class GameMaster {
   actions: Action[] = [];
   io: GeckosServer;
@@ -29,7 +27,6 @@ export abstract class GameMaster {
       console.log("new connection");
       this.channels.push(channel);
 
-      // @ts-ignore
       channel.on("msg", (msg: any) => {
         const message = msg as Message;
         this.actions
