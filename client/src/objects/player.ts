@@ -61,7 +61,7 @@ export class Player extends Sprite {
 
   public shoot(emitAlert = true) {
     {
-      const aud = new Audio("/assets/shoot.mp3");
+      const aud = new Audio("assets/shoot.mp3");
       aud.volume = 0.1;
       aud.play();
     }
