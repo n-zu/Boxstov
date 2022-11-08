@@ -49,7 +49,6 @@ export class Player extends Phaser.Physics.Arcade.Sprite {
   }
 
   public getState(): PlayerState {
-    this.setDepth(this.y);
     return {
       id: this.id,
       position: {

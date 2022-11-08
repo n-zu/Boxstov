@@ -85,7 +85,6 @@ export class Enemy extends Phaser.Physics.Arcade.Sprite {
     if (direction) {
       this.facing = direction;
     }
-    this.setDepth(this.y);
   }
 
   public getState(): EnemyState {
@@ -176,7 +175,6 @@ export class Enemy extends Phaser.Physics.Arcade.Sprite {
   private die() {
     this.health = 0;
     this.setVelocity(0, 0);
-    this.setDepth(this.y - 100);
     this.body.enable = false;
     this.gameMaster.broadcast("enemy", {
       id: this.id,

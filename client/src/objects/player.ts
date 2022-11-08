@@ -14,7 +14,6 @@ import { PlayerUpdatePayload } from "../../../common/types/messages";
 
 const SPEED = 200;
 const SYNC_DIFF_TOLERANCE = 0.01;
-const SYNC_DEPTH_TOLERANCE = 0.01;
 
 export class Player extends Sprite {
   scene: Phaser.Scene;
@@ -102,7 +101,6 @@ export class Player extends Sprite {
 
   public sync(state: PlayerState) {
     this.syncPosition(state.position.x, state.position.y);
-    this.syncDepth(state.position.y);
     this.health = state.health;
   }
 
@@ -137,17 +135,12 @@ export class Player extends Sprite {
     this.playIdleAnimation();
   }
 
-  private syncDepth(y: number) {
-    if (Math.abs(this.y - y) > SYNC_DEPTH_TOLERANCE) {
-      this.setDepth(y);
-    }
-  }
-
   private syncPosition(x: number, y: number) {
     const diffX = Math.abs(this.x - x);
     const diffY = Math.abs(this.y - y);
     if (diffX > SYNC_DIFF_TOLERANCE || diffY > SYNC_DIFF_TOLERANCE) {
       this.setPosition(x, y);
+      this.setDepth(y);
     }
   }
 
