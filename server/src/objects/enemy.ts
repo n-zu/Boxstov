@@ -11,6 +11,7 @@ const HEALTH = 100;
 export class Enemy extends Phaser.Physics.Arcade.Sprite {
   id: number;
   health = HEALTH;
+  strength = 3;
   facing: Direction = Direction.Down;
   gameMaster: GameMaster;
   cooldown = Math.random() * 100;
@@ -86,7 +87,13 @@ export class Enemy extends Phaser.Physics.Arcade.Sprite {
     if (direction) {
       this.facing = direction;
     }
+
     this.action = isFar ? "walk" : "atk";
+    if (!isFar) {
+      closestPlayer.receiveDamage(
+        (this.strength * this.scene.game.loop.delta) / 100
+      );
+    }
   }
 
   public getState(): EnemyState {

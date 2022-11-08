@@ -125,4 +125,11 @@ export class Player extends Phaser.Physics.Arcade.Sprite {
         };
     }
   }
+
+  public receiveDamage(damage: number) {
+    this.health -= damage;
+    if (this.health <= 0) {
+      this.health = this.maxHealth;
+    }
+  }
 }
