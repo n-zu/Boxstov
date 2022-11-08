@@ -14,7 +14,7 @@ export class Player extends Phaser.Physics.Arcade.Sprite {
   gameMaster: GameMaster;
   bulletGroup: BulletGroup;
   id: string;
-  movementDirection: DirectionVector = new DirectionVector(0, 0);
+  movementDirection: DirectionVector = new DirectionVector(0, 1);
   maxHealth = 100;
   health = 100;
 
