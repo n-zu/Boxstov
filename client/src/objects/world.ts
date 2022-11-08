@@ -61,6 +61,7 @@ export class World {
     this.players = [player];
 
     scene.cameras.main.startFollow(player);
+    scene.cameras.main.zoom = 0.6;
 
     // @ts-ignore
     scene.input.on("wheel", (pointer, gameObjects, deltaX, deltaY) => {

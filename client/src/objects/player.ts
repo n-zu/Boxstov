@@ -42,11 +42,6 @@ export class Player extends Sprite {
     this.gameMaster = gameMaster;
     this.bulletGroup = bulletGroup;
 
-    this.setBodySize(180, 220);
-    this.setDisplaySize(250, 250);
-    this.setDisplayOrigin(250, 320);
-    this.setOffset(160, 240);
-
     playAnimation(
       this,
       AnimationActor.Player,
