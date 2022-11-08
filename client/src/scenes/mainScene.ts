@@ -75,7 +75,7 @@ export default class MainScene extends Phaser.Scene {
       frameWidth: 512,
       frameHeight: 512,
     });
-    this.load.spritesheet("zombie", "assets/Mobs/zombie_map_big.png", {
+    this.load.spritesheet("zombie", "assets/Mobs/zombie_map.png", {
       frameWidth: 512,
       frameHeight: 512,
     });
