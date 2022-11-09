@@ -1,61 +1,96 @@
 <!DOCTYPE html>
 <html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta
+      name="viewport"
+      content="width=device-width, initial-scale=1.0, minimum-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover"
+    />
+    <meta http-equiv="X-UA-Compatible" content="ie=edge" />
 
-<head>
-  <meta charset="UTF-8" />
-  <meta name="viewport"
-    content="width=device-width, initial-scale=1.0, minimum-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover" />
-  <meta http-equiv="X-UA-Compatible" content="ie=edge" />
+    <meta name="theme-color" content="#000000" />
 
-  <meta name="theme-color" content="#000000" />
+    <link rel="manifest" href="./manifest.json" />
 
-  <link rel="manifest" href="./manifest.json" />
+    <meta name="mobile-web-app-capable" content="yes" />
+    <meta name="apple-mobile-web-app-capable" content="yes" />
+    <meta
+      name="application-name"
+      content="<%= htmlWebpackPlugin.options.gameName %>"
+    />
+    <meta
+      name="apple-mobile-web-app-title"
+      content="<%= htmlWebpackPlugin.options.gameName %>"
+    />
+    <meta name="msapplication-starturl" content="./" />
 
-  <meta name="mobile-web-app-capable" content="yes" />
-  <meta name="apple-mobile-web-app-capable" content="yes" />
-  <meta name="application-name" content="<%= htmlWebpackPlugin.options.gameName %>" />
-  <meta name="apple-mobile-web-app-title" content="<%= htmlWebpackPlugin.options.gameName %>" />
-  <meta name="msapplication-starturl" content="./" />
+    <link
+      rel="icon"
+      type="image/png"
+      sizes="192x192"
+      href="./icons/icons-192.png"
+    />
+    <link
+      rel="apple-touch-icon"
+      type="image/png"
+      sizes="192x192"
+      href="./icons/icons-192.png"
+    />
 
-  <link rel="icon" type="image/png" sizes="192x192" href="./icons/icons-192.png" />
-  <link rel="apple-touch-icon" type="image/png" sizes="192x192" href="./icons/icons-192.png" />
+    <link
+      rel="icon"
+      type="image/png"
+      sizes="512x512"
+      href="./icons/icons-512.png"
+    />
+    <link
+      rel="apple-touch-icon"
+      type="image/png"
+      sizes="512x512"
+      href="./icons/icons-512.png"
+    />
 
-  <link rel="icon" type="image/png" sizes="512x512" href="./icons/icons-512.png" />
-  <link rel="apple-touch-icon" type="image/png" sizes="512x512" href="./icons/icons-512.png" />
+    <link rel="shortcut icon" href="./favicon.ico" type="image/x-icon" />
 
-  <link rel="shortcut icon" href="./favicon.ico" type="image/x-icon" />
+    <title><%= htmlWebpackPlugin.options.gameName %></title>
+    <noscript
+      >Please enable javascript to continue using this application.</noscript
+    >
 
-  <title>
-    <%= htmlWebpackPlugin.options.gameName %>
-  </title>
-  <noscript>Please enable javascript to continue using this application.</noscript>
-
-  <!-- installs the serviceWorker -->
-  <!-- <script>
+    <!-- installs the serviceWorker -->
+    <!-- <script>
       if ('serviceWorker' in navigator) {
         window.addEventListener('load', () => {
           navigator.serviceWorker.register('./sw.js')
         })
       }
     </script> -->
-</head>
+  </head>
 
-<body>
-  <div class="center vertical">
-    <img src="play/assets/img/logo.png" onerror="this.onerror=null; this.src='assets/img/logo.png'" alt="logo"
-      class="logo" height="200" />
-    <button id="btnPlay">Host Game</button>
-    <div class="border">
-      <h2>Dev Menu</h2>
-      <div>
-        <input value="12345" placeholder="Game ID" id="inputID" />
-        <div class="buttonContainer">
-          <button id="btnHost">Host ID</button>
-          <button id="btnJoin">Join ID</button>
+  <body>
+    <div class="center vertical">
+      <img
+        src="play/assets/img/logo.png"
+        onerror="this.onerror=null; this.src='assets/img/logo.png'"
+        alt="logo"
+        class="logo"
+        height="200"
+      />
+      <a href="/play">
+        <button>Play Game</button>
+      </a>
+      <br />
+      <button id="btnPlay" disabled>Host Game</button>
+      <div class="border disabled">
+        <h2>Dev Menu</h2>
+        <div>
+          <input value="12345" placeholder="Game ID" id="inputID" />
+          <div class="buttonContainer">
+            <button id="btnHost" disabled>Host ID</button>
+            <button id="btnJoin" disabled>Join ID</button>
+          </div>
         </div>
       </div>
     </div>
-  </div>
-</body>
-
+  </body>
 </html>
