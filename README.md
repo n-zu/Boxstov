@@ -4,10 +4,22 @@ Zombies survival co-op game using Phaser and WebRTC.
 
 ## How To Use
 
+### Client
+
 ```bash
+$ cd client
 # Install dependencies
 $ npm install
+# Start the local development server
+$ npm run start
+```
 
-# Start the local development server (on port 8080)
-$ npm start
+### Server
+
+```bash
+$ cd server
+# Install dependencies
+$ npm install
+# Start the local development server
+$ npm run dev
 ```

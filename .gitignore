@@ -4,3 +4,12 @@
 .idea
 /docs
 .vscode
+.env
+.idea
+.vscode
+node_modules
+dist
+docs
+build
+key.pem
+cert.pem
