@@ -1,6 +1,5 @@
 const path = require("path");
 const HtmlWebpackPlugin = require("html-webpack-plugin");
-const MiniCssExtractPlugin = require("mini-css-extract-plugin");
 const ResolveTypeScriptPlugin = require("resolve-typescript-plugin");
 
 module.exports = {
@@ -29,10 +28,6 @@ module.exports = {
         include: path.join(__dirname, "../../common"),
         loader: "ts-loader",
       },
-      {
-        test: /\.css$/,
-        use: [MiniCssExtractPlugin.loader, "css-loader"],
-      },
     ],
   },
   optimization: {
@@ -54,6 +49,5 @@ module.exports = {
       filename: "index.html",
       chunks: ["index"],
     }),
-    new MiniCssExtractPlugin(),
   ],
 };
