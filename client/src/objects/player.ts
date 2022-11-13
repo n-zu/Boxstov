@@ -1,16 +1,13 @@
 import { GuestMaster } from "../gameMaster/guestMaster";
 import * as Phaser from "phaser";
 import { BulletGroup } from "../groups/bulletGroup";
-import {
-  AnimationActor,
-  AnimationSuffix,
-  playAnimation,
-} from "../scenes/mainScene";
 import Sprite = Phaser.Physics.Arcade.Sprite;
 import { Direction, UnitVector } from "../../../common/types/direction";
 import DirectionVector from "../../../common/controls/direction";
 import { PlayerState } from "../../../common/types/state";
 import { PlayerUpdatePayload } from "../../../common/types/messages";
+import { playAnimation } from "../scenes/mainScene";
+import { AnimationActor, AnimationSuffix } from "../types/animation";
 
 const SPEED = 200;
 const SYNC_DIFF_TOLERANCE = 0.01;

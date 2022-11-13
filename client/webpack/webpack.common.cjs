@@ -5,8 +5,7 @@ const ResolveTypeScriptPlugin = require("resolve-typescript-plugin");
 
 module.exports = {
   entry: {
-    play: ["./src/play.ts", "./webpack/credits.js"],
-    index: ["./src/client.ts"],
+    index: ["./src/index.ts"],
   },
   output: {
     path: path.resolve(__dirname, "../docs"),
@@ -54,12 +53,6 @@ module.exports = {
       template: "src/index.html",
       filename: "index.html",
       chunks: ["index"],
-    }),
-    new HtmlWebpackPlugin({
-      gameName: "Boxstov",
-      filename: "play/index.html",
-      template: "src/play/index.html",
-      chunks: ["play"],
     }),
     new MiniCssExtractPlugin(),
   ],

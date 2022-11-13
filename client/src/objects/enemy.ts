@@ -1,12 +1,9 @@
 import { Direction } from "../../../common/types/direction";
-import {
-  AnimationActor,
-  AnimationSuffix,
-  playAnimation,
-} from "../scenes/mainScene";
+import { playAnimation } from "../scenes/mainScene";
 import { EnemyState } from "../../../common/types/state";
 import Sprite = Phaser.GameObjects.Sprite;
 import { EnemyUpdate } from "../../../common/types/messages";
+import { AnimationActor, AnimationSuffix } from "../types/animation";
 
 const SPEED = 50;
 const HEALTH = 100;
