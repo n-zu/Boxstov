@@ -9,6 +9,7 @@ import {
   PlayerUpdate,
   SyncUpdate,
 } from "../../../common/types/messages";
+import { ENEMY_GROUP_MAX } from "../../../common/constants";
 
 export class World {
   players!: Player[];
@@ -23,7 +24,7 @@ export class World {
   constructor(scene: Phaser.Scene, gameMaster: GameMaster, username: string) {
     this.gameMaster = gameMaster;
     this.scene = scene;
-    this.enemies = new EnemyGroup(scene, 5);
+    this.enemies = new EnemyGroup(scene, ENEMY_GROUP_MAX);
 
     this.setupGameMaster(gameMaster);
     this.setupFirstPlayer(scene, gameMaster, username);

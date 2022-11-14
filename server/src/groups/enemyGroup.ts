@@ -8,7 +8,7 @@ import {
 } from "../../../common/types/state.js";
 import { EnemyUpdate } from "../../../common/types/messages.js";
 
-const TIME_BETWEEN_HORDES = 1000;
+const TIME_BETWEEN_HORDES = 700;
 
 export enum Difficulty {
   Easy = "easy",
