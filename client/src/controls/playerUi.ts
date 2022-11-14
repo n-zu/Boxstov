@@ -53,9 +53,8 @@ class Points {
     this.points.setText(`Points: ${points.toFixed(2)}`);
   }
 
-  update(x: number, y: number, scale: number) {
+  update(x: number, y: number) {
     this.points.setPosition(x, y);
-    this.points.setScale(scale);
   }
 }
 
@@ -97,10 +96,9 @@ export class PlayerUI {
     }
     this.healthBar.draw(this.player);
 
-    const cz = 0.6 ** 1.5 / (2 * camera.zoom ** 1.5);
-    const cx = 50 * cz + camera.width * cz;
-    const cy = -200 - camera.height * cz;
-    this.points.update(x + cx, y + cy, 0.6 / camera.zoom);
+    const cx = 0;
+    const cy = 0;
+    this.points.update(cx, cy);
   }
 
   public sync(points: number) {

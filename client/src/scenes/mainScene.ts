@@ -51,7 +51,34 @@ export default class MainScene extends Phaser.Scene {
     super({ key: "MainScene" });
   }
 
+  setupCameras() {
+    const camera = this.cameras.main;
+    const uiCamera = this.cameras.add(0, 0, camera.width, camera.height);
+
+    const add_existing = this.add.existing;
+    this.add.existing = function (...params): any {
+      const elem: any = add_existing.call(this, ...params);
+      uiCamera.ignore(elem);
+      return elem;
+    };
+
+    const add_tile_sprite = this.add.tileSprite;
+    this.add.tileSprite = function (...params): any {
+      const elem: any = add_tile_sprite.call(this, ...params);
+      uiCamera.ignore(elem);
+      return elem;
+    };
+
+    const add_text = this.add.text;
+    this.add.text = function (...params): any {
+      const elem: any = add_text.call(this, ...params);
+      camera.ignore(elem);
+      return elem;
+    };
+  }
+
   create() {
+    this.setupCameras();
     this.game = this.game as MultiplayerGame;
     this.gameMaster = this.game.gameMaster;
     this.world = new World(this, this.game.gameMaster);
