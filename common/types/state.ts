@@ -4,7 +4,7 @@ export type WorldState = {
   players: PlayerState[];
   bullets: BulletGroupState;
   enemies: EnemyGroupState;
-  points: number;
+  rage: number;
   kills: number;
 };
 

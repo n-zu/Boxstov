@@ -5,7 +5,7 @@ import { loadUIAssets } from "./load";
 
 class Points {
   kills: Phaser.GameObjects.Text;
-  points: Phaser.GameObjects.Text;
+  rage: Phaser.GameObjects.Text;
   bar: Phaser.GameObjects.Graphics;
 
   constructor(scene: Phaser.Scene) {
@@ -13,7 +13,7 @@ class Points {
       fontFamily: "system-ui",
       fontSize: "40px",
     });
-    this.points = scene.add.text(10, 50, "Multiplier", {
+    this.rage = scene.add.text(10, 50, "Multiplier", {
       fontFamily: "system-ui",
       fontSize: "30px",
     });
@@ -22,7 +22,7 @@ class Points {
     this.barFill(0);
 
     this.kills.setDepth(9999);
-    this.points.setDepth(9999);
+    this.rage.setDepth(9999);
   }
 
   barFill(fill: number) {
@@ -33,11 +33,11 @@ class Points {
     this.bar.fillRect(10, 85, 110 * fill, 5);
   }
 
-  update(kills: number, points: number) {
+  update(kills: number, rage: number) {
     this.kills.setText(`Kills: ${kills}`);
-    this.points.setText(`Rage: x${Math.ceil(points)}`);
+    this.rage.setText(`Rage: x${Math.ceil(rage)}`);
 
-    this.barFill(points % 1);
+    this.barFill(rage % 1);
   }
 }
 export default class UI extends Phaser.Scene {
@@ -67,7 +67,7 @@ export default class UI extends Phaser.Scene {
   }
 
   update() {
-    this.points?.update(this.world?.kills || 0, this.world?.points || 0);
+    this.points?.update(this.world?.kills || 0, this.world?.rage || 0);
   }
 
   private addJoinUrl() {

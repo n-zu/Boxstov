@@ -13,7 +13,7 @@ import {
 export class World {
   players!: Player[];
   enemies: EnemyGroup;
-  points = 0;
+  rage = 0;
   kills = 0;
   playerControls!: PlayerControls;
   bulletGroup!: BulletGroup;
@@ -43,7 +43,7 @@ export class World {
 
     this.bulletGroup.sync(worldState.bullets);
 
-    this.points = worldState.points;
+    this.rage = worldState.rage;
     this.kills = worldState.kills;
   }
 

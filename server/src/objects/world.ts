@@ -16,7 +16,7 @@ export class World {
   gameMaster: GameMaster;
   scene: Phaser.Scene;
   kills = 0;
-  points = 0.0;
+  rage = 0.0;
   onEnd: () => void;
 
   constructor(scene: Phaser.Scene, gameMaster: GameMaster, onEnd: () => void) {
@@ -63,14 +63,14 @@ export class World {
     this.players = this.players.filter(isActive);
     if (!this.players.length) this.onEnd();
     this.enemies?.update(this.players);
-    this.points = Math.max(0, this.points - 0.002);
+    this.rage = Math.max(0, this.rage - 0.002);
   }
 
   public getState(): WorldState {
     return {
       players: this.players.map((player) => player.getState()),
       bullets: this.bulletGroup.getState(),
-      points: this.points,
+      rage: this.rage,
       kills: this.kills,
       enemies: this.enemies!.getState(),
     };
@@ -109,6 +109,6 @@ export class World {
 
   private onEnemyKilled(enemy: Enemy) {
     this.kills++;
-    this.points = Math.ceil(this.points) + 1;
+    this.rage = Math.ceil(this.rage) + 1;
   }
 }
