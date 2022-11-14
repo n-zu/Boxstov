@@ -1,6 +1,5 @@
 import { MultiplayerGame } from "./game/multiplayerGame";
 import { GuestMaster } from "./gameMaster/guestMaster";
-import Loader from "./scenes/load";
 import GameConfig = Phaser.Types.Core.GameConfig;
 
 const DEFAULT_WIDTH = 1280;

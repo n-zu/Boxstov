@@ -54,7 +54,7 @@ export default class Menu extends Phaser.Scene {
     }
     this.addErrorText(300);
 
-    this.initMainScene();
+    this.scene.add("MainScene", MainScene, false);
     this.scene.add("Spinner", Spinner, false);
   }
 
@@ -130,25 +130,37 @@ export default class Menu extends Phaser.Scene {
       .setOrigin(0.5);
   }
 
-  private initMainScene() {
-    const sessionMaster = new SessionMaster(this.guestMaster!);
-    this.scene.add("MainScene", MainScene, false, {
-      gameMaster: sessionMaster,
-    });
-  }
-
   private addCallbacks() {
+    let done = false;
     this.guestMaster?.addCallback("gameInfo", () => {
-      this.scene.start("MainScene");
+      if (done) return false; // make sure we only do this once
+
+      done = true;
+      const sessionMaster = new SessionMaster(this.guestMaster!);
+      this.scene.start("MainScene", {
+        username: this.nameInput!.value,
+        gameMaster: sessionMaster,
+      });
       this.scene.stop("Spinner");
       this.scene.stop();
       return false;
     });
 
     this.guestMaster?.addCallback("invalidId", () => {
+      if (done) return false;
       this.scene.wake();
       this.scene.stop("Spinner");
       this.errorText?.setText("Invalid game ID. Check the URL and try again.");
+      return true;
+    });
+
+    this.guestMaster?.addCallback("nameTaken", () => {
+      if (done) return false;
+      this.scene.wake();
+      this.scene.stop("Spinner");
+      this.nameInput?.focus();
+      this.nameInput?.classList.add("error");
+      this.errorText?.setText("That name is already taken. Try another.");
       return true;
     });
   }
@@ -157,7 +169,13 @@ export default class Menu extends Phaser.Scene {
     if (!this.checkName()) return false;
     this.scene.start("Spinner");
     this.scene.sleep();
-    this.guestMaster?.send("createGame", undefined, true);
+    this.guestMaster?.send(
+      "createGame",
+      {
+        username: this.nameInput!.value,
+      },
+      true
+    );
   }
 
   private joinGame(gameId: string) {
@@ -168,6 +186,7 @@ export default class Menu extends Phaser.Scene {
       "joinGame",
       {
         gameId,
+        username: this.nameInput!.value,
       },
       true
     );

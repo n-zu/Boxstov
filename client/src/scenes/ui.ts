@@ -23,6 +23,7 @@ export default class UI extends Phaser.Scene {
     const url = `${loc.protocol}//${
       loc.host
     }/?join=${this.gameMaster?.getGameId()}`;
+
     const icon = this.add
       .image(0, 0, "invite")
       .setOrigin(1, 1)

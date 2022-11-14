@@ -32,9 +32,9 @@ export default class MainScene extends Phaser.Scene {
     super({ key: "MainScene" });
   }
 
-  create(data: { gameMaster: GameMaster }) {
+  create(data: { gameMaster: GameMaster; username: string }) {
     this.gameMaster = data.gameMaster;
-    this.world = new World(this, data.gameMaster);
+    this.world = new World(this, data.gameMaster, data.username);
     this.add.tileSprite(0, 0, 7680, 4320, "tiles").setDepth(-9999);
     this.scene.add("UI", UI, true, { gameMaster: data.gameMaster });
   }

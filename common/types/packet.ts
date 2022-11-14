@@ -1,11 +1,19 @@
 import { Message } from "./messages";
 
 export type ClientPacketType = "gameInfo" | "createGame" | "joinGame";
-export type ServerPacketType = "gameInfo" | "invalidId";
+export type ServerPacketType = "gameInfo" | "invalidId" | "nameTaken";
 export type PacketType = ClientPacketType | ServerPacketType;
+
+export type Create = {
+  username: string;
+};
 
 export type GameInfo = {
   payload: Message;
+} & GameId;
+
+export type Join = {
+  username: string;
 } & GameId;
 
 export type GameId = {
@@ -15,7 +23,9 @@ export type GameId = {
 export type PayloadFor<T extends PacketType> = T extends "gameInfo"
   ? GameInfo
   : T extends "joinGame"
-  ? GameId
+  ? Join
+  : T extends "createGame"
+  ? Create
   : undefined;
 
 export type Packet<T extends PacketType> = {

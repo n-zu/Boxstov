@@ -8,6 +8,7 @@ import { PlayerState } from "../../../common/types/state";
 import { PlayerUpdatePayload } from "../../../common/types/messages";
 import { playAnimation } from "../scenes/mainScene";
 import { AnimationActor, AnimationSuffix } from "../types/animation";
+import { PlayerUI } from "../controls/playerUi";
 
 const SPEED = 200;
 const SYNC_DIFF_TOLERANCE = 0.01;
@@ -20,6 +21,7 @@ export class Player extends Sprite {
   maxHealth = 100;
   health = 100;
   movementDirection: DirectionVector = new DirectionVector(0, 1);
+  ui: PlayerUI;
 
   constructor(
     scene: Phaser.Scene,
@@ -37,6 +39,7 @@ export class Player extends Sprite {
     this.id = id;
     this.gameMaster = gameMaster;
     this.bulletGroup = bulletGroup;
+    this.ui = new PlayerUI(scene, this);
 
     playAnimation(
       this,
@@ -68,6 +71,10 @@ export class Player extends Sprite {
       });
     }
     this.bulletGroup.shootBullet(xGun, yGun, this.movementDirection);
+  }
+
+  public update() {
+    this.ui.update();
   }
 
   public doMove(unit: UnitVector) {

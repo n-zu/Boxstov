@@ -1,4 +1,3 @@
-import { MultiplayerGame } from "../game/multiplayerGame.js";
 import { World } from "../objects/world.js";
 import { GameMaster } from "../gameMaster/gameMaster.js";
 
@@ -25,5 +24,9 @@ export default class MainScene extends Phaser.Scene {
   update() {
     this.world.update();
     this.gameMaster?.broadcast("sync", this.world.getState());
+  }
+
+  public addPlayer(id: string): boolean {
+    return this.world?.addPlayer(id);
   }
 }
