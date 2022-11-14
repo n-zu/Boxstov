@@ -1,11 +1,12 @@
 import { MultiplayerGame } from "./game/multiplayerGame";
 import { GuestMaster } from "./gameMaster/guestMaster";
 import Loader from "./scenes/load";
+import GameConfig = Phaser.Types.Core.GameConfig;
 
 const DEFAULT_WIDTH = 1280;
 const DEFAULT_HEIGHT = 720;
 
-const gameConfig = {
+const gameConfig: GameConfig = {
   type: Phaser.AUTO,
   backgroundColor: "#ffffff",
   scale: {
@@ -15,13 +16,15 @@ const gameConfig = {
     width: DEFAULT_WIDTH,
     height: DEFAULT_HEIGHT,
   },
-  scene: [Loader],
   antialias: true,
   physics: {
     default: "arcade",
     arcade: {
       debug: false,
     },
+  },
+  dom: {
+    createContainer: true,
   },
   transparent: true,
 };

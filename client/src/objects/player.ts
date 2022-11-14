@@ -1,4 +1,4 @@
-import { GuestMaster } from "../gameMaster/guestMaster";
+import { GameMaster } from "../gameMaster/gameMaster";
 import * as Phaser from "phaser";
 import { BulletGroup } from "../groups/bulletGroup";
 import Sprite = Phaser.Physics.Arcade.Sprite;
@@ -14,7 +14,7 @@ const SYNC_DIFF_TOLERANCE = 0.01;
 
 export class Player extends Sprite {
   scene: Phaser.Scene;
-  gameMaster: GuestMaster;
+  gameMaster: GameMaster;
   bulletGroup: BulletGroup;
   id: string;
   maxHealth = 100;
@@ -26,7 +26,7 @@ export class Player extends Sprite {
     x: number,
     y: number,
     id: string,
-    gameMaster: GuestMaster,
+    gameMaster: GameMaster,
     bulletGroup: BulletGroup
   ) {
     super(scene, x, y, "player");

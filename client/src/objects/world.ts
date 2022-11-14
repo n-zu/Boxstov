@@ -1,6 +1,6 @@
 import { Player } from "./player";
 import { BulletGroup } from "../groups/bulletGroup";
-import { GuestMaster } from "../gameMaster/guestMaster";
+import { GameMaster } from "../gameMaster/gameMaster";
 import { PlayerControls } from "../controls/playerControls";
 import { EnemyGroup } from "../groups/enemyGroup";
 import { WorldState } from "../../../common/types/state";
@@ -21,10 +21,10 @@ export class World {
   playerUI: PlayerUI;
   // @ts-ignore
   bulletGroup: BulletGroup;
-  gameMaster: GuestMaster;
+  gameMaster: GameMaster;
   scene: Phaser.Scene;
 
-  constructor(scene: Phaser.Scene, gameMaster: GuestMaster) {
+  constructor(scene: Phaser.Scene, gameMaster: GameMaster) {
     this.gameMaster = gameMaster;
     this.scene = scene;
     this.enemies = new EnemyGroup(scene, 5);
@@ -48,7 +48,7 @@ export class World {
     this.bulletGroup.sync(worldState.bullets);
   }
 
-  private setupFirstPlayer(scene: Phaser.Scene, gameMaster: GuestMaster) {
+  private setupFirstPlayer(scene: Phaser.Scene, gameMaster: GameMaster) {
     this.bulletGroup = new BulletGroup(scene);
 
     const playerId = Math.random().toString(36).substring(7);
@@ -99,7 +99,7 @@ export class World {
     return player;
   }
 
-  private setupGameMaster(gameMaster: GuestMaster) {
+  private setupGameMaster(gameMaster: GameMaster) {
     gameMaster.addAction("player", (data: PlayerUpdate) => {
       const player = this.getOrCreatePlayer(data.id);
       player.handleMessage(data.payload);

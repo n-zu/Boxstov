@@ -1,10 +1,9 @@
-import express, { Express, Request, Response } from "express";
+import express, { Request, Response } from "express";
 import dotenv from "dotenv";
 import fs from "fs";
 import http from "http";
 import https from "https";
-import { MultiplayerGame } from "./game/multiplayerGame.js";
-import { HostMaster } from "./gameMaster/hostMaster.js";
+import GameServer from "./server.js";
 
 const PORT = process.env.PORT || 9208;
 
@@ -24,7 +23,7 @@ try {
     server = http.createServer(app);
   }
 
-  const game = new MultiplayerGame(server, new HostMaster(server));
+  const game = new GameServer(server);
   app.use("/", express.static("./dist"));
 
   app.get("/health", (req: Request, res: Response) => {

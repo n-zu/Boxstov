@@ -2,6 +2,7 @@
 // cargue rápido asi se muestra la pantalla de carga rápido
 import Phaser from "phaser";
 import { Direction } from "../../../common/types/direction";
+import { GuestMaster } from "../gameMaster/guestMaster";
 import { AnimationActor, AnimationSuffix } from "../types/animation";
 
 // Imports de las escenas, se hacen desde acá para que se carguen durante la
@@ -23,6 +24,14 @@ export function loadGameAssets(scene: Phaser.Scene) {
 export function loadMenuAssets(scene: Phaser.Scene) {
   scene.load.image("squares", "assets/img/background.png");
   scene.load.image("logo", "assets/img/logo.png");
+  scene.load.html("input", "html/input.html");
+}
+
+export function loadSpinnerAssets(scene: Phaser.Scene) {
+  scene.load.spritesheet("spinner", "assets/img/spinner.png", {
+    frameWidth: 200,
+    frameHeight: 200,
+  });
 }
 
 const IDLE_FRAMERATE = 1;
@@ -38,12 +47,20 @@ const PROGRESS_PADDING = 10;
 const INNER_WIDTH = PROGRESS_WIDTH - PROGRESS_PADDING * 2;
 const INNER_HEIGHT = PROGRESS_HEIGHT - PROGRESS_PADDING * 2;
 
+export type MenuData = {
+  guestMaster: GuestMaster;
+};
+
 export default class LoadScene extends Phaser.Scene {
+  guestMaster?: GuestMaster;
+
   constructor() {
     super({ key: "Loading" });
   }
 
-  create() {}
+  create({ guestMaster }: MenuData) {
+    this.guestMaster = guestMaster;
+  }
 
   preload() {
     let menu = import("./menu");
@@ -52,11 +69,13 @@ export default class LoadScene extends Phaser.Scene {
       this.createAnimations();
       menu.then(({ default: menu }) => {
         console.log("Loaded scripts!");
-        this.scene.add("Menu", menu, true);
+        this.scene.stop();
+        this.scene.add("Menu", menu, true, { guestMaster: this.guestMaster });
       });
     });
     loadGameAssets(this);
     loadMenuAssets(this);
+    loadSpinnerAssets(this);
   }
 
   private loadingBar(onComplete: () => void) {
@@ -93,6 +112,16 @@ export default class LoadScene extends Phaser.Scene {
   }
 
   private createAnimations() {
+    this.anims.create({
+      key: "spinner",
+      frames: this.anims.generateFrameNumbers("spinner", {
+        start: 0,
+        end: 50,
+      }),
+      frameRate: 30,
+      repeat: -1,
+    });
+
     const directions = [
       Direction.Down,
       Direction.DownRight,

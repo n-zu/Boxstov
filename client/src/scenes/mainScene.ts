@@ -5,6 +5,7 @@ import { MultiplayerGame } from "../game/multiplayerGame";
 import { World } from "../objects/world";
 import { loadGameAssets } from "./load";
 import Sprite = Phaser.GameObjects.Sprite;
+import { GameMaster } from "../gameMaster/gameMaster";
 
 export function playAnimation(
   sprite: Sprite,
@@ -26,17 +27,14 @@ export default class MainScene extends Phaser.Scene {
   declare game: MultiplayerGame;
   // @ts-ignore
   world: World;
-  // @ts-ignore
-  gameMaster: GameMaster;
 
   protected constructor() {
     super({ key: "MainScene" });
   }
 
-  create() {
+  create(data: { gameMaster: GameMaster }) {
     this.game = this.game as MultiplayerGame;
-    this.gameMaster = this.game.gameMaster;
-    this.world = new World(this, this.game.gameMaster);
+    this.world = new World(this, data.gameMaster);
 
     this.add.tileSprite(0, 0, 7680, 4320, "tiles").setDepth(-9999);
   }

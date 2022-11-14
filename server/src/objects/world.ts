@@ -9,17 +9,18 @@ import { EnemyUpdate, PlayerUpdate } from "../../../common/types/messages.js";
 
 export class World {
   players: Player[];
-  // @ts-ignore
-  enemies: EnemyGroup;
+  enemies?: EnemyGroup;
   bulletGroup: BulletGroup;
   gameMaster: GameMaster;
   scene: Phaser.Scene;
+  onEnd: () => void;
 
-  constructor(scene: Phaser.Scene, gameMaster: GameMaster) {
+  constructor(scene: Phaser.Scene, gameMaster: GameMaster, onEnd: () => void) {
     this.players = [];
     this.bulletGroup = new BulletGroup(scene);
     this.gameMaster = gameMaster;
     this.scene = scene;
+    this.onEnd = onEnd;
   }
 
   public create() {
@@ -55,14 +56,15 @@ export class World {
     // TODO: 5000ms is a magic number
     const isActive = (p: Player) => Date.now() - 5000 < p.lastUpdate;
     this.players = this.players.filter(isActive);
-    this.enemies.update(this.players);
+    if (!this.players) this.onEnd();
+    this.enemies?.update(this.players);
   }
 
   public getState(): WorldState {
     return {
       players: this.players.map((player) => player.getState()),
       bullets: this.bulletGroup.getState(),
-      enemies: this.enemies.getState(),
+      enemies: this.enemies!.getState(),
     };
   }
 
@@ -89,7 +91,7 @@ export class World {
     });
 
     gameMaster.addAction("enemy", (data: EnemyUpdate) => {
-      this.enemies.handleMessage(data);
+      this.enemies?.handleMessage(data);
     });
   }
 }
