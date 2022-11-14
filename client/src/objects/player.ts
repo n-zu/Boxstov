@@ -1,35 +1,34 @@
-import { GuestMaster } from "../gameMaster/guestMaster";
+import { GameMaster } from "../gameMaster/gameMaster";
 import * as Phaser from "phaser";
 import { BulletGroup } from "../groups/bulletGroup";
-import {
-  AnimationActor,
-  AnimationSuffix,
-  playAnimation,
-} from "../scenes/mainScene";
 import Sprite = Phaser.Physics.Arcade.Sprite;
 import { Direction, UnitVector } from "../../../common/types/direction";
 import DirectionVector from "../../../common/controls/direction";
 import { PlayerState } from "../../../common/types/state";
 import { PlayerUpdatePayload } from "../../../common/types/messages";
+import { playAnimation } from "../scenes/mainScene";
+import { AnimationActor, AnimationSuffix } from "../types/animation";
+import { PlayerUI } from "../controls/playerUi";
 
 const SPEED = 200;
 const SYNC_DIFF_TOLERANCE = 0.01;
 
 export class Player extends Sprite {
   scene: Phaser.Scene;
-  gameMaster: GuestMaster;
+  gameMaster: GameMaster;
   bulletGroup: BulletGroup;
   id: string;
   maxHealth = 100;
   health = 100;
   movementDirection: DirectionVector = new DirectionVector(0, 1);
+  ui: PlayerUI;
 
   constructor(
     scene: Phaser.Scene,
     x: number,
     y: number,
     id: string,
-    gameMaster: GuestMaster,
+    gameMaster: GameMaster,
     bulletGroup: BulletGroup
   ) {
     super(scene, x, y, "player");
@@ -40,6 +39,7 @@ export class Player extends Sprite {
     this.id = id;
     this.gameMaster = gameMaster;
     this.bulletGroup = bulletGroup;
+    this.ui = new PlayerUI(scene, this);
 
     playAnimation(
       this,
@@ -71,6 +71,10 @@ export class Player extends Sprite {
       });
     }
     this.bulletGroup.shootBullet(xGun, yGun, this.movementDirection);
+  }
+
+  public update() {
+    this.ui.update();
   }
 
   public doMove(unit: UnitVector) {

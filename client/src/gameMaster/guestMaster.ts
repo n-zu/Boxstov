@@ -1,50 +1,85 @@
 import geckos, { ClientChannel } from "@geckos.io/client";
+import { Action, Message } from "../../../common/types/messages";
 import {
-  Action,
-  ActionFnFor,
-  Message,
-  UpdateFor,
-  UpdateType,
-} from "../../../common/types/messages";
+  ClientPacket,
+  ClientPacketType,
+  PayloadFor,
+  ServerPacket,
+  ServerPacketType,
+} from "../../../common/types/packet";
 
 const SERVER_PORT = 9208;
 
+export type CallbackFnFor<T extends ServerPacketType> = (
+  arg: PayloadFor<T>
+) => boolean; // false to remove callback
+
+export type CallbackFor<T extends ServerPacketType> = {
+  type: T;
+  callback: CallbackFnFor<T>;
+};
+export type Callback = CallbackFor<ServerPacketType>;
+
 export class GuestMaster {
+  callbacks: Callback[] = [];
   actions: Action[] = [];
   channel: ClientChannel;
+  gameId: string = "";
+  gameHandler?: (msg: Message) => void;
 
   constructor() {
     this.channel = geckos({
       url: process.env.SERVER_URL,
       port: SERVER_PORT,
     });
+    this.addHandlerCallback();
 
     this.channel.onConnect((error) => {
       if (error) console.error(error.message);
 
-      this.channel.on("msg", (msg: any) => {
-        const message = msg as Message;
-        this.actions
-          .find((action) => action.type === message.type)
-          ?.action(message.payload);
+      this.channel.on("msg", (p: any) => {
+        const packet = p as ServerPacket;
+        if (packet.payload?.gameId) this.gameId = packet.payload.gameId;
+
+        this.callbacks = this.callbacks.filter(
+          (c) => c.type !== packet.type || c.callback(packet.payload)
+        );
       });
     });
   }
 
-  public addAction<T extends UpdateType>(type: T, action: ActionFnFor<T>) {
-    this.actions.push({ type, action });
+  public setGameHandler(handler: (msg: Message) => void) {
+    this.gameHandler = handler;
   }
 
-  public send<T extends UpdateType>(type: T, payload: UpdateFor<T>) {
+  private addHandlerCallback() {
+    this.addCallback("gameInfo", (payload) => {
+      this.gameHandler?.(payload.payload);
+      return true;
+    });
+  }
+
+  public addCallback<T extends ServerPacketType>(
+    type: T,
+    callback: CallbackFnFor<T>
+  ) {
+    this.callbacks.push({ type, callback });
+  }
+
+  public send<T extends ClientPacketType>(
+    type: T,
+    payload: PayloadFor<T>,
+    reliable: boolean = true
+  ) {
     const msg = {
       type,
       payload,
     };
 
-    this.send_async(msg);
+    this.send_async(msg, reliable);
   }
 
-  private async send_async(msg: Message) {
-    this.channel.emit("msg", msg);
+  private async send_async(msg: ClientPacket, reliable: boolean = true) {
+    this.channel.emit("msg", msg, { reliable });
   }
 }

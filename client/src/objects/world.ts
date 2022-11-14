@@ -1,6 +1,6 @@
 import { Player } from "./player";
 import { BulletGroup } from "../groups/bulletGroup";
-import { GuestMaster } from "../gameMaster/guestMaster";
+import { GameMaster } from "../gameMaster/gameMaster";
 import { PlayerControls } from "../controls/playerControls";
 import { EnemyGroup } from "../groups/enemyGroup";
 import { WorldState } from "../../../common/types/state";
@@ -9,33 +9,27 @@ import {
   PlayerUpdate,
   SyncUpdate,
 } from "../../../common/types/messages";
-import { PlayerUI } from "../controls/playerUi";
 
 export class World {
-  // @ts-ignore
-  players: Player[];
+  players!: Player[];
   enemies: EnemyGroup;
-  // @ts-ignore
-  playerControls: PlayerControls;
-  // @ts-ignore
-  playerUI: PlayerUI;
-  // @ts-ignore
-  bulletGroup: BulletGroup;
-  gameMaster: GuestMaster;
+  playerControls!: PlayerControls;
+  bulletGroup!: BulletGroup;
+  gameMaster: GameMaster;
   scene: Phaser.Scene;
 
-  constructor(scene: Phaser.Scene, gameMaster: GuestMaster) {
+  constructor(scene: Phaser.Scene, gameMaster: GameMaster, username: string) {
     this.gameMaster = gameMaster;
     this.scene = scene;
     this.enemies = new EnemyGroup(scene, 5);
 
     this.setupGameMaster(gameMaster);
-    this.setupFirstPlayer(scene, gameMaster);
+    this.setupFirstPlayer(scene, gameMaster, username);
   }
 
   public update() {
     this.playerControls.update();
-    this.playerUI.update();
+    this.players?.forEach((player) => player.update());
   }
 
   public sync(worldState: WorldState) {
@@ -48,24 +42,26 @@ export class World {
     this.bulletGroup.sync(worldState.bullets);
   }
 
-  private setupFirstPlayer(scene: Phaser.Scene, gameMaster: GuestMaster) {
+  private setupFirstPlayer(
+    scene: Phaser.Scene,
+    gameMaster: GameMaster,
+    username: string
+  ) {
     this.bulletGroup = new BulletGroup(scene);
 
-    const playerId = Math.random().toString(36).substring(7);
     const player = new Player(
       scene,
       800,
       500,
-      playerId,
+      username,
       gameMaster,
       this.bulletGroup
     );
     this.playerControls = new PlayerControls(player);
-    this.playerUI = new PlayerUI(scene, player);
 
     setInterval(() => {
       this.gameMaster.send("player", {
-        id: playerId,
+        id: username,
         payload: {
           type: "ping",
         },
@@ -99,7 +95,7 @@ export class World {
     return player;
   }
 
-  private setupGameMaster(gameMaster: GuestMaster) {
+  private setupGameMaster(gameMaster: GameMaster) {
     gameMaster.addAction("player", (data: PlayerUpdate) => {
       const player = this.getOrCreatePlayer(data.id);
       player.handleMessage(data.payload);
