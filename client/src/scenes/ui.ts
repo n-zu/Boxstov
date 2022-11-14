@@ -35,7 +35,7 @@ class Points {
 
   update(kills: number, points: number) {
     this.kills.setText(`Kills: ${kills}`);
-    this.points.setText(`Streak: ${Math.ceil(points)}`);
+    this.points.setText(`Rage: x${Math.ceil(points)}`);
 
     this.barFill(points % 1);
   }
