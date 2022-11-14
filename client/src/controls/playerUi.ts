@@ -41,9 +41,9 @@ class Points {
   points: Phaser.GameObjects.Text;
 
   constructor(scene: Phaser.Scene) {
-    this.points = scene.add.text(0, 0, "Hello World", {
-      fontFamily: '"Roboto Condensed"',
-      fontSize: "50px",
+    this.points = scene.add.text(10, 10, "Hello World", {
+      fontFamily: "system-ui",
+      fontSize: "40px",
     });
 
     this.points.setDepth(9999);
@@ -51,10 +51,6 @@ class Points {
 
   sync(points: number) {
     this.points.setText(`Points: ${points.toFixed(2)}`);
-  }
-
-  update(x: number, y: number) {
-    this.points.setPosition(x, y);
   }
 }
 
@@ -95,10 +91,6 @@ export class PlayerUI {
       window.location.reload();
     }
     this.healthBar.draw(this.player);
-
-    const cx = 0;
-    const cy = 0;
-    this.points.update(cx, cy);
   }
 
   public sync(points: number) {

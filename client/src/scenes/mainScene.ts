@@ -46,6 +46,7 @@ export default class MainScene extends Phaser.Scene {
   world: World;
   // @ts-ignore
   gameMaster: GameMaster;
+  uiCamera?: Phaser.Cameras.Scene2D.Camera;
 
   protected constructor() {
     super({ key: "MainScene" });
@@ -54,6 +55,7 @@ export default class MainScene extends Phaser.Scene {
   setupCameras() {
     const camera = this.cameras.main;
     const uiCamera = this.cameras.add(0, 0, camera.width, camera.height);
+    this.uiCamera = uiCamera;
 
     const add_existing = this.add.existing;
     this.add.existing = function (...params): any {
@@ -82,6 +84,8 @@ export default class MainScene extends Phaser.Scene {
     this.game = this.game as MultiplayerGame;
     this.gameMaster = this.game.gameMaster;
     this.world = new World(this, this.game.gameMaster);
+
+    this.uiCamera?.ignore(this.world.bulletGroup);
 
     this.createAnimations();
     this.add.tileSprite(0, 0, 7680, 4320, "tiles").setDepth(-9999);
