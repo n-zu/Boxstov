@@ -4,19 +4,40 @@ import { World } from "../objects/world";
 import { loadUIAssets } from "./load";
 
 class Points {
+  kills: Phaser.GameObjects.Text;
   points: Phaser.GameObjects.Text;
+  bar: Phaser.GameObjects.Graphics;
 
   constructor(scene: Phaser.Scene) {
-    this.points = scene.add.text(10, 10, "Hello World", {
+    this.kills = scene.add.text(10, 10, "Kills: 0", {
       fontFamily: "system-ui",
       fontSize: "40px",
     });
+    this.points = scene.add.text(10, 50, "Multiplier", {
+      fontFamily: "system-ui",
+      fontSize: "30px",
+    });
 
+    this.bar = scene.add.graphics();
+    this.barFill(0);
+
+    this.kills.setDepth(9999);
     this.points.setDepth(9999);
   }
 
-  update(points: number) {
-    this.points.setText(`Points: ${points.toFixed(2)}`);
+  barFill(fill: number) {
+    this.bar.clear();
+    this.bar.fillStyle(0x000000, 0.5);
+    this.bar.fillRect(10, 85, 110, 5);
+    this.bar.fillStyle(0xffffff, 1);
+    this.bar.fillRect(10, 85, 110 * fill, 5);
+  }
+
+  update(kills: number, points: number) {
+    this.kills.setText(`Kills: ${kills}`);
+    this.points.setText(`Streak: ${Math.ceil(points)}`);
+
+    this.barFill(points % 1);
   }
 }
 export default class UI extends Phaser.Scene {
@@ -46,7 +67,7 @@ export default class UI extends Phaser.Scene {
   }
 
   update() {
-    this.points?.update(this.world?.points || 0);
+    this.points?.update(this.world?.kills || 0, this.world?.points || 0);
   }
 
   private addJoinUrl() {

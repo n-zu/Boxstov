@@ -63,7 +63,7 @@ export class World {
     this.players = this.players.filter(isActive);
     if (!this.players.length) this.onEnd();
     this.enemies?.update(this.players);
-    this.points = Math.max(0, this.points - 0.01);
+    this.points = Math.max(0, this.points - 0.002);
   }
 
   public getState(): WorldState {
@@ -71,6 +71,7 @@ export class World {
       players: this.players.map((player) => player.getState()),
       bullets: this.bulletGroup.getState(),
       points: this.points,
+      kills: this.kills,
       enemies: this.enemies!.getState(),
     };
   }

@@ -14,6 +14,7 @@ export class World {
   players!: Player[];
   enemies: EnemyGroup;
   points = 0;
+  kills = 0;
   playerControls!: PlayerControls;
   bulletGroup!: BulletGroup;
   gameMaster: GameMaster;
@@ -43,6 +44,7 @@ export class World {
     this.bulletGroup.sync(worldState.bullets);
 
     this.points = worldState.points;
+    this.kills = worldState.kills;
   }
 
   private setupFirstPlayer(

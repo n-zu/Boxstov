@@ -5,6 +5,7 @@ export type WorldState = {
   bullets: BulletGroupState;
   enemies: EnemyGroupState;
   points: number;
+  kills: number;
 };
 
 // Enemy
