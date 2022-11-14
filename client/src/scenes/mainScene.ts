@@ -1,7 +1,6 @@
 import { Direction } from "../../../common/types/direction";
 import { AnimationActor, AnimationSuffix } from "../types/animation";
 import { WorldState } from "../../../common/types/state";
-import { MultiplayerGame } from "../game/multiplayerGame";
 import { World } from "../objects/world";
 import { loadGameAssets } from "./load";
 import Sprite = Phaser.GameObjects.Sprite;
@@ -27,7 +26,6 @@ export function playAnimation(
 export default class MainScene extends Phaser.Scene {
   gameMaster?: GameMaster;
   world?: World;
-  uiCamera?: Phaser.Cameras.Scene2D.Camera;
 
   protected constructor() {
     super({ key: "MainScene" });
