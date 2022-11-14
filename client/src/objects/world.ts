@@ -46,6 +46,8 @@ export class World {
     this.enemies.sync(worldState.enemies);
 
     this.bulletGroup.sync(worldState.bullets);
+
+    this.playerUI.sync(worldState.points);
   }
 
   private setupFirstPlayer(scene: Phaser.Scene, gameMaster: GuestMaster) {

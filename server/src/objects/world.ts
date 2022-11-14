@@ -37,7 +37,8 @@ export class World {
       5,
       Difficulty.Hard,
       spawnPoints,
-      this.gameMaster
+      this.gameMaster,
+      this.onEnemyKilled.bind(this)
     );
 
     this.scene.physics.add.overlap(this.enemies, this.bulletGroup, (e, b) => {
@@ -92,16 +93,13 @@ export class World {
       player.handleMessage(data.payload);
     });
 
-    gameMaster.addAction("enemy", this.enemyAction);
+    /*gameMaster.addAction("enemy", (data: EnemyUpdate) => {
+      this.enemies.handleMessage(data);
+    });*/
   }
 
-  private enemyAction(data: EnemyUpdate) {
-    this.enemies.handleMessage(data);
-
-    switch (data.type) {
-      case "die":
-        this.kills++;
-        this.points += Math.ceil(this.points) + 1;
-    }
+  private onEnemyKilled(enemy: Enemy) {
+    this.kills++;
+    this.points = Math.ceil(this.points) + 1;
   }
 }

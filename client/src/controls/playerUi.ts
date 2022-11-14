@@ -37,6 +37,28 @@ class HealthBar {
   }
 }
 
+class Points {
+  points: Phaser.GameObjects.Text;
+
+  constructor(scene: Phaser.Scene) {
+    this.points = scene.add.text(0, 0, "Hello World", {
+      fontFamily: '"Roboto Condensed"',
+      fontSize: "50px",
+    });
+
+    this.points.setDepth(9999);
+  }
+
+  sync(points: number) {
+    this.points.setText(`Points: ${points.toFixed(2)}`);
+  }
+
+  update(x: number, y: number, scale: number) {
+    this.points.setPosition(x, y);
+    this.points.setScale(scale);
+  }
+}
+
 const motivationalMessages = [
   "GIT GUD",
   "You've been killed to death",
@@ -47,12 +69,14 @@ export class PlayerUI {
   scene: Phaser.Scene;
   player: Player;
   healthBar: HealthBar;
+  points: Points;
   over = false;
 
   constructor(scene: Phaser.Scene, player: Player) {
     this.scene = scene;
     this.player = player;
     this.healthBar = new HealthBar(scene);
+    this.points = new Points(scene);
   }
 
   public update() {
@@ -60,7 +84,9 @@ export class PlayerUI {
     // - Where should player death & other main player logic go?
     // - What should happen on death ? -> reloads page rn
     // - Should the player be responsible for its own death? <- sugerencia de copilot :)
-    if (this.player.health <= 0 && !this.over) {
+    const { health, x, y } = this.player;
+    const camera = this.scene.cameras.main;
+    if (health <= 0 && !this.over) {
       this.over = true;
       alert(
         motivationalMessages[
@@ -70,5 +96,14 @@ export class PlayerUI {
       window.location.reload();
     }
     this.healthBar.draw(this.player);
+
+    const cz = 0.6 ** 1.5 / (2 * camera.zoom ** 1.5);
+    const cx = 50 * cz + camera.width * cz;
+    const cy = -200 - camera.height * cz;
+    this.points.update(x + cx, y + cy, 0.6 / camera.zoom);
+  }
+
+  public sync(points: number) {
+    this.points.sync(points);
   }
 }
