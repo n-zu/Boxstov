@@ -38,8 +38,9 @@ const prod = {
     }),
     new CopyWebpackPlugin({
       patterns: [
-        { from: "src/assets", to: "play/assets" },
-        { from: "pwa", to: "play" },
+        { from: "src/assets", to: "assets" },
+        { from: "src/html", to: "html" },
+        { from: "pwa", to: "" },
         { from: "src/favicon.ico", to: "" },
       ],
     }),

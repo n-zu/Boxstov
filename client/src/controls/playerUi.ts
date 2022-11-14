@@ -1,61 +1,64 @@
 import { Player } from "../objects/player";
 
+const Y_OFFSET_BAR = 60;
+const Y_OFFSET_TEXT = 40;
+const BAR_HEIGHT = 12;
+const BAR_PADDING = 2;
+const TAG_DEPTH_BASE = 10000;
+
+const NAMETAG_STYLE = {
+  align: "center",
+  font: "bold 20px monospace",
+};
+
 class HealthBar {
   bar: Phaser.GameObjects.Graphics;
+  name: Phaser.GameObjects.Text;
 
-  constructor(scene: Phaser.Scene) {
+  constructor(scene: Phaser.Scene, username: string) {
     this.bar = new Phaser.GameObjects.Graphics(scene);
     this.bar.setDepth(9999);
+    this.name = new Phaser.GameObjects.Text(
+      scene,
+      0,
+      0,
+      username,
+      NAMETAG_STYLE
+    ).setOrigin(0.5);
 
     scene.add.existing(this.bar);
+    scene.add.existing(this.name);
   }
 
   draw(player: Player) {
     this.bar.clear();
+    const x = player.x;
+    const y = player.y - player.height / 2;
 
-    const x = player.x - 60;
-    const y = player.y - 180;
-    const height = 12;
+    const barX = x - player.maxHealth / 2 - BAR_PADDING;
+    const barY = y + Y_OFFSET_BAR;
+
     const width = player.health;
     const maxWidth = player.maxHealth;
+    const pad = BAR_PADDING;
 
     //  BG
     this.bar.fillStyle(0x000000);
-    this.bar.fillRect(x, y, maxWidth + 4, height + 4);
+    this.bar.fillRect(barX, barY, maxWidth + pad * 2, BAR_HEIGHT + pad * 2);
 
     //  Health
     this.bar.fillStyle(0xffffff);
-    this.bar.fillRect(x + 2, y + 2, maxWidth, height);
+    this.bar.fillRect(barX + pad, barY + pad, maxWidth, BAR_HEIGHT);
 
     if (width < maxWidth / 5) {
       this.bar.fillStyle(0xff0000);
     } else {
       this.bar.fillStyle(0x00ff00);
     }
+    this.bar.fillRect(barX + pad, barY + pad, width, BAR_HEIGHT);
 
-    this.bar.fillRect(x + 2, y + 2, width, height);
-  }
-}
-
-class Points {
-  points: Phaser.GameObjects.Text;
-
-  constructor(scene: Phaser.Scene) {
-    this.points = scene.add.text(0, 0, "Hello World", {
-      fontFamily: '"Roboto Condensed"',
-      fontSize: "50px",
-    });
-
-    this.points.setDepth(9999);
-  }
-
-  sync(points: number) {
-    this.points.setText(`Points: ${points.toFixed(2)}`);
-  }
-
-  update(x: number, y: number, scale: number) {
-    this.points.setPosition(x, y);
-    this.points.setScale(scale);
+    this.name.setPosition(x, y + Y_OFFSET_TEXT);
+    this.name.setDepth(TAG_DEPTH_BASE + y);
   }
 }
 
@@ -69,14 +72,12 @@ export class PlayerUI {
   scene: Phaser.Scene;
   player: Player;
   healthBar: HealthBar;
-  points: Points;
   over = false;
 
   constructor(scene: Phaser.Scene, player: Player) {
     this.scene = scene;
     this.player = player;
-    this.healthBar = new HealthBar(scene);
-    this.points = new Points(scene);
+    this.healthBar = new HealthBar(scene, player.id);
   }
 
   public update() {
@@ -96,14 +97,5 @@ export class PlayerUI {
       window.location.reload();
     }
     this.healthBar.draw(this.player);
-
-    const cz = 0.6 ** 1.5 / (2 * camera.zoom ** 1.5);
-    const cx = 50 * cz + camera.width * cz;
-    const cy = -200 - camera.height * cz;
-    this.points.update(x + cx, y + cy, 0.6 / camera.zoom);
-  }
-
-  public sync(points: number) {
-    this.points.sync(points);
   }
 }

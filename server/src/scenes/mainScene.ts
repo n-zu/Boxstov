@@ -1,27 +1,32 @@
-import { MultiplayerGame } from "../game/multiplayerGame.js";
 import { World } from "../objects/world.js";
 import { GameMaster } from "../gameMaster/gameMaster.js";
 
-export default class MainScene extends Phaser.Scene {
-  // @ts-ignore
-  game: MultiplayerGame;
-  // @ts-ignore
-  world: World;
-  // @ts-ignore
+type MainSceneData = {
   gameMaster: GameMaster;
+  onEnd: () => void;
+};
+
+export default class MainScene extends Phaser.Scene {
+  world!: World;
+  gameMaster?: GameMaster;
+  onEnd?: () => void;
 
   protected constructor() {
     super({ key: "MainScene" });
   }
 
-  create() {
-    this.world = new World(this, this.game.gameMaster);
+  create({ gameMaster, onEnd }: MainSceneData) {
+    this.gameMaster = gameMaster;
+    this.world = new World(this, gameMaster, onEnd);
     this.world.create();
-    this.gameMaster = this.game.gameMaster;
   }
 
   update() {
     this.world.update();
-    this.gameMaster.broadcast("sync", this.world.getState());
+    this.gameMaster?.broadcast("sync", this.world.getState());
+  }
+
+  public addPlayer(id: string): boolean {
+    return this.world?.addPlayer(id);
   }
 }
