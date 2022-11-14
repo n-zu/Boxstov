@@ -14,6 +14,8 @@ export class World {
   bulletGroup: BulletGroup;
   gameMaster: GameMaster;
   scene: Phaser.Scene;
+  kills = 0;
+  points = 0.0;
 
   constructor(scene: Phaser.Scene, gameMaster: GameMaster) {
     this.players = [];
@@ -56,6 +58,7 @@ export class World {
     const isActive = (p: Player) => Date.now() - 5000 < p.lastUpdate;
     this.players = this.players.filter(isActive);
     this.enemies.update(this.players);
+    this.points = Math.max(0, this.points - 0.01);
   }
 
   public getState(): WorldState {
@@ -63,6 +66,7 @@ export class World {
       players: this.players.map((player) => player.getState()),
       bullets: this.bulletGroup.getState(),
       enemies: this.enemies.getState(),
+      points: this.points,
     };
   }
 
@@ -88,8 +92,16 @@ export class World {
       player.handleMessage(data.payload);
     });
 
-    gameMaster.addAction("enemy", (data: EnemyUpdate) => {
-      this.enemies.handleMessage(data);
-    });
+    gameMaster.addAction("enemy", this.enemyAction);
+  }
+
+  private enemyAction(data: EnemyUpdate) {
+    this.enemies.handleMessage(data);
+
+    switch (data.type) {
+      case "die":
+        this.kills++;
+        this.points += Math.ceil(this.points) + 1;
+    }
   }
 }
