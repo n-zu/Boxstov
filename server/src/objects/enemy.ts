@@ -17,13 +17,15 @@ export class Enemy extends Phaser.Physics.Arcade.Sprite {
   cooldown = Math.random() * 100;
   cooldownCount = this.cooldown;
   action = "walk";
+  onDeath: (enemy: Enemy) => void;
 
   constructor(
     scene: Phaser.Scene,
     x: number,
     y: number,
     gameMaster: GameMaster,
-    id: number
+    id: number,
+    onDeath: (enemy: Enemy) => void
   ) {
     super(scene, x, y, "zombie");
     scene.add.existing(this);
@@ -36,6 +38,7 @@ export class Enemy extends Phaser.Physics.Arcade.Sprite {
 
     this.gameMaster = gameMaster;
     this.id = id;
+    this.onDeath = onDeath;
   }
 
   public update(players: Player[]) {
@@ -124,11 +127,11 @@ export class Enemy extends Phaser.Physics.Arcade.Sprite {
     this.body.enable = true;
   }
 
-  public handleMessage(payload: EnemyUpdate) {
+  /*public handleMessage(payload: EnemyUpdate) {
     if (payload.type === "die") {
       this.die();
     }
-  }
+  }*/
 
   private getMovementDirection(
     xMovement: number,
@@ -190,6 +193,7 @@ export class Enemy extends Phaser.Physics.Arcade.Sprite {
       id: this.id,
       type: "die",
     });
+    this.onDeath(this);
 
     this.setRotation(Math.random() * 0.4 - 0.2);
 

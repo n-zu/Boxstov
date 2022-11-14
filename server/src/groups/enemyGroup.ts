@@ -26,13 +26,14 @@ export class EnemyGroup extends Phaser.Physics.Arcade.Group {
     maxEnemies: number,
     difficulty: Difficulty,
     spawnPoints: SpawnPoint[],
-    gameMaster: GameMaster
+    gameMaster: GameMaster,
+    onDeath: (enemy: Enemy) => void
   ) {
     super(scene.physics.world, scene);
 
     const enemies: Enemy[] = [];
     for (let i = 0; i < maxEnemies; i++) {
-      enemies.push(new Enemy(scene, 0, 0, gameMaster, i));
+      enemies.push(new Enemy(scene, 0, 0, gameMaster, i, onDeath));
     }
 
     this.addMultiple(enemies);
@@ -65,10 +66,10 @@ export class EnemyGroup extends Phaser.Physics.Arcade.Group {
     };
   }
 
-  public handleMessage(message: EnemyUpdate) {
+  /*public handleMessage(message: EnemyUpdate) {
     const enemy = this.children.entries[message.id] as Enemy;
     enemy.handleMessage(message);
-  }
+  }*/
 
   private getEnemiesToSpawn() {
     const deadEnemies = this.getMatching("active", false).length;

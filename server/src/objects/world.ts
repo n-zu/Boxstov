@@ -15,6 +15,8 @@ export class World {
   bulletGroup: BulletGroup;
   gameMaster: GameMaster;
   scene: Phaser.Scene;
+  kills = 0;
+  rage = 0.0;
   onEnd: () => void;
 
   constructor(scene: Phaser.Scene, gameMaster: GameMaster, onEnd: () => void) {
@@ -38,7 +40,8 @@ export class World {
       5,
       Difficulty.Hard,
       spawnPoints,
-      this.gameMaster
+      this.gameMaster,
+      this.onEnemyKilled.bind(this)
     );
 
     this.scene.physics.add.overlap(this.enemies, this.bulletGroup, (e, b) => {
@@ -60,12 +63,15 @@ export class World {
     this.players = this.players.filter(isActive);
     if (!this.players.length) this.onEnd();
     this.enemies?.update(this.players);
+    this.rage = Math.max(0, this.rage - 0.002);
   }
 
   public getState(): WorldState {
     return {
       players: this.players.map((player) => player.getState()),
       bullets: this.bulletGroup.getState(),
+      rage: this.rage,
+      kills: this.kills,
       enemies: this.enemies!.getState(),
     };
   }
@@ -96,8 +102,13 @@ export class World {
       player?.handleMessage(data.payload);
     });
 
-    gameMaster.addAction("enemy", (data: EnemyUpdate) => {
+    /*gameMaster.addAction("enemy", (data: EnemyUpdate) => {
       this.enemies?.handleMessage(data);
-    });
+    });*/
+  }
+
+  private onEnemyKilled(enemy: Enemy) {
+    this.kills++;
+    this.rage = Math.ceil(this.rage) + 1;
   }
 }

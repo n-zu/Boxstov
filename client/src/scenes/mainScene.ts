@@ -1,7 +1,6 @@
 import { Direction } from "../../../common/types/direction";
 import { AnimationActor, AnimationSuffix } from "../types/animation";
 import { WorldState } from "../../../common/types/state";
-import { MultiplayerGame } from "../game/multiplayerGame";
 import { World } from "../objects/world";
 import { loadGameAssets } from "./load";
 import Sprite = Phaser.GameObjects.Sprite;
@@ -35,8 +34,12 @@ export default class MainScene extends Phaser.Scene {
   create(data: { gameMaster: GameMaster; username: string }) {
     this.gameMaster = data.gameMaster;
     this.world = new World(this, data.gameMaster, data.username);
+
     this.add.tileSprite(0, 0, 7680, 4320, "tiles").setDepth(-9999);
-    this.scene.add("UI", UI, true, { gameMaster: data.gameMaster });
+    this.scene.add("UI", UI, true, {
+      gameMaster: data.gameMaster,
+      world: this.world,
+    });
   }
 
   public sync(worldState: WorldState) {

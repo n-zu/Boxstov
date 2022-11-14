@@ -85,7 +85,9 @@ export class PlayerUI {
     // - Where should player death & other main player logic go?
     // - What should happen on death ? -> reloads page rn
     // - Should the player be responsible for its own death? <- sugerencia de copilot :)
-    if (this.player.health <= 0 && !this.over) {
+    const { health, x, y } = this.player;
+    const camera = this.scene.cameras.main;
+    if (health <= 0 && !this.over) {
       this.over = true;
       alert(
         motivationalMessages[

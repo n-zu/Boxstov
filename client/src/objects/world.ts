@@ -13,6 +13,8 @@ import {
 export class World {
   players!: Player[];
   enemies: EnemyGroup;
+  rage = 0;
+  kills = 0;
   playerControls!: PlayerControls;
   bulletGroup!: BulletGroup;
   gameMaster: GameMaster;
@@ -40,6 +42,9 @@ export class World {
     this.enemies.sync(worldState.enemies);
 
     this.bulletGroup.sync(worldState.bullets);
+
+    this.rage = worldState.rage;
+    this.kills = worldState.kills;
   }
 
   private setupFirstPlayer(

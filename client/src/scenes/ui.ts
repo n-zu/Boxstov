@@ -1,21 +1,73 @@
 import Phaser from "phaser";
 import { GameMaster } from "../gameMaster/gameMaster";
+import { World } from "../objects/world";
 import { loadUIAssets } from "./load";
 
+class Points {
+  kills: Phaser.GameObjects.Text;
+  rage: Phaser.GameObjects.Text;
+  bar: Phaser.GameObjects.Graphics;
+
+  constructor(scene: Phaser.Scene) {
+    this.kills = scene.add.text(10, 10, "Kills: 0", {
+      fontFamily: "system-ui",
+      fontSize: "40px",
+    });
+    this.rage = scene.add.text(10, 50, "Multiplier", {
+      fontFamily: "system-ui",
+      fontSize: "30px",
+    });
+
+    this.bar = scene.add.graphics();
+    this.barFill(0);
+
+    this.kills.setDepth(9999);
+    this.rage.setDepth(9999);
+  }
+
+  barFill(fill: number) {
+    this.bar.clear();
+    this.bar.fillStyle(0x000000, 0.5);
+    this.bar.fillRect(10, 85, 110, 5);
+    this.bar.fillStyle(0xffffff, 1);
+    this.bar.fillRect(10, 85, 110 * fill, 5);
+  }
+
+  update(kills: number, rage: number) {
+    this.kills.setText(`Kills: ${kills}`);
+    this.rage.setText(`Rage: x${Math.ceil(rage)}`);
+
+    this.barFill(rage % 1);
+  }
+}
 export default class UI extends Phaser.Scene {
   gameMaster?: GameMaster;
+  world?: World;
+  points?: Points;
 
   constructor() {
     super({ key: "UI" });
   }
 
-  create(data: { gameMaster: GameMaster }) {
+  create(data: { gameMaster: GameMaster; world: World }) {
     this.gameMaster = data.gameMaster;
     this.addJoinUrl();
+    const game_points = new Points(this);
+    this.points = game_points;
+    this.world = data.world;
+    // TODO: Why doesnt this work?
+    /*data.gameMaster.addAction("sync", (state) => {
+      console.log("sync", state);
+      game_points.update(state.points);
+    });*/
   }
 
   preload() {
     loadUIAssets(this);
+  }
+
+  update() {
+    this.points?.update(this.world?.kills || 0, this.world?.rage || 0);
   }
 
   private addJoinUrl() {
