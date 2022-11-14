@@ -6,6 +6,7 @@ import { World } from "../objects/world";
 import { loadGameAssets } from "./load";
 import Sprite = Phaser.GameObjects.Sprite;
 import { GameMaster } from "../gameMaster/gameMaster";
+import UI from "./ui";
 
 export function playAnimation(
   sprite: Sprite,
@@ -24,27 +25,26 @@ export function playAnimation(
 }
 
 export default class MainScene extends Phaser.Scene {
-  declare game: MultiplayerGame;
-  // @ts-ignore
-  world: World;
+  gameMaster?: GameMaster;
+  world?: World;
 
   protected constructor() {
     super({ key: "MainScene" });
   }
 
   create(data: { gameMaster: GameMaster }) {
-    this.game = this.game as MultiplayerGame;
+    this.gameMaster = data.gameMaster;
     this.world = new World(this, data.gameMaster);
-
     this.add.tileSprite(0, 0, 7680, 4320, "tiles").setDepth(-9999);
+    this.scene.add("UI", UI, true, { gameMaster: data.gameMaster });
   }
 
   public sync(worldState: WorldState) {
-    this.world.sync(worldState);
+    this.world?.sync(worldState);
   }
 
   update() {
-    this.world.update();
+    this.world?.update();
   }
 
   preload() {

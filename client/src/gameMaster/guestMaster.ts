@@ -41,7 +41,6 @@ export class GuestMaster {
         const packet = p as ServerPacket;
         if (packet.payload?.gameId) this.gameId = packet.payload.gameId;
 
-        console.log("callbacks", this.callbacks);
         this.callbacks = this.callbacks.filter(
           (c) => c.type !== packet.type || c.callback(packet.payload)
         );

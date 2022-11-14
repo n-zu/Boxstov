@@ -34,6 +34,10 @@ export function loadSpinnerAssets(scene: Phaser.Scene) {
   });
 }
 
+export function loadUIAssets(scene: Phaser.Scene) {
+  scene.load.image("invite", "assets/img/invite.png");
+}
+
 const IDLE_FRAMERATE = 1;
 const RUN_FRAMERATE = 10;
 const ATTACK_FRAMERATE = 10;
@@ -76,6 +80,7 @@ export default class LoadScene extends Phaser.Scene {
     loadGameAssets(this);
     loadMenuAssets(this);
     loadSpinnerAssets(this);
+    loadUIAssets(this);
   }
 
   private loadingBar(onComplete: () => void) {

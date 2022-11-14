@@ -55,6 +55,7 @@ export default class Menu extends Phaser.Scene {
     this.addErrorText(300);
 
     this.initMainScene();
+    this.scene.add("Spinner", Spinner, false);
   }
 
   preload() {
@@ -139,6 +140,7 @@ export default class Menu extends Phaser.Scene {
   private addCallbacks() {
     this.guestMaster?.addCallback("gameInfo", () => {
       this.scene.start("MainScene");
+      this.scene.stop("Spinner");
       this.scene.stop();
       return false;
     });
@@ -153,15 +155,15 @@ export default class Menu extends Phaser.Scene {
 
   private newGame() {
     if (!this.checkName()) return false;
+    this.scene.start("Spinner");
     this.scene.sleep();
-    this.scene.add("Spinner", Spinner, true);
     this.guestMaster?.send("createGame", undefined, true);
   }
 
   private joinGame(gameId: string) {
     if (!this.checkName()) return false;
     this.scene.sleep();
-    this.scene.add("Spinner", Spinner, true);
+    this.scene.run("Spinner");
     this.guestMaster?.send(
       "joinGame",
       {
