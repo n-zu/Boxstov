@@ -5,7 +5,7 @@ import { BulletGroup } from "../groups/bulletGroup";
 import { Direction, UnitVector } from "../../../common/types/direction.js";
 import DirectionVector from "../../../common/controls/direction.js";
 import { PlayerState } from "../../../common/types/state.js";
-import { PlayerUpdatePayload } from "../../../common/types/messages.js";
+import { PlayerUpdate } from "../../../common/types/messages.js";
 const SPEED = 200;
 
 // @ts-ignore
@@ -64,7 +64,7 @@ export class Player extends Phaser.Physics.Arcade.Sprite {
     this.setVelocity(0, 0);
   }
 
-  public handleMessage(message: PlayerUpdatePayload) {
+  public handleMessage(message: PlayerUpdate) {
     this.lastUpdate = Date.now();
     switch (message.type) {
       case "move":

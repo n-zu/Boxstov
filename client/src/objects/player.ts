@@ -5,10 +5,10 @@ import Sprite = Phaser.Physics.Arcade.Sprite;
 import { Direction, UnitVector } from "../../../common/types/direction";
 import DirectionVector from "../../../common/controls/direction";
 import { PlayerState } from "../../../common/types/state";
-import { PlayerUpdatePayload } from "../../../common/types/messages";
 import { playAnimation } from "../scenes/mainScene";
 import { AnimationActor, AnimationSuffix } from "../types/animation";
 import { PlayerUI } from "../controls/playerUi";
+import { PlayerUpdate } from "../../../common/types/messages";
 
 const SPEED = 200;
 const SYNC_DIFF_TOLERANCE = 0.01;
@@ -65,9 +65,7 @@ export class Player extends Sprite {
     if (emitAlert) {
       this.gameMaster.send("player", {
         id: this.id,
-        payload: {
-          type: "shoot",
-        },
+        type: "shoot",
       });
     }
     this.bulletGroup.shootBullet(xGun, yGun, this.movementDirection);
@@ -112,26 +110,10 @@ export class Player extends Sprite {
     if (this.movementDirection) {
       this.gameMaster.send("player", {
         id: this.id,
-        payload: {
-          type: "stop",
-        },
+        type: "stop",
       });
     }
     this.doStopMovement();
-  }
-
-  public handleMessage(message: PlayerUpdatePayload) {
-    switch (message.type) {
-      case "move":
-        this.doMove(message.direction);
-        break;
-      case "stop":
-        this.doStopMovement();
-        break;
-      case "shoot":
-        this.shoot(false);
-        break;
-    }
   }
 
   private doStopMovement() {
@@ -158,10 +140,8 @@ export class Player extends Sprite {
   private sendMovementMessage(direction: DirectionVector) {
     this.gameMaster.send("player", {
       id: this.id,
-      payload: {
-        type: "move",
-        direction: direction.getUnitVector(),
-      },
+      type: "move",
+      direction: direction.getUnitVector(),
     });
   }
 

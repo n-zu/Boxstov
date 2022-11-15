@@ -15,6 +15,7 @@ export type EnemyState = {
     x: number;
     y: number;
   };
+  dead: boolean;
   health: number;
   active: boolean;
   visible: boolean;

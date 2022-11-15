@@ -5,7 +5,7 @@ import { Enemy } from "./enemy.js";
 import { Bullet } from "./bullet.js";
 import { Difficulty, EnemyGroup } from "../groups/enemyGroup.js";
 import { WorldState } from "../../../common/types/state.js";
-import { EnemyUpdate, PlayerUpdate } from "../../../common/types/messages.js";
+import { PlayerUpdate } from "../../../common/types/messages.js";
 
 const INACTIVE_THRESHOLD = 60000; // if 60 seconds pass, the player is considered inactive
 
@@ -99,7 +99,7 @@ export class World {
   private setupGameMaster(gameMaster: GameMaster) {
     gameMaster.addAction("player", (data: PlayerUpdate) => {
       const player = this.getPlayer(data.id);
-      player?.handleMessage(data.payload);
+      player?.handleMessage(data);
     });
 
     /*gameMaster.addAction("enemy", (data: EnemyUpdate) => {

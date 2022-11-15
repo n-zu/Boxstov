@@ -72,9 +72,8 @@ export default class UI extends Phaser.Scene {
 
   private addJoinUrl() {
     const loc = window.location;
-    const url = `${loc.protocol}//${
-      loc.host
-    }/?join=${this.gameMaster?.getGameId()}`;
+    const url = `${loc.protocol}//${loc.host}${loc.pathname}
+      ?join=${this.gameMaster?.getGameId()}`;
 
     const icon = this.add
       .image(0, 0, "invite")

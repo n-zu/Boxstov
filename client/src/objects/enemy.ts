@@ -14,6 +14,7 @@ export class Enemy extends Sprite {
   facing: Direction = Direction.Down;
   redTint = 0;
   action = "";
+  dead: boolean = true;
 
   constructor(scene: Phaser.Scene, x: number, y: number, id: number) {
     super(scene, x, y, "zombie");
@@ -33,7 +34,10 @@ export class Enemy extends Sprite {
       this.move(state.position.x, state.position.y);
       this.takeDamage(state.health);
     }
-
+    if (!this.dead && state.dead) {
+      this.die();
+    }
+    this.dead = state.dead;
     this.setActive(state.active);
     this.setVisible(state.visible);
     this.active = state.active;
@@ -46,12 +50,6 @@ export class Enemy extends Sprite {
 
     this.health -= damage;
     if (this.health <= 0) {
-      this.die();
-    }
-  }
-
-  public handleMessage(payload: EnemyUpdate) {
-    if (payload.type === "die") {
       this.die();
     }
   }

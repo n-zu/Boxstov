@@ -67,9 +67,7 @@ export class World {
     setInterval(() => {
       this.gameMaster.send("player", {
         id: username,
-        payload: {
-          type: "ping",
-        },
+        type: "ping",
       });
     }, 500);
 
@@ -101,17 +99,8 @@ export class World {
   }
 
   private setupGameMaster(gameMaster: GameMaster) {
-    gameMaster.addAction("player", (data: PlayerUpdate) => {
-      const player = this.getOrCreatePlayer(data.id);
-      player.handleMessage(data.payload);
-    });
-
     gameMaster.addAction("sync", (data: SyncUpdate) => {
       this.sync(data);
-    });
-
-    gameMaster.addAction("enemy", (data: EnemyUpdate) => {
-      this.enemies.handleMessage(data);
     });
   }
 }

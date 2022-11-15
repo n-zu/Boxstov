@@ -1,5 +1,5 @@
 import geckos, { ClientChannel } from "@geckos.io/client";
-import { Action, Message } from "../../../common/types/messages";
+import { Action, ServerMessage } from "../../../common/types/messages";
 import {
   ClientPacket,
   ClientPacketType,
@@ -25,7 +25,7 @@ export class GuestMaster {
   actions: Action[] = [];
   channel: ClientChannel;
   gameId: string = "";
-  gameHandler?: (msg: Message) => void;
+  gameHandler?: (msg: ServerMessage) => void;
 
   constructor() {
     this.channel = geckos({
@@ -48,12 +48,12 @@ export class GuestMaster {
     });
   }
 
-  public setGameHandler(handler: (msg: Message) => void) {
+  public setGameHandler(handler: (msg: ServerMessage) => void) {
     this.gameHandler = handler;
   }
 
   private addHandlerCallback() {
-    this.addCallback("gameInfo", (payload) => {
+    this.addCallback("gameSync", (payload) => {
       this.gameHandler?.(payload.payload);
       return true;
     });

@@ -132,7 +132,7 @@ export default class Menu extends Phaser.Scene {
 
   private addCallbacks() {
     let done = false;
-    this.guestMaster?.addCallback("gameInfo", () => {
+    this.guestMaster?.addCallback("gameSync", () => {
       if (done) return false; // make sure we only do this once
 
       done = true;

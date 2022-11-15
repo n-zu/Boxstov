@@ -1,23 +1,47 @@
 import { UnitVector } from "./direction.js";
 import { WorldState } from "./state.js";
 
+// Messages
+
+export type ServerMessageType = "sync";
+export type ClientMessageType = "player" | "enemy";
+export type MessageType = ServerMessageType | ClientMessageType;
+
+export type Message<T extends MessageType> = {
+  type: T;
+  payload: UpdateFor<T>;
+};
+export type ClientMessage = Message<ClientMessageType>;
+export type ServerMessage = Message<ServerMessageType>;
+
+// Updates
+
+export type UpdateFor<T extends MessageType> = T extends "sync"
+  ? SyncUpdate
+  : T extends "player"
+  ? PlayerUpdate
+  : T extends "enemy"
+  ? EnemyUpdate
+  : undefined;
+
 // Player
 
-export type PlayerUpdate = {
-  id: string;
-  payload: PlayerUpdatePayload;
-};
+export type PlayerUpdateType = "move" | "stop" | "shoot" | "ping";
 
-export type PlayerUpdatePayload = PlayerUpdateMove | PlayerUpdateOther;
+export type PlayerUpdateBase<T extends PlayerUpdateType> = {
+  id: string;
+  type: T;
+};
 
 export type PlayerUpdateMove = {
-  type: "move";
   direction: UnitVector;
-};
+} & PlayerUpdateBase<"move">;
 
-export type PlayerUpdateOther = {
-  type: "stop" | "shoot" | "ping";
-};
+export type PlayerUpdateFor<T extends PlayerUpdateType> = T extends "move"
+  ? PlayerUpdateMove
+  : PlayerUpdateBase<T>;
+
+export type PlayerUpdate = PlayerUpdateFor<PlayerUpdateType>;
 
 // Enemy
 
@@ -30,31 +54,11 @@ export type EnemyUpdate = {
 
 export type SyncUpdate = WorldState;
 
-// Updates
-
-export type UpdateType = "player" | "sync" | "enemy";
-export type Update = PlayerUpdate | SyncUpdate | EnemyUpdate;
-export type UpdateFor<T extends UpdateType> = T extends "player"
-  ? PlayerUpdate
-  : T extends "sync"
-  ? SyncUpdate
-  : T extends "enemy"
-  ? EnemyUpdate
-  : never;
-
 // Actions
 
-export type ActionFnFor<T extends UpdateType> = (arg: UpdateFor<T>) => void;
-export type ActionI<T extends UpdateType> = {
+export type ActionFnFor<T extends MessageType> = (arg: UpdateFor<T>) => void;
+export type ActionI<T extends MessageType> = {
   type: T;
   action: ActionFnFor<T>;
 };
-export type Action = ActionI<UpdateType>;
-
-// Messages
-
-export type MessageI<T extends UpdateType> = {
-  type: T;
-  payload: UpdateFor<T>;
-};
-export type Message = MessageI<UpdateType>;
+export type Action = ActionI<MessageType>;
