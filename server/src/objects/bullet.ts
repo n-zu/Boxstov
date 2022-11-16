@@ -14,7 +14,7 @@ export class Bullet extends Phaser.Physics.Arcade.Sprite {
   }
 
   public fire(x: number, y: number, direction: MovementDirection) {
-    const [velocityX, velocityY] = direction.getSpeed(SPEED);
+    const [velocityX, velocityY] = direction.getFacingSpeed(SPEED);
     const rotation = Math.atan2(velocityY, velocityX);
 
     this.setScale(0.5);

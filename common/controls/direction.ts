@@ -37,13 +37,12 @@ export default class MovementDirection {
   public update(newDirection: UnitVector) {
     this.movement = newDirection;
 
-    if (!this.isStill()) this.facing = this.movement;
+    if (this.isMoving()) this.facing = this.movement;
   }
 
-  // Returns true if the entity is not currently moving
-  public isStill(): boolean {
+  public isMoving(): boolean {
     const [x, y] = this.movement;
-    return !x && !y;
+    return Boolean(x || y);
   }
 
   // Gets the current facing direction
