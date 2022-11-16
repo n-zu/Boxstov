@@ -19,7 +19,8 @@ export class Player extends Sprite {
   id: string;
   maxHealth = 100;
   health = 100;
-  movementDirection: DirectionVector = new DirectionVector(0, 1);
+  movementDirection: DirectionVector = new DirectionVector(0, 0);
+  facing: Direction = Direction.Down;
   ui: PlayerUI;
   local: boolean;
 
@@ -77,11 +78,6 @@ export class Player extends Sprite {
     this.ui.update();
   }
 
-  public doMove(unit: UnitVector) {
-    const direction = new DirectionVector(...unit);
-    this.setVelocity(...direction.getSpeed(SPEED));
-  }
-
   public move(direction: DirectionVector) {
     const [x, y] = direction.getSpeed(SPEED);
     this.setVelocity(x, y);
@@ -92,18 +88,15 @@ export class Player extends Sprite {
       this.sendMovementMessage(direction);
     }
 
-    if (x === 0 && y === 0) {
-      this.stopMovement();
+    this.movementDirection = direction;
+    const facing = direction.getDirection();
+    if (!facing) {
+      this.doStopMovement();
       return;
     }
 
-    this.movementDirection = direction;
-    playAnimation(
-      this,
-      AnimationActor.Player,
-      direction.getDirection(),
-      AnimationSuffix.Run
-    );
+    this.facing = facing;
+    playAnimation(this, AnimationActor.Player, facing, AnimationSuffix.Run);
   }
 
   public sync(state: PlayerState) {
@@ -111,16 +104,6 @@ export class Player extends Sprite {
     this.health = state.health;
     if (!this.local)
       this.move(DirectionVector.fromUnitVector(state.movementDirection));
-  }
-
-  public stopMovement() {
-    if (this.movementDirection) {
-      this.gameMaster.send("player", {
-        id: this.id,
-        type: "stop",
-      });
-    }
-    this.doStopMovement();
   }
 
   private doStopMovement() {
@@ -155,7 +138,7 @@ export class Player extends Sprite {
   private getGunPosition(): { x: number; y: number } {
     // We should change this logic so that the bullet receives the position and angle
     // of shooting, so that the bullet travels parallel to the player's gun
-    switch (this.movementDirection?.getDirection()) {
+    switch (this.facing) {
       case Direction.Up:
         return {
           x: this.x + 15,

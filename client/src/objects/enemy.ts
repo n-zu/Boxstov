@@ -1,9 +1,9 @@
 import { Direction } from "../../../common/types/direction";
 import { playAnimation } from "../scenes/mainScene";
 import { EnemyState } from "../../../common/types/state";
-import Sprite = Phaser.GameObjects.Sprite;
-import { EnemyUpdate } from "../../../common/types/messages";
+import Sprite = Phaser.Physics.Arcade.Sprite;
 import { AnimationActor, AnimationSuffix } from "../types/animation";
+import DirectionVector from "../../../common/controls/direction";
 
 const SPEED = 50;
 const HEALTH = 100;
@@ -27,12 +27,9 @@ export class Enemy extends Sprite {
   }
 
   public sync(state: EnemyState) {
-    // There is a bug in this method
-    // If the zombie is dead in the guest and revives with a sync
-    // it won't play the movement animation until update() is called with this.cooldownCount = 0
     if (state.health > 0) {
-      this.move(state.position.x, state.position.y);
-      this.takeDamage(state.health);
+      this.updateHealth(state.health);
+      this.move(state);
     }
     if (!this.dead && state.dead) {
       this.die();
@@ -54,37 +51,20 @@ export class Enemy extends Sprite {
     }
   }
 
-  private takeDamage(newHealth: number) {
+  private updateHealth(newHealth: number) {
     if (newHealth < this.health) this.receiveDamage(this.health - newHealth);
     else this.redTint *= 0.9 / this.scene.time.timeScale;
 
     this.setTint(0xff0000 + 0x00ffff * (1 - this.redTint));
   }
 
-  private move(x: number, y: number) {
-    const dx = x - this.x;
-    const dy = y - this.y;
+  private move(state: EnemyState) {
+    this.setPosition(state.position.x, state.position.y);
+    this.setDepth(state.position.y);
 
-    if (dx < 0 && dy < 0) {
-      this.facing = Direction.UpLeft;
-    } else if (dx > 0 && dy < 0) {
-      this.facing = Direction.UpRight;
-    } else if (dx < 0 && dy > 0) {
-      this.facing = Direction.DownLeft;
-    } else if (dx > 0 && dy > 0) {
-      this.facing = Direction.DownRight;
-    } else if (dx < 0) {
-      this.facing = Direction.Left;
-    } else if (dx > 0) {
-      this.facing = Direction.Right;
-    } else if (dy < 0) {
-      this.facing = Direction.Up;
-    } else if (dy > 0) {
-      this.facing = Direction.Down;
-    }
-
-    this.setDepth(this.y);
-    this.setPosition(x, y);
+    const direction = DirectionVector.fromUnitVector(state.movementDirection);
+    this.setVelocity(...direction.getSpeed(SPEED));
+    this.facing = direction.getDirection() || this.facing;
 
     if (Math.random() < 0.3) {
       playAnimation(

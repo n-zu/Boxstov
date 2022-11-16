@@ -14,7 +14,8 @@ export class Player extends Phaser.Physics.Arcade.Sprite {
   gameMaster: GameMaster;
   bulletGroup: BulletGroup;
   id: string;
-  movementDirection: DirectionVector = new DirectionVector(0, 1);
+  movementDirection: DirectionVector = new DirectionVector(0, 0);
+  facing: Direction = Direction.Down;
   maxHealth = 100;
   health = 100;
   lastUpdate = Date.now();
@@ -43,10 +44,10 @@ export class Player extends Phaser.Physics.Arcade.Sprite {
   }
 
   public move(direction: UnitVector) {
-    const [x, y] = direction;
-    let vector = new DirectionVector(x, y);
+    const vector = DirectionVector.fromUnitVector(direction);
     this.setVelocity(...vector.getSpeed(SPEED));
-    if (x || y) this.movementDirection = vector;
+    this.movementDirection = vector;
+    this.facing = this.movementDirection.getDirection() || this.facing;
   }
 
   public getState(): PlayerState {
@@ -71,9 +72,6 @@ export class Player extends Phaser.Physics.Arcade.Sprite {
       case "move":
         this.move(message.direction);
         break;
-      case "stop":
-        this.stopMovement();
-        break;
       case "shoot":
         this.shoot();
         break;
@@ -83,7 +81,7 @@ export class Player extends Phaser.Physics.Arcade.Sprite {
   private getGunPosition(): { x: number; y: number } {
     // We should change this logic so that the bullet receives the position and angle
     // of shooting, so that the bullet travels parallel to the player's gun
-    switch (this.movementDirection.getDirection()) {
+    switch (this.facing) {
       case Direction.Up:
         return {
           x: this.x + 15,

@@ -26,7 +26,7 @@ export type UpdateFor<T extends MessageType> = T extends "sync"
 
 // Player
 
-export type PlayerUpdateType = "move" | "stop" | "shoot" | "ping";
+export type PlayerUpdateType = "move" | "shoot" | "ping";
 
 export type PlayerUpdateBase<T extends PlayerUpdateType> = {
   id: string;

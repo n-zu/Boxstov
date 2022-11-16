@@ -19,7 +19,7 @@ export default class DirectionVector {
     return new DirectionVector(x, y);
   }
 
-  public getDirection(): Direction {
+  public getDirection(): Direction | null {
     const [x, y] = this.unit;
     if (x > 0 && y > 0) return Direction.DownRight;
     if (x > 0 && y < 0) return Direction.UpRight;
@@ -29,7 +29,8 @@ export default class DirectionVector {
     if (x < 0) return Direction.Left;
     if (y > 0) return Direction.Down;
     if (y < 0) return Direction.Up;
-    return Direction.Down;
+    if (y > 0) return Direction.Down;
+    return null;
   }
 
   public getUnitVector(): UnitVector {

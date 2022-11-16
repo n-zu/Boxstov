@@ -17,6 +17,7 @@ export type EnemyState = {
     x: number;
     y: number;
   };
+  movementDirection: UnitVector;
   dead: boolean;
   health: number;
   active: boolean;

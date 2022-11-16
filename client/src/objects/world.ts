@@ -60,7 +60,8 @@ export class World {
       500,
       username,
       gameMaster,
-      this.bulletGroup
+      this.bulletGroup,
+      true
     );
     this.playerControls = new PlayerControls(player);
 
