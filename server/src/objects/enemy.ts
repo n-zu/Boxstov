@@ -65,15 +65,13 @@ export class Enemy extends Phaser.Physics.Arcade.Sprite {
 
     this.cooldownCount = this.cooldown;
     const closestPlayer = this.getClosestPlayer(players);
-    const vec = new Phaser.Math.Vector2(
-      closestPlayer.x - this.x,
-      closestPlayer.y - this.y
-    );
-    const distance = vec.length();
+    const dx = closestPlayer.x - this.x;
+    const dy = closestPlayer.y - this.y;
+
+    const distance = Math.sqrt(dx * dx + dy * dy);
     const isFar = distance > 150 ? 1 : 0;
 
-    const angle = this.roundAngle(vec.angle());
-    this.movementDirection.update([Math.cos(angle), Math.sin(angle)]);
+    this.movementDirection.update([dx / distance, dy / distance]);
     this.setVelocity(...this.movementDirection.getSpeed(SPEED * isFar));
 
     this.action = isFar ? "walk" : "atk";

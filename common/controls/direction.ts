@@ -2,6 +2,10 @@ import { Direction, UnitVector } from "../types/direction.js";
 
 export type EncodedMovementDirection = [UnitVector, UnitVector];
 
+// See getFacingDirection method
+const VERTICAL_THRESHOLD = Math.tan(Math.PI / 3);
+const DIAGONAL_THRESHOLD = Math.tan(Math.PI / 6);
+
 export default class MovementDirection {
   movement: UnitVector;
   facing: UnitVector;
@@ -11,12 +15,14 @@ export default class MovementDirection {
     this.facing = facingDirection;
     if (!x && !y) return;
 
-    if (Math.abs(x ** 2 + y ** 2 - 1) > Number.EPSILON) {
-      console.error("MovementDirection got invalid unit vector: ", x, y);
-      return;
+    const magnitude2 = x * x + y * y;
+    if (Math.abs(magnitude2 - 1) > Number.EPSILON) {
+      const magnitude = Math.sqrt(magnitude2);
+      this.movement = [x / magnitude, y / magnitude];
+    } else {
+      this.movement = [x, y];
     }
 
-    this.movement = [x, y];
     this.facing = this.movement;
   }
 
@@ -47,15 +53,25 @@ export default class MovementDirection {
 
   // Gets the current facing direction
   public getFacingDirection(): Direction {
+    // Splits the first quadrant in 3 regions for each of the
+    // directions. Then uses that information with the sign of
+    // the coordinates to determine the direction.
     const [x, y] = this.facing;
-    if (x > 0 && y > 0) return Direction.DownRight;
-    if (x > 0 && y < 0) return Direction.UpRight;
-    if (x < 0 && y > 0) return Direction.DownLeft;
-    if (x < 0 && y < 0) return Direction.UpLeft;
-    if (x > 0) return Direction.Right;
-    if (x < 0) return Direction.Left;
-    if (y > 0) return Direction.Down;
-    return Direction.Up;
+    const [mX, mY] = [Math.abs(x), Math.abs(y)];
+
+    if (mY > VERTICAL_THRESHOLD * mX) {
+      if (y > 0) return Direction.Down;
+      return Direction.Up;
+    } else if (mY < DIAGONAL_THRESHOLD * mX) {
+      if (x > 0) return Direction.Right;
+      return Direction.Left;
+    }
+    if (x > 0) {
+      if (y > 0) return Direction.DownRight;
+      return Direction.UpRight;
+    }
+    if (y > 0) return Direction.DownLeft;
+    return Direction.UpLeft;
   }
 
   // Returns an unit vector of the current movement direction.
