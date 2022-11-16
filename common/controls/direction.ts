@@ -76,6 +76,6 @@ export default class MovementDirection {
 
   // Returns a speed vector in with the given magnitude at the facing direction
   public getFacingSpeed(speed: number): UnitVector {
-    return MovementDirection.getSpeed(this.movement, speed);
+    return MovementDirection.getSpeed(this.facing, speed);
   }
 }
