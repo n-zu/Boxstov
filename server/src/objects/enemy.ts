@@ -148,6 +148,7 @@ export class Enemy extends Phaser.Physics.Arcade.Sprite {
   private die() {
     this.health = 0;
     this.setVelocity(0, 0);
+    this.movementDirection = new DirectionVector(0, 0);
     this.body.enable = false;
     this.dead = true;
     this.onDeath(this);
