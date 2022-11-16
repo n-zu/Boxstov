@@ -56,6 +56,7 @@ export class Player extends Phaser.Physics.Arcade.Sprite {
         x: this.x,
         y: this.y,
       },
+      movementDirection: this.movementDirection.getUnitVector(),
       health: this.health,
     };
   }

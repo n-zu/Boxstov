@@ -38,7 +38,7 @@ export default class GameServer {
     const id = this.generateGameId();
     const session = new SessionMaster(id, this.hostMaster);
     const game = new MultiplayerGame(session, () => {
-      game.destroy(true);
+      game.destroy(false);
       delete this.games[id];
     });
     this.games[id] = {

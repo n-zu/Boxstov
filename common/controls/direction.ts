@@ -15,6 +15,10 @@ export default class DirectionVector {
     this.unit = [x, y];
   }
 
+  static fromUnitVector([x, y]: UnitVector): DirectionVector {
+    return new DirectionVector(x, y);
+  }
+
   public getDirection(): Direction {
     const [x, y] = this.unit;
     if (x > 0 && y > 0) return Direction.DownRight;

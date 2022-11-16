@@ -54,8 +54,8 @@ export class Enemy extends Sprite {
     }
   }
 
-  private takeDamage(health: number) {
-    if (health < this.health) this.receiveDamage(this.health - health);
+  private takeDamage(newHealth: number) {
+    if (newHealth < this.health) this.receiveDamage(this.health - newHealth);
     else this.redTint *= 0.9 / this.scene.time.timeScale;
 
     this.setTint(0xff0000 + 0x00ffff * (1 - this.redTint));

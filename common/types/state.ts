@@ -1,5 +1,7 @@
 // World
 
+import { UnitVector } from "./direction";
+
 export type WorldState = {
   players: PlayerState[];
   bullets: BulletGroupState;
@@ -43,6 +45,7 @@ export type PlayerState = {
     y: number;
   };
   health: number;
+  movementDirection: UnitVector;
 };
 
 // Bullet

@@ -8,7 +8,6 @@ import { PlayerState } from "../../../common/types/state";
 import { playAnimation } from "../scenes/mainScene";
 import { AnimationActor, AnimationSuffix } from "../types/animation";
 import { PlayerUI } from "../controls/playerUi";
-import { PlayerUpdate } from "../../../common/types/messages";
 
 const SPEED = 200;
 const SYNC_DIFF_TOLERANCE = 0.01;
@@ -22,6 +21,7 @@ export class Player extends Sprite {
   health = 100;
   movementDirection: DirectionVector = new DirectionVector(0, 1);
   ui: PlayerUI;
+  local: boolean;
 
   constructor(
     scene: Phaser.Scene,
@@ -29,7 +29,8 @@ export class Player extends Sprite {
     y: number,
     id: string,
     gameMaster: GameMaster,
-    bulletGroup: BulletGroup
+    bulletGroup: BulletGroup,
+    local: boolean = false
   ) {
     super(scene, x, y, "player");
     this.scene = scene;
@@ -40,6 +41,7 @@ export class Player extends Sprite {
     this.gameMaster = gameMaster;
     this.bulletGroup = bulletGroup;
     this.ui = new PlayerUI(scene, this);
+    this.local = local;
 
     playAnimation(
       this,
@@ -83,7 +85,10 @@ export class Player extends Sprite {
   public move(direction: DirectionVector) {
     const [x, y] = direction.getSpeed(SPEED);
     this.setVelocity(x, y);
-    if (this.movementDirection?.getUnitVector() !== direction.getUnitVector()) {
+    if (
+      this.local &&
+      this.movementDirection?.getUnitVector() !== direction.getUnitVector()
+    ) {
       this.sendMovementMessage(direction);
     }
 
@@ -104,6 +109,8 @@ export class Player extends Sprite {
   public sync(state: PlayerState) {
     this.syncPosition(state.position.x, state.position.y);
     this.health = state.health;
+    if (!this.local)
+      this.move(DirectionVector.fromUnitVector(state.movementDirection));
   }
 
   public stopMovement() {
