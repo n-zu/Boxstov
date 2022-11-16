@@ -43,6 +43,8 @@ export class PlayerControls {
   }
 
   private getFacingDirection(): UnitVector {
+    if (!document.hasFocus()) return [0, 0];
+
     let horizontal = +this.right() - +this.left();
     let vertical = +this.down() - +this.up();
     if (horizontal && vertical) {
