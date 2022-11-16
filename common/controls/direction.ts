@@ -31,17 +31,22 @@ export default class MovementDirection {
     return new MovementDirection(x, y, initial);
   }
 
+  // Updates the movement according to the given direction.
+  // If it's a null vector, it stops the movement but doesn't
+  // change the direction that the entity is facing
   public update(newDirection: UnitVector) {
     this.movement = newDirection;
 
-    if (!this.isNullVector()) this.facing = this.movement;
+    if (!this.isStill()) this.facing = this.movement;
   }
 
-  public isNullVector(): boolean {
+  // Returns true if the entity is not currently moving
+  public isStill(): boolean {
     const [x, y] = this.movement;
     return !x && !y;
   }
 
+  // Gets the current facing direction
   public getFacingDirection(): Direction {
     const [x, y] = this.facing;
     if (x > 0 && y > 0) return Direction.DownRight;
@@ -54,6 +59,8 @@ export default class MovementDirection {
     return Direction.Up;
   }
 
+  // Returns an unit vector of the current movement direction.
+  // If there's no movement, it returns a null vector.
   public getUnitVector(): UnitVector {
     return this.movement;
   }
@@ -62,10 +69,13 @@ export default class MovementDirection {
     return [x * speed, y * speed];
   }
 
+  // Returns a speed vector in with the given magnitude at the movement direction
+  // Might be a null vector if it isn't curently moving
   public getSpeed(speed: number): UnitVector {
     return MovementDirection.getSpeed(this.movement, speed);
   }
 
+  // Returns a speed vector in with the given magnitude at the facing direction
   public getFacingSpeed(speed: number): UnitVector {
     return MovementDirection.getSpeed(this.movement, speed);
   }

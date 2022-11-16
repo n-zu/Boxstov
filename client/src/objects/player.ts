@@ -88,7 +88,7 @@ export class Player extends Sprite {
 
   public move() {
     this.setVelocity(...this.movementDirection.getSpeed(SPEED));
-    if (this.movementDirection.isNullVector()) {
+    if (this.movementDirection.isStill()) {
       this.doStopMovement();
       return;
     }

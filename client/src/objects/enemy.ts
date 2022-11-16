@@ -28,8 +28,8 @@ export class Enemy extends Sprite {
   public sync(state: EnemyState) {
     if (state.health > 0) {
       this.updateHealth(state.health);
-      this.move(state);
     }
+    this.move(state);
     if (!this.dead && state.dead) {
       this.die();
     }
@@ -61,10 +61,9 @@ export class Enemy extends Sprite {
     this.setPosition(state.position.x, state.position.y);
     this.setDepth(state.position.y);
 
-    this.movementDirection = MovementDirection.decode(state.movementDirection);
     this.setVelocity(...this.movementDirection.getSpeed(SPEED));
 
-    if (Math.random() < 0.3) {
+    if (!this.movementDirection.isStill() && Math.random() < 0.3) {
       playAnimation(
         this,
         AnimationActor.Zombie,
