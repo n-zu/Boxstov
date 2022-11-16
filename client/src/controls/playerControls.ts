@@ -42,7 +42,7 @@ export class PlayerControls {
     return this.cursorKeys.right.isDown || this.letterKeys.D.isDown;
   }
 
-  private getFacingDirection(): UnitVector {
+  private getKeysDirection(): UnitVector {
     if (!document.hasFocus()) return [0, 0];
 
     let horizontal = +this.right() - +this.left();
@@ -55,7 +55,7 @@ export class PlayerControls {
   }
 
   update() {
-    this.player.moveTo(this.getFacingDirection());
+    this.player.moveTo(this.getKeysDirection());
 
     if (this.cursorKeys.space.isDown) {
       if (Date.now() - lasShot > 100) {
