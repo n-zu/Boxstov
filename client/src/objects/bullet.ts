@@ -1,6 +1,6 @@
 import Sprite = Phaser.GameObjects.Sprite;
 import { BulletState } from "../../../common/types/state";
-import DirectionVector from "../../../common/controls/direction";
+import MovementDirection from "../../../common/controls/direction";
 
 const SPEED = 2000;
 
@@ -9,7 +9,7 @@ export class Bullet extends Sprite {
     super(scene, x, y, "bullet");
   }
 
-  public fire(x: number, y: number, direction: DirectionVector) {
+  public fire(x: number, y: number, direction: MovementDirection) {
     const [velocityX, velocityY] = direction.getSpeed(SPEED);
     const rotation = Math.atan2(velocityY, velocityX);
 

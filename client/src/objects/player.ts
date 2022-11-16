@@ -3,7 +3,7 @@ import * as Phaser from "phaser";
 import { BulletGroup } from "../groups/bulletGroup";
 import Sprite = Phaser.Physics.Arcade.Sprite;
 import { Direction, UnitVector } from "../../../common/types/direction";
-import DirectionVector from "../../../common/controls/direction";
+import MovementDirection from "../../../common/controls/direction";
 import { PlayerState } from "../../../common/types/state";
 import { playAnimation } from "../scenes/mainScene";
 import { AnimationActor, AnimationSuffix } from "../types/animation";
@@ -19,8 +19,7 @@ export class Player extends Sprite {
   id: string;
   maxHealth = 100;
   health = 100;
-  movementDirection: DirectionVector = new DirectionVector(0, 0);
-  facing: Direction = Direction.Down;
+  movementDirection: MovementDirection = new MovementDirection();
   ui: PlayerUI;
   local: boolean;
 
@@ -78,32 +77,39 @@ export class Player extends Sprite {
     this.ui.update();
   }
 
-  public move(direction: DirectionVector) {
-    const [x, y] = direction.getSpeed(SPEED);
-    this.setVelocity(x, y);
-    if (
-      this.local &&
-      this.movementDirection?.getUnitVector() !== direction.getUnitVector()
-    ) {
-      this.sendMovementMessage(direction);
-    }
+  public moveTo(direction: UnitVector) {
+    const previous = this.movementDirection.getUnitVector();
+    this.movementDirection.update(direction);
+    if (this.local && previous !== this.movementDirection.getUnitVector())
+      this.sendMovementMessage(this.movementDirection);
 
-    this.movementDirection = direction;
-    const facing = direction.getDirection();
-    if (!facing) {
+    this.move();
+  }
+
+  public move() {
+    this.setVelocity(...this.movementDirection.getSpeed(SPEED));
+    if (this.movementDirection.isNullVector()) {
       this.doStopMovement();
       return;
     }
 
-    this.facing = facing;
-    playAnimation(this, AnimationActor.Player, facing, AnimationSuffix.Run);
+    playAnimation(
+      this,
+      AnimationActor.Player,
+      this.movementDirection.getFacingDirection(),
+      AnimationSuffix.Run
+    );
   }
 
   public sync(state: PlayerState) {
     this.syncPosition(state.position.x, state.position.y);
     this.health = state.health;
-    if (!this.local)
-      this.move(DirectionVector.fromUnitVector(state.movementDirection));
+    if (!this.local) {
+      this.movementDirection = MovementDirection.decode(
+        state.movementDirection
+      );
+      this.move();
+    }
   }
 
   private doStopMovement() {
@@ -123,22 +129,22 @@ export class Player extends Sprite {
   private playIdleAnimation() {
     const animationName = `${
       AnimationActor.Player
-    }-${this.movementDirection?.getDirection()}-${AnimationSuffix.Idle}`;
+    }-${this.movementDirection?.getFacingDirection()}-${AnimationSuffix.Idle}`;
     this.anims.play(animationName, true);
   }
 
-  private sendMovementMessage(direction: DirectionVector) {
+  private sendMovementMessage(direction: MovementDirection) {
     this.gameMaster.send("player", {
       id: this.id,
       type: "move",
-      direction: direction.getUnitVector(),
+      direction: direction.encode(),
     });
   }
 
   private getGunPosition(): { x: number; y: number } {
     // We should change this logic so that the bullet receives the position and angle
     // of shooting, so that the bullet travels parallel to the player's gun
-    switch (this.facing) {
+    switch (this.movementDirection.getFacingDirection()) {
       case Direction.Up:
         return {
           x: this.x + 15,

@@ -2,7 +2,7 @@ import "@geckos.io/phaser-on-nodejs";
 import Phaser from "phaser";
 import { Enemy } from "./enemy";
 import { BulletState } from "../../../common/types/state.js";
-import DirectionVector from "../../../common/controls/direction.js";
+import MovementDirection from "../../../common/controls/direction.js";
 
 const SPEED = 2000;
 
@@ -13,7 +13,7 @@ export class Bullet extends Phaser.Physics.Arcade.Sprite {
     super(scene, x, y, "");
   }
 
-  public fire(x: number, y: number, direction: DirectionVector) {
+  public fire(x: number, y: number, direction: MovementDirection) {
     const [velocityX, velocityY] = direction.getSpeed(SPEED);
     const rotation = Math.atan2(velocityY, velocityX);
 

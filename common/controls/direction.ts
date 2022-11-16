@@ -1,26 +1,49 @@
 import { Direction, UnitVector } from "../types/direction.js";
 
-export default class DirectionVector {
-  unit: [number, number];
+export type EncodedMovementDirection = [UnitVector, UnitVector];
 
-  constructor(x = 0, y = 0) {
-    this.unit = [0, 0];
+export default class MovementDirection {
+  movement: UnitVector;
+  facing: UnitVector;
+
+  constructor(x = 0, y = 0, facingDirection: UnitVector = [0, 1]) {
+    this.movement = [0, 0];
+    this.facing = facingDirection;
     if (!x && !y) return;
 
     if (Math.abs(x ** 2 + y ** 2 - 1) > Number.EPSILON) {
-      console.error("DirectionVector got invalid unit vector: ", x, y);
+      console.error("MovementDirection got invalid unit vector: ", x, y);
       return;
     }
 
-    this.unit = [x, y];
+    this.movement = [x, y];
+    this.facing = this.movement;
   }
 
-  static fromUnitVector([x, y]: UnitVector): DirectionVector {
-    return new DirectionVector(x, y);
+  public encode(): EncodedMovementDirection {
+    return [this.movement, this.facing];
   }
 
-  public getDirection(): Direction | null {
-    const [x, y] = this.unit;
+  public static decode([
+    [x, y],
+    initial,
+  ]: EncodedMovementDirection): MovementDirection {
+    return new MovementDirection(x, y, initial);
+  }
+
+  public update(newDirection: UnitVector) {
+    this.movement = newDirection;
+
+    if (!this.isNullVector()) this.facing = this.movement;
+  }
+
+  public isNullVector(): boolean {
+    const [x, y] = this.movement;
+    return !x && !y;
+  }
+
+  public getFacingDirection(): Direction {
+    const [x, y] = this.facing;
     if (x > 0 && y > 0) return Direction.DownRight;
     if (x > 0 && y < 0) return Direction.UpRight;
     if (x < 0 && y > 0) return Direction.DownLeft;
@@ -28,17 +51,22 @@ export default class DirectionVector {
     if (x > 0) return Direction.Right;
     if (x < 0) return Direction.Left;
     if (y > 0) return Direction.Down;
-    if (y < 0) return Direction.Up;
-    if (y > 0) return Direction.Down;
-    return null;
+    return Direction.Up;
   }
 
   public getUnitVector(): UnitVector {
-    return this.unit;
+    return this.movement;
+  }
+
+  private static getSpeed([x, y]: UnitVector, speed: number): UnitVector {
+    return [x * speed, y * speed];
   }
 
   public getSpeed(speed: number): UnitVector {
-    const [x, y] = this.unit;
-    return [x * speed, y * speed];
+    return MovementDirection.getSpeed(this.movement, speed);
+  }
+
+  public getFacingSpeed(speed: number): UnitVector {
+    return MovementDirection.getSpeed(this.movement, speed);
   }
 }

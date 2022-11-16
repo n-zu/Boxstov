@@ -3,7 +3,7 @@ import Phaser from "phaser";
 import { Player } from "./player";
 import { GameMaster } from "../gameMaster/gameMaster.js";
 import { EnemyState } from "../../../common/types/state.js";
-import DirectionVector from "../../../common/controls/direction.js";
+import MovementDirection from "../../../common/controls/direction.js";
 const SPEED = 50;
 const HEALTH = 100;
 
@@ -11,7 +11,7 @@ export class Enemy extends Phaser.Physics.Arcade.Sprite {
   id: number;
   health = HEALTH;
   strength = 3;
-  movementDirection: DirectionVector = new DirectionVector(0, 1);
+  movementDirection: MovementDirection = new MovementDirection();
   gameMaster: GameMaster;
   cooldown = Math.random() * 100;
   cooldownCount = this.cooldown;
@@ -73,10 +73,7 @@ export class Enemy extends Phaser.Physics.Arcade.Sprite {
     const isFar = distance > 150 ? 1 : 0;
 
     const angle = this.roundAngle(vec.angle());
-    this.movementDirection = new DirectionVector(
-      Math.cos(angle),
-      Math.sin(angle)
-    );
+    this.movementDirection.update([Math.cos(angle), Math.sin(angle)]);
     this.setVelocity(...this.movementDirection.getSpeed(SPEED * isFar));
 
     this.action = isFar ? "walk" : "atk";
@@ -99,7 +96,7 @@ export class Enemy extends Phaser.Physics.Arcade.Sprite {
       visible: this.visible,
       bodyEnabled: this.body.enable,
       action: this.action,
-      movementDirection: this.movementDirection.getUnitVector(),
+      movementDirection: this.movementDirection.encode(),
     };
   }
 
@@ -148,7 +145,7 @@ export class Enemy extends Phaser.Physics.Arcade.Sprite {
   private die() {
     this.health = 0;
     this.setVelocity(0, 0);
-    this.movementDirection = new DirectionVector(0, 0);
+    this.movementDirection.update([0, 0]);
     this.body.enable = false;
     this.dead = true;
     this.onDeath(this);

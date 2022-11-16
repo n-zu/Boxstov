@@ -3,7 +3,7 @@ import Phaser from "phaser";
 import { GameMaster } from "../gameMaster/gameMaster.js";
 import { BulletGroup } from "../groups/bulletGroup";
 import { Direction, UnitVector } from "../../../common/types/direction.js";
-import DirectionVector from "../../../common/controls/direction.js";
+import MovementDirection from "../../../common/controls/direction.js";
 import { PlayerState } from "../../../common/types/state.js";
 import { PlayerUpdate } from "../../../common/types/messages.js";
 const SPEED = 200;
@@ -14,8 +14,7 @@ export class Player extends Phaser.Physics.Arcade.Sprite {
   gameMaster: GameMaster;
   bulletGroup: BulletGroup;
   id: string;
-  movementDirection: DirectionVector = new DirectionVector(0, 0);
-  facing: Direction = Direction.Down;
+  movementDirection: MovementDirection = new MovementDirection();
   maxHealth = 100;
   health = 100;
   lastUpdate = Date.now();
@@ -43,11 +42,9 @@ export class Player extends Phaser.Physics.Arcade.Sprite {
     this.bulletGroup.shootBullet(xGun, yGun, this.movementDirection);
   }
 
-  public move(direction: UnitVector) {
-    const vector = DirectionVector.fromUnitVector(direction);
-    this.setVelocity(...vector.getSpeed(SPEED));
-    this.movementDirection = vector;
-    this.facing = this.movementDirection.getDirection() || this.facing;
+  public move(direction: MovementDirection) {
+    this.movementDirection = direction;
+    this.setVelocity(...this.movementDirection.getSpeed(SPEED));
   }
 
   public getState(): PlayerState {
@@ -57,7 +54,7 @@ export class Player extends Phaser.Physics.Arcade.Sprite {
         x: this.x,
         y: this.y,
       },
-      movementDirection: this.movementDirection.getUnitVector(),
+      movementDirection: this.movementDirection.encode(),
       health: this.health,
     };
   }
@@ -70,7 +67,7 @@ export class Player extends Phaser.Physics.Arcade.Sprite {
     this.lastUpdate = Date.now();
     switch (message.type) {
       case "move":
-        this.move(message.direction);
+        this.move(MovementDirection.decode(message.direction));
         break;
       case "shoot":
         this.shoot();
@@ -81,7 +78,7 @@ export class Player extends Phaser.Physics.Arcade.Sprite {
   private getGunPosition(): { x: number; y: number } {
     // We should change this logic so that the bullet receives the position and angle
     // of shooting, so that the bullet travels parallel to the player's gun
-    switch (this.facing) {
+    switch (this.movementDirection.getFacingDirection()) {
       case Direction.Up:
         return {
           x: this.x + 15,

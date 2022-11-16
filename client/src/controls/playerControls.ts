@@ -1,6 +1,7 @@
 import CursorKeys = Phaser.Types.Input.Keyboard.CursorKeys;
 import { Player } from "../objects/player";
-import DirectionVector from "../../../common/controls/direction";
+import MovementDirection from "../../../common/controls/direction";
+import { UnitVector } from "../../../common/types/direction";
 
 let lasShot = 0;
 const diagonalFactor = Math.sqrt(2) / 2;
@@ -41,18 +42,18 @@ export class PlayerControls {
     return this.cursorKeys.right.isDown || this.letterKeys.D.isDown;
   }
 
-  private getDirection(): DirectionVector {
+  private getFacingDirection(): UnitVector {
     let horizontal = +this.right() - +this.left();
     let vertical = +this.down() - +this.up();
     if (horizontal && vertical) {
       horizontal *= diagonalFactor;
       vertical *= diagonalFactor;
     }
-    return new DirectionVector(horizontal, vertical);
+    return [horizontal, vertical];
   }
 
   update() {
-    this.player.move(this.getDirection());
+    this.player.moveTo(this.getFacingDirection());
 
     if (this.cursorKeys.space.isDown) {
       if (Date.now() - lasShot > 100) {

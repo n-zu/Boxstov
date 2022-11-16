@@ -1,9 +1,8 @@
-import { Direction } from "../../../common/types/direction";
 import { playAnimation } from "../scenes/mainScene";
 import { EnemyState } from "../../../common/types/state";
 import Sprite = Phaser.Physics.Arcade.Sprite;
 import { AnimationActor, AnimationSuffix } from "../types/animation";
-import DirectionVector from "../../../common/controls/direction";
+import MovementDirection from "../../../common/controls/direction";
 
 const SPEED = 50;
 const HEALTH = 100;
@@ -11,7 +10,7 @@ const HEALTH = 100;
 export class Enemy extends Sprite {
   id: number;
   health = HEALTH;
-  facing: Direction = Direction.Down;
+  movementDirection: MovementDirection = new MovementDirection();
   redTint = 0;
   action = "";
   dead: boolean = true;
@@ -62,15 +61,14 @@ export class Enemy extends Sprite {
     this.setPosition(state.position.x, state.position.y);
     this.setDepth(state.position.y);
 
-    const direction = DirectionVector.fromUnitVector(state.movementDirection);
-    this.setVelocity(...direction.getSpeed(SPEED));
-    this.facing = direction.getDirection() || this.facing;
+    this.movementDirection = MovementDirection.decode(state.movementDirection);
+    this.setVelocity(...this.movementDirection.getSpeed(SPEED));
 
     if (Math.random() < 0.3) {
       playAnimation(
         this,
         AnimationActor.Zombie,
-        this.facing,
+        this.movementDirection.getFacingDirection(),
         this.action === AnimationSuffix.Attack
           ? AnimationSuffix.Attack
           : AnimationSuffix.Walk
@@ -87,7 +85,7 @@ export class Enemy extends Sprite {
     playAnimation(
       this,
       AnimationActor.Zombie,
-      this.facing,
+      this.movementDirection.getFacingDirection(),
       AnimationSuffix.Die
     );
     this.setRotation(Math.random() * 0.4 - 0.2);

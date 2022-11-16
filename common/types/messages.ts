@@ -1,3 +1,4 @@
+import { EncodedMovementDirection } from "../controls/direction.js";
 import { UnitVector } from "./direction.js";
 import { WorldState } from "./state.js";
 
@@ -34,7 +35,7 @@ export type PlayerUpdateBase<T extends PlayerUpdateType> = {
 };
 
 export type PlayerUpdateMove = {
-  direction: UnitVector;
+  direction: EncodedMovementDirection;
 } & PlayerUpdateBase<"move">;
 
 export type PlayerUpdateFor<T extends PlayerUpdateType> = T extends "move"

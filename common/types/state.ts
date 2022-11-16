@@ -1,6 +1,6 @@
 // World
 
-import { UnitVector } from "./direction";
+import { EncodedMovementDirection } from "../controls/direction";
 
 export type WorldState = {
   players: PlayerState[];
@@ -17,7 +17,7 @@ export type EnemyState = {
     x: number;
     y: number;
   };
-  movementDirection: UnitVector;
+  movementDirection: EncodedMovementDirection;
   dead: boolean;
   health: number;
   active: boolean;
@@ -46,7 +46,7 @@ export type PlayerState = {
     y: number;
   };
   health: number;
-  movementDirection: UnitVector;
+  movementDirection: EncodedMovementDirection;
 };
 
 // Bullet
