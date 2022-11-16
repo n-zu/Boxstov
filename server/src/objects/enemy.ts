@@ -3,7 +3,7 @@ import Phaser from "phaser";
 import { Player } from "./player";
 import { GameMaster } from "../gameMaster/gameMaster.js";
 import { EnemyState } from "../../../common/types/state.js";
-import DirectionVector from "../../../common/controls/direction";
+import DirectionVector from "../../../common/controls/direction.js";
 const SPEED = 50;
 const HEALTH = 100;
 
