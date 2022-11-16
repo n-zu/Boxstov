@@ -18,7 +18,6 @@ export type EnemyState = {
     y: number;
   };
   movementDirection: EncodedMovementDirection;
-  dead: boolean;
   health: number;
   active: boolean;
   visible: boolean;
