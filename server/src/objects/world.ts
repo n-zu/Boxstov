@@ -6,6 +6,7 @@ import { Bullet } from "./bullet.js";
 import { Difficulty, EnemyGroup } from "../groups/enemyGroup.js";
 import { WorldState } from "../../../common/types/state.js";
 import { PlayerUpdate } from "../../../common/types/messages.js";
+import { ENEMY_GROUP_MAX } from "../../../common/constants.js";
 
 const INACTIVE_THRESHOLD = 60000; // if 60 seconds pass, the player is considered inactive
 
@@ -37,7 +38,7 @@ export class World {
 
     this.enemies = new EnemyGroup(
       this.scene,
-      5,
+      ENEMY_GROUP_MAX,
       Difficulty.Hard,
       spawnPoints,
       this.gameMaster,
