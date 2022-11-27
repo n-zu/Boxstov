@@ -81,6 +81,8 @@ export class World {
     // @ts-ignore
     scene.input.on("wheel", (pointer, gameObjects, deltaX, deltaY) => {
       scene.cameras.main.zoom -= deltaY * 0.001;
+      if (scene.cameras.main.zoom < 0.2) scene.cameras.main.zoom = 0.2;
+      if (scene.cameras.main.zoom > 1) scene.cameras.main.zoom = 1;
     });
   }
 
