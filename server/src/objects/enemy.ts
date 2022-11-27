@@ -17,6 +17,7 @@ export class Enemy extends Phaser.Physics.Arcade.Sprite {
   cooldownCount = this.cooldown;
   action = "walk";
   dead: boolean = true;
+  damagerId = "";
   onDeath: (enemy: Enemy) => void;
 
   constructor(
@@ -98,10 +99,11 @@ export class Enemy extends Phaser.Physics.Arcade.Sprite {
     };
   }
 
-  public receiveDamage(damage: number) {
+  public receiveDamage(damage: number, damagerId: string) {
     if (this.health <= 0) return;
 
     this.health -= damage;
+    this.damagerId = damagerId;
   }
 
   public spawn(x: number, y: number) {

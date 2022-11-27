@@ -15,10 +15,15 @@ export class BulletGroup extends Phaser.Physics.Arcade.Group {
     });
   }
 
-  public shootBullet(x: number, y: number, direction: MovementDirection) {
+  public shootBullet(
+    x: number,
+    y: number,
+    direction: MovementDirection,
+    playerId: string
+  ) {
     const bullet = this.getFirstDead(false) as Bullet;
     if (bullet) {
-      bullet.fire(x, y, direction);
+      bullet.fire(x, y, direction, playerId);
     }
   }
 

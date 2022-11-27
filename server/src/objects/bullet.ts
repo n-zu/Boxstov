@@ -8,12 +8,18 @@ const SPEED = 2000;
 
 export class Bullet extends Phaser.Physics.Arcade.Sprite {
   damage = 50;
+  playerId = "none";
 
   constructor(scene: Phaser.Scene, x: number, y: number) {
     super(scene, x, y, "");
   }
 
-  public fire(x: number, y: number, direction: MovementDirection) {
+  public fire(
+    x: number,
+    y: number,
+    direction: MovementDirection,
+    playerId: string
+  ) {
     const [velocityX, velocityY] = direction.getFacingSpeed(SPEED);
     const rotation = Math.atan2(velocityY, velocityX);
 
@@ -28,6 +34,7 @@ export class Bullet extends Phaser.Physics.Arcade.Sprite {
     this.setActive(true);
     this.setVisible(true);
     this.body.enable = true;
+    this.playerId = playerId;
 
     this.scene.time.addEvent({
       delay: 3000,
@@ -46,7 +53,7 @@ export class Bullet extends Phaser.Physics.Arcade.Sprite {
 
   // We should use an interface for this
   public collideWith(enemy: Enemy) {
-    enemy.receiveDamage(this.damage);
+    enemy.receiveDamage(this.damage, this.playerId);
     this.die();
   }
 

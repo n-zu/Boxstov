@@ -8,6 +8,7 @@ export type WorldState = {
   enemies: EnemyGroupState;
   rage: number;
   kills: number;
+  killsPerPlayer: Record<string, number>;
 };
 
 // Enemy

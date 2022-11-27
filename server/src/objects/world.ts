@@ -17,6 +17,7 @@ export class World {
   gameMaster: GameMaster;
   scene: Phaser.Scene;
   kills = 0;
+  killsPerPlayer: Record<string, number> = {};
   rage = 0.0;
   onEnd: () => void;
 
@@ -73,6 +74,7 @@ export class World {
       bullets: this.bulletGroup.getState(),
       rage: this.rage,
       kills: this.kills,
+      killsPerPlayer: this.killsPerPlayer,
       enemies: this.enemies!.getState(),
     };
   }
@@ -110,6 +112,8 @@ export class World {
 
   private onEnemyKilled(enemy: Enemy) {
     this.kills++;
+    this.killsPerPlayer[enemy.damagerId] =
+      (this.killsPerPlayer[enemy.damagerId] || 0) + 1;
     this.rage = Math.ceil(this.rage) + 1;
   }
 }

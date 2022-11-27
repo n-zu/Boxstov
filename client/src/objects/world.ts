@@ -16,6 +16,7 @@ export class World {
   enemies: EnemyGroup;
   rage = 0;
   kills = 0;
+  killsPerPlayer: Record<string, number> = {};
   playerControls!: PlayerControls;
   bulletGroup!: BulletGroup;
   gameMaster: GameMaster;
@@ -46,6 +47,7 @@ export class World {
 
     this.rage = worldState.rage;
     this.kills = worldState.kills;
+    this.killsPerPlayer = worldState.killsPerPlayer;
   }
 
   private setupFirstPlayer(

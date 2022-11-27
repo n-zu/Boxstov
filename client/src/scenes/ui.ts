@@ -43,6 +43,30 @@ class Points {
   }
 }
 
+class killsPerPlayer {
+  text: Phaser.GameObjects.Text;
+
+  constructor(scene: Phaser.Scene) {
+    this.text = scene.add.text(14, 220, "No Kills", {
+      fontFamily: "system-ui",
+      fontSize: "15px",
+      strokeThickness: 0.08,
+    });
+    this.text.setDepth(9999);
+  }
+
+  update(killsPerPlayer: Record<string, number>) {
+    const text = Object.entries(killsPerPlayer)
+      .sort((a, b) => b[1] - a[1])
+      .map(([player, kills]) => {
+        return `${kills} | ${player}`;
+      })
+      .join("\n");
+
+    this.text.setText(`Leader Board\n${text}`);
+  }
+}
+
 class MiniMap {
   scene: Phaser.Scene;
   map: Phaser.GameObjects.Graphics;
@@ -90,6 +114,7 @@ export default class UI extends Phaser.Scene {
   world?: World;
   points?: Points;
   minimap?: MiniMap;
+  killsPerPlater?: killsPerPlayer;
 
   constructor() {
     super({ key: "UI" });
@@ -102,6 +127,7 @@ export default class UI extends Phaser.Scene {
     this.points = game_points;
     this.world = data.world;
     this.minimap = new MiniMap(this);
+    this.killsPerPlater = new killsPerPlayer(this);
 
     // TODO: Why doesnt this work?
     /*data.gameMaster.addAction("sync", (state) => {
@@ -117,6 +143,7 @@ export default class UI extends Phaser.Scene {
   update() {
     this.points?.update(this.world?.kills || 0, this.world?.rage || 0);
     this.minimap?.update(this.world);
+    this.killsPerPlater?.update(this.world?.killsPerPlayer || {});
   }
 
   private addJoinUrl() {

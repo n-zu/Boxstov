@@ -37,10 +37,10 @@ export class Player extends Phaser.Physics.Arcade.Sprite {
     this.bulletGroup = bulletGroup;
   }
 
-  public shoot() {
+  public shoot(playerId: string) {
     const { x: xGun, y: yGun } = this.getGunPosition();
 
-    this.bulletGroup.shootBullet(xGun, yGun, this.movementDirection);
+    this.bulletGroup.shootBullet(xGun, yGun, this.movementDirection, playerId);
   }
 
   public move(direction: MovementDirection) {
@@ -82,7 +82,7 @@ export class Player extends Phaser.Physics.Arcade.Sprite {
         this.move(MovementDirection.decode(message.direction));
         break;
       case "shoot":
-        this.shoot();
+        this.shoot(message.id);
         break;
     }
   }
