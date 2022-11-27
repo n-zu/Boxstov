@@ -135,7 +135,7 @@ export default class UI extends Phaser.Scene {
         const { x, y } = icon.getCenter();
         const txt = this.add
           .text(x, y, "Copied!", {
-            color: "white",
+            color: "#55ff55",
             fontSize: "18px",
           })
           .setOrigin(0.5);
