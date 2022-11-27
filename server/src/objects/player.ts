@@ -6,6 +6,7 @@ import { Direction, UnitVector } from "../../../common/types/direction.js";
 import MovementDirection from "../../../common/controls/direction.js";
 import { PlayerState } from "../../../common/types/state.js";
 import { PlayerUpdate } from "../../../common/types/messages.js";
+import { GAME_HEIGHT, GAME_WIDTH } from "../../../common/constants.js";
 const SPEED = 200;
 
 // @ts-ignore
@@ -47,7 +48,18 @@ export class Player extends Phaser.Physics.Arcade.Sprite {
     this.setVelocity(...this.movementDirection.getSpeed(SPEED));
   }
 
+  private clampPosition() {
+    const w = GAME_WIDTH / 2 - 50;
+    const h = GAME_HEIGHT / 2 - 50;
+    if (this.x > w) this.x = w;
+    if (this.x < -w) this.x = -w;
+    if (this.y > h) this.y = h;
+    if (this.y < -h) this.y = -h;
+  }
+
   public getState(): PlayerState {
+    this.clampPosition();
+
     return {
       id: this.id,
       position: {

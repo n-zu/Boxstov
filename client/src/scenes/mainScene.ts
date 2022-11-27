@@ -6,6 +6,7 @@ import { loadGameAssets } from "./load";
 import Sprite = Phaser.GameObjects.Sprite;
 import { GameMaster } from "../gameMaster/gameMaster";
 import UI from "./ui";
+import { GAME_HEIGHT, GAME_WIDTH } from "../../../common/constants";
 
 export function playAnimation(
   sprite: Sprite,
@@ -35,7 +36,7 @@ export default class MainScene extends Phaser.Scene {
     this.gameMaster = data.gameMaster;
     this.world = new World(this, data.gameMaster, data.username);
 
-    this.add.tileSprite(0, 0, 7680, 4320, "tiles").setDepth(-9999);
+    this.add.tileSprite(0, 0, GAME_WIDTH, GAME_HEIGHT, "tiles").setDepth(-9999);
     this.scene.add("UI", UI, true, {
       gameMaster: data.gameMaster,
       world: this.world,
