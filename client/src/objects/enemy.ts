@@ -28,11 +28,12 @@ export class Enemy extends Sprite {
   public sync(state: EnemyState) {
     if (state.health > 0) {
       this.updateHealth(state.health);
-    } else if (!this.dead) {
+    }
+    this.move(state);
+    if (!this.dead && state.dead) {
       this.die();
     }
-
-    this.move(state);
+    this.dead = state.dead;
     this.setActive(state.active);
     this.setVisible(state.visible);
     this.active = state.active;
@@ -77,7 +78,6 @@ export class Enemy extends Sprite {
 
   private die() {
     this.health = 0;
-    this.dead = true;
     this.setTint(0xff5555);
     setTimeout(() => this.setTint(0xffdddd), 1000);
     this.setDepth(this.y - 100);

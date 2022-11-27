@@ -88,6 +88,7 @@ export class Enemy extends Phaser.Physics.Arcade.Sprite {
         x: this.x,
         y: this.y,
       },
+      dead: this.dead,
       health: this.health,
       active: this.active,
       visible: this.visible,
