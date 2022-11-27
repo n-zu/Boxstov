@@ -7,10 +7,12 @@ import Sprite = Phaser.GameObjects.Sprite;
 import { GameMaster } from "../gameMaster/gameMaster";
 import UI from "./ui";
 import { GAME_HEIGHT, GAME_WIDTH } from "../../../common/constants";
+import { GunName } from "../../../common/guns";
+
 
 export function playAnimation(
   sprite: Sprite,
-  actor: AnimationActor,
+  actor: AnimationActor | GunName,
   direction: Direction,
   suffix: AnimationSuffix,
   startFrame?: number

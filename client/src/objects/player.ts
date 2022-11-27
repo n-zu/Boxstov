@@ -8,6 +8,7 @@ import { PlayerState } from "../../../common/types/state";
 import { playAnimation } from "../scenes/mainScene";
 import { AnimationActor, AnimationSuffix } from "../types/animation";
 import { PlayerUI } from "../controls/playerUi";
+import { GunName } from "../../../common/guns";
 
 const SPEED = 200;
 const SYNC_DIFF_TOLERANCE = 0.01;
@@ -22,6 +23,7 @@ export class Player extends Sprite {
   movementDirection: MovementDirection = new MovementDirection();
   ui: PlayerUI;
   local: boolean;
+  gunName = GunName.Rifle;
 
   constructor(
     scene: Phaser.Scene,
@@ -43,12 +45,7 @@ export class Player extends Sprite {
     this.ui = new PlayerUI(scene, this);
     this.local = local;
 
-    playAnimation(
-      this,
-      AnimationActor.Player,
-      Direction.Down,
-      AnimationSuffix.Idle
-    );
+    playAnimation(this, this.gunName, Direction.Down, AnimationSuffix.Idle);
   }
 
   public getId() {
@@ -95,7 +92,7 @@ export class Player extends Sprite {
 
     playAnimation(
       this,
-      AnimationActor.Player,
+      this.gunName,
       this.movementDirection.getFacingDirection(),
       AnimationSuffix.Run
     );
@@ -110,6 +107,7 @@ export class Player extends Sprite {
       );
       this.move();
     }
+    this.gunName = state.gunName;
   }
 
   private doStopMovement() {
@@ -128,7 +126,7 @@ export class Player extends Sprite {
 
   private playIdleAnimation() {
     const animationName = `${
-      AnimationActor.Player
+      this.gunName
     }-${this.movementDirection?.getFacingDirection()}-${AnimationSuffix.Idle}`;
     this.anims.play(animationName, true);
   }
@@ -138,6 +136,15 @@ export class Player extends Sprite {
       id: this.id,
       type: "move",
       direction: direction.encode(),
+    });
+  }
+
+  public setGun(gunName: GunName) {
+    this.gunName = gunName;
+    this.gameMaster.send("player", {
+      id: this.id,
+      type: "switch_gun",
+      gunName,
     });
   }
 

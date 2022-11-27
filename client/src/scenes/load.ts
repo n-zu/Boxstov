@@ -3,6 +3,7 @@
 import Phaser from "phaser";
 import { Direction } from "../../../common/types/direction";
 import { GuestMaster } from "../gameMaster/guestMaster";
+import { GunName } from "../../../common/guns";
 import { AnimationActor, AnimationSuffix } from "../types/animation";
 
 // Imports de las escenas, se hacen desde acá para que se carguen durante la
@@ -11,7 +12,15 @@ import { AnimationActor, AnimationSuffix } from "../types/animation";
 export function loadGameAssets(scene: Phaser.Scene) {
   scene.load.image("tiles", "assets/Floor.png");
   scene.load.image("bullet", "assets/strip.png");
-  scene.load.spritesheet("player", "assets/Player/rifle_map.png", {
+  scene.load.spritesheet(GunName.Rifle, "assets/Player/rifle_map.png", {
+    frameWidth: 512,
+    frameHeight: 512,
+  });
+  scene.load.spritesheet(GunName.Shotgun, "assets/Player/shotgun_map.png", {
+    frameWidth: 512,
+    frameHeight: 512,
+  });
+  scene.load.spritesheet(GunName.Rpg, "assets/Player/rpg_map.png", {
     frameWidth: 512,
     frameHeight: 512,
   });
@@ -139,20 +148,22 @@ export default class LoadScene extends Phaser.Scene {
     ];
 
     directions.forEach((direction, index) => {
-      this.createAnimation(
-        AnimationActor.Player,
-        direction,
-        AnimationSuffix.Idle,
-        index * 8,
-        index * 8 + 1
-      );
-      this.createAnimation(
-        AnimationActor.Player,
-        direction,
-        AnimationSuffix.Run,
-        index * 8 + 2,
-        index * 8 + 7
-      );
+      [GunName.Rifle, GunName.Shotgun, GunName.Rpg].forEach((actor) => {
+        this.createAnimation(
+          actor,
+          direction,
+          AnimationSuffix.Idle,
+          index * 8,
+          index * 8 + 1
+        );
+        this.createAnimation(
+          actor,
+          direction,
+          AnimationSuffix.Run,
+          index * 8 + 2,
+          index * 8 + 7
+        );
+      });
 
       this.createAnimation(
         AnimationActor.Zombie,
@@ -204,7 +215,7 @@ export default class LoadScene extends Phaser.Scene {
   }
 
   private createAnimation(
-    actor: AnimationActor,
+    actor: AnimationActor | GunName,
     direction: Direction,
     suffix: AnimationSuffix,
     startFrame: number,

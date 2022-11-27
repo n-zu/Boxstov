@@ -2,6 +2,7 @@ import CursorKeys = Phaser.Types.Input.Keyboard.CursorKeys;
 import { Player } from "../objects/player";
 import MovementDirection from "../../../common/controls/direction";
 import { UnitVector } from "../../../common/types/direction";
+import { numToGunName } from "../../../common/guns";
 
 let lasShot = 0;
 const diagonalFactor = Math.sqrt(2) / 2;
@@ -24,6 +25,14 @@ export class PlayerControls {
       "W,A,S,D"
     ) as LetterKeys;
     this.player = player;
+
+    player.scene.input.keyboard.on("keydown", (event: any) => {
+      if (event.keyCode >= 49 && event.keyCode <= 57) {
+        const num = event.keyCode - 49;
+        const name = numToGunName(num);
+        this.player.setGun(name);
+      }
+    });
   }
 
   public down(): boolean {

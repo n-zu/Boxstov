@@ -1,6 +1,7 @@
 // World
 
 import { EncodedMovementDirection } from "../controls/direction";
+import { GunName } from "../guns";
 
 export type WorldState = {
   players: PlayerState[];
@@ -48,6 +49,7 @@ export type PlayerState = {
   };
   health: number;
   movementDirection: EncodedMovementDirection;
+  gunName: GunName;
 };
 
 // Bullet

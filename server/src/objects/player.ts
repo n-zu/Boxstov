@@ -7,6 +7,7 @@ import MovementDirection from "../../../common/controls/direction.js";
 import { PlayerState } from "../../../common/types/state.js";
 import { PlayerUpdate } from "../../../common/types/messages.js";
 import { GAME_HEIGHT, GAME_WIDTH } from "../../../common/constants.js";
+import { GunName } from "../../../common/guns.js";
 const SPEED = 200;
 
 // @ts-ignore
@@ -19,6 +20,7 @@ export class Player extends Phaser.Physics.Arcade.Sprite {
   maxHealth = 100;
   health = 100;
   lastUpdate = Date.now();
+  gunName = GunName.Rifle;
 
   constructor(
     scene: Phaser.Scene,
@@ -41,6 +43,11 @@ export class Player extends Phaser.Physics.Arcade.Sprite {
     const { x: xGun, y: yGun } = this.getGunPosition();
 
     this.bulletGroup.shootBullet(xGun, yGun, this.movementDirection, playerId);
+  }
+
+  public switchGun(gunName: GunName) {
+    // TODO: check if the gun is available
+    this.gunName = gunName;
   }
 
   public move(direction: MovementDirection) {
@@ -68,6 +75,7 @@ export class Player extends Phaser.Physics.Arcade.Sprite {
       },
       movementDirection: this.movementDirection.encode(),
       health: this.health,
+      gunName: this.gunName,
     };
   }
 
@@ -83,6 +91,9 @@ export class Player extends Phaser.Physics.Arcade.Sprite {
         break;
       case "shoot":
         this.shoot(message.id);
+        break;
+      case "switch_gun":
+        this.switchGun(message.gunName as GunName);
         break;
     }
   }
