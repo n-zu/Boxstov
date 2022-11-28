@@ -1,0 +1,8 @@
+{
+  "devDependencies": {
+    "typescript": "^4.9.3"
+  },
+  "dependencies": {
+    "@geckos.io/typed-array-buffer-schema": "^1.2.1"
+  }
+}
