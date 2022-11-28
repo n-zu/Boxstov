@@ -37,7 +37,7 @@ export class Gun {
 }
 
 export const Guns: { [key in GunName]: Gun } = {
-  [GunName.Rifle]: new Gun(30, 2000, "bullet", 0.5),
-  [GunName.Shotgun]: new Gun(60, 1500, "shell", 1),
-  [GunName.Rpg]: new Gun(200, 1000, "rocket", 2),
+  [GunName.Rifle]: new Gun(30, 2000, "bullet", 100),
+  [GunName.Shotgun]: new Gun(60, 1500, "shell", 300),
+  [GunName.Rpg]: new Gun(200, 1000, "rocket", 600),
 };

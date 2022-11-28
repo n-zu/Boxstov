@@ -202,4 +202,9 @@ export class Player extends Sprite {
         };
     }
   }
+
+  public getShootReloadTime(): number {
+    const gun = Guns[this.gunName];
+    return gun.reloadTime;
+  }
 }
