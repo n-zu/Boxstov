@@ -7,5 +7,7 @@ import {
 export interface GameMaster {
   addAction<T extends UpdateType>(type: T, action: ActionFnFor<T>): void;
 
-  broadcast<T extends UpdateType>(type: T, payload: UpdateFor<T>): void;
+  send<T extends UpdateType>(type: T, payload: UpdateFor<T>): void;
+
+  getGameId(): string;
 }

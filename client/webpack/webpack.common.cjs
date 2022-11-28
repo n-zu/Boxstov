@@ -1,12 +1,10 @@
 const path = require("path");
 const HtmlWebpackPlugin = require("html-webpack-plugin");
-const MiniCssExtractPlugin = require("mini-css-extract-plugin");
 const ResolveTypeScriptPlugin = require("resolve-typescript-plugin");
 
 module.exports = {
   entry: {
-    play: ["./src/play.ts", "./webpack/credits.js"],
-    index: ["./src/client.ts"],
+    index: ["./src/index.ts"],
   },
   output: {
     path: path.resolve(__dirname, "../docs"),
@@ -30,10 +28,6 @@ module.exports = {
         include: path.join(__dirname, "../../common"),
         loader: "ts-loader",
       },
-      {
-        test: /\.css$/,
-        use: [MiniCssExtractPlugin.loader, "css-loader"],
-      },
     ],
   },
   optimization: {
@@ -55,12 +49,5 @@ module.exports = {
       filename: "index.html",
       chunks: ["index"],
     }),
-    new HtmlWebpackPlugin({
-      gameName: "Boxstov",
-      filename: "play/index.html",
-      template: "src/play/index.html",
-      chunks: ["play"],
-    }),
-    new MiniCssExtractPlugin(),
   ],
 };

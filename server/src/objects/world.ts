@@ -6,20 +6,26 @@ import { Bullet } from "./bullet.js";
 import { Difficulty, EnemyGroup } from "../groups/enemyGroup.js";
 import { WorldState } from "../../../common/types/state.js";
 import { EnemyUpdate, PlayerUpdate } from "../../../common/types/messages.js";
+import { ENEMY_GROUP_MAX } from "../../../common/constants.js";
+
+const INACTIVE_THRESHOLD = 60000; // if 60 seconds pass, the player is considered inactive
 
 export class World {
   players: Player[];
-  // @ts-ignore
-  enemies: EnemyGroup;
+  enemies?: EnemyGroup;
   bulletGroup: BulletGroup;
   gameMaster: GameMaster;
   scene: Phaser.Scene;
+  kills = 0;
+  rage = 0.0;
+  onEnd: () => void;
 
-  constructor(scene: Phaser.Scene, gameMaster: GameMaster) {
+  constructor(scene: Phaser.Scene, gameMaster: GameMaster, onEnd: () => void) {
     this.players = [];
     this.bulletGroup = new BulletGroup(scene);
     this.gameMaster = gameMaster;
     this.scene = scene;
+    this.onEnd = onEnd;
   }
 
   public create() {
@@ -32,10 +38,11 @@ export class World {
 
     this.enemies = new EnemyGroup(
       this.scene,
-      5,
+      ENEMY_GROUP_MAX,
       Difficulty.Hard,
       spawnPoints,
-      this.gameMaster
+      this.gameMaster,
+      this.onEnemyKilled.bind(this)
     );
 
     this.scene.physics.add.overlap(this.enemies, this.bulletGroup, (e, b) => {
@@ -52,44 +59,57 @@ export class World {
   }
 
   public update() {
-    // TODO: 5000ms is a magic number
-    const isActive = (p: Player) => Date.now() - 5000 < p.lastUpdate;
+    const isActive = (p: Player) =>
+      Date.now() - INACTIVE_THRESHOLD < p.lastUpdate;
     this.players = this.players.filter(isActive);
-    this.enemies.update(this.players);
+    if (!this.players.length) this.onEnd();
+    this.enemies?.update(this.players);
+    this.rage = Math.max(0, this.rage - 0.002);
   }
 
   public getState(): WorldState {
     return {
       players: this.players.map((player) => player.getState()),
       bullets: this.bulletGroup.getState(),
-      enemies: this.enemies.getState(),
+      rage: this.rage,
+      kills: this.kills,
+      enemies: this.enemies!.getState(),
     };
   }
 
-  private getOrCreatePlayer(id: string): Player {
+  private getPlayer(id: string): Player | undefined {
     let player = this.players.find((p) => p.id === id);
-    if (player === undefined) {
-      player = new Player(
-        this.scene,
-        800,
-        500,
-        id,
-        this.gameMaster,
-        this.bulletGroup
-      );
-      this.players.push(player);
-    }
     return player;
+  }
+
+  // Returns false if that id is already taken
+  public addPlayer(id: string): boolean {
+    if (this.players.some((p) => p.id === id)) return false;
+    const player = new Player(
+      this.scene,
+      800,
+      500,
+      id,
+      this.gameMaster,
+      this.bulletGroup
+    );
+    this.players.push(player);
+    return true;
   }
 
   private setupGameMaster(gameMaster: GameMaster) {
     gameMaster.addAction("player", (data: PlayerUpdate) => {
-      const player = this.getOrCreatePlayer(data.id);
-      player.handleMessage(data.payload);
+      const player = this.getPlayer(data.id);
+      player?.handleMessage(data.payload);
     });
 
-    gameMaster.addAction("enemy", (data: EnemyUpdate) => {
-      this.enemies.handleMessage(data);
-    });
+    /*gameMaster.addAction("enemy", (data: EnemyUpdate) => {
+      this.enemies?.handleMessage(data);
+    });*/
+  }
+
+  private onEnemyKilled(enemy: Enemy) {
+    this.kills++;
+    this.rage = Math.ceil(this.rage) + 1;
   }
 }
