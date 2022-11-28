@@ -1,13 +1,11 @@
 import { GameMaster } from "./gameMaster.js";
 import { ServerChannel } from "@geckos.io/server";
 import {
-  Message,
-  MessageType,
-  UpdateFor,
-  ActionFnFor,
   Action,
+  ActionFnFor,
   ClientMessageType,
   ServerMessageType,
+  UpdateFor
 } from "../../../common/types/messages.js";
 import { HostMaster } from "./hostMaster.js";
 import { Packet } from "../../../common/types/packet.js";
@@ -47,7 +45,7 @@ export class SessionMaster implements GameMaster {
   public broadcast<T extends ServerMessageType>(type: T, payload: UpdateFor<T>) {
     const msg = {
       type,
-      payload,
+      payload
     };
 
     this.channels.forEach((channel) => {
@@ -55,8 +53,8 @@ export class SessionMaster implements GameMaster {
         type: "gameSync",
         payload: {
           gameId: this.id,
-          payload: msg,
-        },
+          payload: msg
+        }
       });
     });
   }
