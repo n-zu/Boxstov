@@ -3,12 +3,11 @@ import Phaser from "phaser";
 import { Enemy } from "./enemy";
 import { BulletState } from "../../../common/types/state.js";
 import MovementDirection from "../../../common/controls/direction.js";
-
-const SPEED = 2000;
+import { GunName, Guns } from "../../../common/guns";
 
 export class Bullet extends Phaser.Physics.Arcade.Sprite {
-  damage = 50;
   playerId = "none";
+  gunName = GunName.Rifle;
 
   constructor(scene: Phaser.Scene, x: number, y: number) {
     super(scene, x, y, "");
@@ -18,9 +17,11 @@ export class Bullet extends Phaser.Physics.Arcade.Sprite {
     x: number,
     y: number,
     direction: MovementDirection,
-    playerId: string
+    playerId: string,
+    gunName: GunName
   ) {
-    const [velocityX, velocityY] = direction.getFacingSpeed(SPEED);
+    const gun = Guns[gunName];
+    const [velocityX, velocityY] = direction.getFacingSpeed(gun.bulletSpeed);
     const rotation = Math.atan2(velocityY, velocityX);
 
     this.setScale(0.5);
@@ -33,6 +34,8 @@ export class Bullet extends Phaser.Physics.Arcade.Sprite {
     this.setVelocityY(velocityY);
     this.setActive(true);
     this.setVisible(true);
+
+    this.gunName = gunName;
     this.body.enable = true;
     this.playerId = playerId;
 
@@ -53,7 +56,8 @@ export class Bullet extends Phaser.Physics.Arcade.Sprite {
 
   // We should use an interface for this
   public collideWith(enemy: Enemy) {
-    enemy.receiveDamage(this.damage, this.playerId);
+    const gun = Guns[this.gunName];
+    enemy.receiveDamage(gun.damage, this.playerId);
     this.die();
   }
 
@@ -64,6 +68,7 @@ export class Bullet extends Phaser.Physics.Arcade.Sprite {
       rotation: this.rotation,
       active: this.active,
       visible: this.visible,
+      gunName: this.gunName,
     };
   }
 
@@ -72,5 +77,6 @@ export class Bullet extends Phaser.Physics.Arcade.Sprite {
     this.setRotation(bulletState.rotation);
     this.setActive(bulletState.active);
     this.setVisible(bulletState.visible);
+    this.gunName = bulletState.gunName;
   }
 }

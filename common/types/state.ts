@@ -62,4 +62,5 @@ export type BulletState = {
   rotation: number;
   active: boolean;
   visible: boolean;
+  gunName: GunName;
 };

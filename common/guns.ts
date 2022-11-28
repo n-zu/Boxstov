@@ -16,3 +16,28 @@ export const numToGunName = (num: number): GunName => {
       return GunName.Rifle;
   }
 };
+
+export class Gun {
+  public damage: number;
+  public bulletSpeed: number;
+  public bulletTexture: string;
+  public reloadTime: number;
+
+  constructor(
+    damage: number,
+    bulletSpeed: number,
+    bulletTexture: string,
+    reloadTime: number
+  ) {
+    this.damage = damage;
+    this.bulletSpeed = bulletSpeed;
+    this.bulletTexture = bulletTexture;
+    this.reloadTime = reloadTime;
+  }
+}
+
+export const Guns: { [key in GunName]: Gun } = {
+  [GunName.Rifle]: new Gun(30, 2000, "bullet", 0.5),
+  [GunName.Shotgun]: new Gun(60, 1500, "shell", 1),
+  [GunName.Rpg]: new Gun(200, 1000, "rocket", 2),
+};

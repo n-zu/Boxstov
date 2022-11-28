@@ -11,7 +11,9 @@ import { AnimationActor, AnimationSuffix } from "../types/animation";
 
 export function loadGameAssets(scene: Phaser.Scene) {
   scene.load.image("tiles", "assets/Floor.png");
-  scene.load.image("bullet", "assets/strip.png");
+  scene.load.image("bullet", "assets/bullets/strip.png");
+  scene.load.image("shell", "assets/bullets/shell.png");
+  scene.load.image("rocket", "assets/bullets/rocket.png");
   scene.load.spritesheet(GunName.Rifle, "assets/Player/rifle_map.png", {
     frameWidth: 512,
     frameHeight: 512,

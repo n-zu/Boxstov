@@ -54,6 +54,7 @@ export class Player extends Sprite {
 
   public shoot(emitAlert = true) {
     {
+      //TODO: depends on gun, also other players should be able to shoot
       const aud = new Audio("assets/shoot.mp3");
       aud.volume = 0.1;
       aud.play();
@@ -65,9 +66,15 @@ export class Player extends Sprite {
       this.gameMaster.send("player", {
         id: this.id,
         type: "shoot",
+        gunName: this.gunName,
       });
     }
-    this.bulletGroup.shootBullet(xGun, yGun, this.movementDirection);
+    this.bulletGroup.shootBullet(
+      xGun,
+      yGun,
+      this.movementDirection,
+      this.gunName
+    );
   }
 
   public update() {

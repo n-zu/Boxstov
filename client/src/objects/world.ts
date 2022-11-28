@@ -4,11 +4,7 @@ import { GameMaster } from "../gameMaster/gameMaster";
 import { PlayerControls } from "../controls/playerControls";
 import { EnemyGroup } from "../groups/enemyGroup";
 import { WorldState } from "../../../common/types/state";
-import {
-  EnemyUpdate,
-  PlayerUpdate,
-  SyncUpdate,
-} from "../../../common/types/messages";
+import { SyncUpdate } from "../../../common/types/messages";
 import { ENEMY_GROUP_MAX } from "../../../common/constants";
 
 export class World {
