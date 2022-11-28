@@ -3,7 +3,7 @@ import Phaser from "phaser";
 import { Enemy } from "./enemy";
 import { BulletState } from "../../../common/types/state.js";
 import MovementDirection from "../../../common/controls/direction.js";
-import { GunName, Guns } from "../../../common/guns";
+import { GunName, Guns } from "../../../common/guns.js";
 
 export class Bullet extends Phaser.Physics.Arcade.Sprite {
   playerId = "none";
