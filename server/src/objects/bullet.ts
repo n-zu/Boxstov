@@ -72,11 +72,18 @@ export class Bullet extends Phaser.Physics.Arcade.Sprite {
     };
   }
 
+  public setGunName(gunName: GunName) {
+    if (this.gunName !== gunName) {
+      this.gunName = gunName;
+      this.setTexture(Guns[gunName].bulletTexture);
+    }
+  }
+
   public sync(bulletState: BulletState) {
     this.setPosition(bulletState.x, bulletState.y);
     this.setRotation(bulletState.rotation);
     this.setActive(bulletState.active);
     this.setVisible(bulletState.visible);
-    this.gunName = bulletState.gunName;
+    this.setGunName(bulletState.gunName);
   }
 }

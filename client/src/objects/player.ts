@@ -8,7 +8,7 @@ import { PlayerState } from "../../../common/types/state";
 import { playAnimation } from "../scenes/mainScene";
 import { AnimationActor, AnimationSuffix } from "../types/animation";
 import { PlayerUI } from "../controls/playerUi";
-import { GunName } from "../../../common/guns";
+import { GunName, Guns } from "../../../common/guns";
 
 const SPEED = 200;
 const SYNC_DIFF_TOLERANCE = 0.01;

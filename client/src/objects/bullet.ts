@@ -20,14 +20,11 @@ export class Bullet extends Sprite {
     const [velocityX, velocityY] = direction.getFacingSpeed(gun.bulletSpeed);
     const rotation = Math.atan2(velocityY, velocityX);
 
-    this.setScale(0.5);
-    this.setAlpha(0.3);
-
+    this.setBase();
     this.setPosition(x, y);
     this.setRotation(rotation);
     this.setActive(true);
     this.setVisible(true);
-
     this.setTexture(Guns[gunName].bulletTexture);
 
     this.scene.time.addEvent({
@@ -39,20 +36,31 @@ export class Bullet extends Sprite {
     });
   }
 
+  setBase() {
+    this.setScale(0.5);
+    this.setAlpha(0.3);
+  }
+
   public die() {
     this.setActive(false);
     this.setVisible(false);
   }
 
+  public setGunName(gunName: GunName) {
+    if (this.gunName !== gunName) {
+      this.gunName = gunName;
+      this.setTexture(Guns[gunName].bulletTexture);
+    }
+  }
+
   public sync(bulletState: BulletState) {
+    this.setBase();
+    this.setDepth(bulletState.y);
     this.setPosition(bulletState.x, bulletState.y);
     this.setRotation(bulletState.rotation);
     this.setActive(bulletState.active);
     this.setVisible(bulletState.visible);
-
-    if (this.gunName !== bulletState.gunName) {
-      this.gunName = bulletState.gunName;
-      this.setTexture(Guns[bulletState.gunName].bulletTexture);
-    }
+    this.setGunName(bulletState.gunName);
+    this.setGunName(bulletState.gunName);
   }
 }

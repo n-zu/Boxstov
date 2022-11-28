@@ -31,11 +31,7 @@ export class BulletGroup extends Phaser.GameObjects.Group {
   public sync(bulletGroupState: BulletGroupState) {
     bulletGroupState.forEach((bulletState, i) => {
       const bullet = this.children.entries[i] as Bullet;
-      bullet.setDepth(bulletState.y);
-      bullet.setPosition(bulletState.x, bulletState.y);
-      bullet.setRotation(bulletState.rotation);
-      bullet.setActive(bulletState.active);
-      bullet.setVisible(bulletState.visible);
+      bullet.sync(bulletState);
     });
   }
 }
