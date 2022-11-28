@@ -8,7 +8,7 @@ import { PlayerState } from "../../../common/types/state";
 import { playAnimation } from "../scenes/mainScene";
 import { AnimationActor, AnimationSuffix } from "../types/animation";
 import { PlayerUI } from "../controls/playerUi";
-import { GunName } from "../../../common/guns";
+import { GunName, Guns } from "../../../common/guns";
 
 const SPEED = 200;
 const SYNC_DIFF_TOLERANCE = 0.01;
@@ -54,6 +54,7 @@ export class Player extends Sprite {
 
   public shoot(emitAlert = true) {
     {
+      //TODO: depends on gun, also other players should be able to shoot
       const aud = new Audio("assets/shoot.mp3");
       aud.volume = 0.1;
       aud.play();
@@ -65,9 +66,15 @@ export class Player extends Sprite {
       this.gameMaster.send("player", {
         id: this.id,
         type: "shoot",
+        gunName: this.gunName,
       });
     }
-    this.bulletGroup.shootBullet(xGun, yGun, this.movementDirection);
+    this.bulletGroup.shootBullet(
+      xGun,
+      yGun,
+      this.movementDirection,
+      this.gunName
+    );
   }
 
   public update() {
@@ -194,5 +201,10 @@ export class Player extends Sprite {
           y: this.y - 10,
         };
     }
+  }
+
+  public getShootReloadTime(): number {
+    const gun = Guns[this.gunName];
+    return gun.reloadTime;
   }
 }

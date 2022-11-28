@@ -42,10 +42,16 @@ export type PlayerUpdateSwitchGun = {
   gunName: string;
 } & PlayerUpdateBase<"switch_gun">;
 
+export type PlayerUpdateShoot = {
+  gunName: string;
+} & PlayerUpdateBase<"shoot">;
+
 export type PlayerUpdateFor<T extends PlayerUpdateType> = T extends "move"
   ? PlayerUpdateMove
   : T extends "switch_gun"
   ? PlayerUpdateSwitchGun
+  : T extends "shoot"
+  ? PlayerUpdateShoot
   : PlayerUpdateBase<T>;
 
 export type PlayerUpdate = PlayerUpdateFor<PlayerUpdateType>;

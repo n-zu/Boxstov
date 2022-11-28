@@ -39,10 +39,16 @@ export class Player extends Phaser.Physics.Arcade.Sprite {
     this.bulletGroup = bulletGroup;
   }
 
-  public shoot(playerId: string) {
+  public shoot(playerId: string, gunName: GunName = this.gunName) {
     const { x: xGun, y: yGun } = this.getGunPosition();
 
-    this.bulletGroup.shootBullet(xGun, yGun, this.movementDirection, playerId);
+    this.bulletGroup.shootBullet(
+      xGun,
+      yGun,
+      this.movementDirection,
+      playerId,
+      gunName
+    );
   }
 
   public switchGun(gunName: GunName) {

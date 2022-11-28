@@ -65,9 +65,10 @@ export class PlayerControls {
 
   update() {
     this.player.moveTo(this.getKeysDirection());
+    const reloadTime = this.player.getShootReloadTime();
 
     if (this.cursorKeys.space.isDown) {
-      if (Date.now() - lasShot > 100) {
+      if (Date.now() - lasShot > reloadTime) {
         lasShot = Date.now();
         this.player.shoot();
       }
@@ -76,7 +77,7 @@ export class PlayerControls {
     // if mouse click
     if (this.player.scene.input.activePointer.isDown) {
       const now = Date.now();
-      if (now - lasShot > 100) {
+      if (now - lasShot > reloadTime) {
         lasShot = now;
         this.player.shoot(true);
       }
