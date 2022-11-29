@@ -1,17 +1,17 @@
 import { GameMaster } from "../gameMaster/gameMaster";
 import * as Phaser from "phaser";
 import { BulletGroup } from "../groups/bulletGroup";
-import Sprite = Phaser.Physics.Arcade.Sprite;
 import { Direction, UnitVector } from "../../../common/types/direction";
 import MovementDirection from "../../../common/controls/direction";
 import { PlayerState } from "../../../common/types/state";
 import { playAnimation } from "../scenes/mainScene";
-import { AnimationActor, AnimationSuffix } from "../types/animation";
+import { AnimationSuffix } from "../types/animation";
 import { PlayerUI } from "../controls/playerUi";
 import { GunName, Guns } from "../../../common/guns";
+import { PLAYER_SPEED } from "../../../common/constants";
+import Sprite = Phaser.Physics.Arcade.Sprite;
 
-const SPEED = 200;
-const SYNC_DIFF_TOLERANCE = 0.01;
+const SYNC_DIFF_TOLERANCE = 0.001;
 
 export class Player extends Sprite {
   scene: Phaser.Scene;
@@ -66,7 +66,7 @@ export class Player extends Sprite {
       this.gameMaster.send("player", {
         id: this.id,
         type: "shoot",
-        gunName: this.gunName,
+        gunName: this.gunName
       });
     }
     this.bulletGroup.shootBullet(
@@ -91,7 +91,7 @@ export class Player extends Sprite {
   }
 
   public move() {
-    this.setVelocity(...this.movementDirection.getSpeed(SPEED));
+    this.setVelocity(...this.movementDirection.getSpeed(PLAYER_SPEED));
     if (!this.movementDirection.isMoving()) {
       this.doStopMovement();
       return;
@@ -115,6 +115,20 @@ export class Player extends Sprite {
       this.move();
     }
     this.gunName = state.gunName;
+  }
+
+  public setGun(gunName: GunName) {
+    this.gunName = gunName;
+    this.gameMaster.send("player", {
+      id: this.id,
+      type: "switch_gun",
+      gunName
+    });
+  }
+
+  public getShootReloadTime(): number {
+    const gun = Guns[this.gunName];
+    return gun.reloadTime;
   }
 
   private doStopMovement() {
@@ -142,16 +156,7 @@ export class Player extends Sprite {
     this.gameMaster.send("player", {
       id: this.id,
       type: "move",
-      direction: direction.encode(),
-    });
-  }
-
-  public setGun(gunName: GunName) {
-    this.gunName = gunName;
-    this.gameMaster.send("player", {
-      id: this.id,
-      type: "switch_gun",
-      gunName,
+      direction: direction.encode()
     });
   }
 
@@ -162,49 +167,44 @@ export class Player extends Sprite {
       case Direction.Up:
         return {
           x: this.x + 15,
-          y: this.y - 120,
+          y: this.y - 120
         };
       case Direction.Down:
         return {
           x: this.x - 16,
-          y: this.y,
+          y: this.y
         };
       case Direction.Left:
         return {
           x: this.x - 95,
-          y: this.y - 75,
+          y: this.y - 75
         };
       case Direction.Right:
         return {
           x: this.x + 95,
-          y: this.y - 65,
+          y: this.y - 65
         };
       case Direction.UpLeft:
         return {
           x: this.x - 75,
-          y: this.y - 120,
+          y: this.y - 120
         };
       case Direction.UpRight:
         return {
           x: this.x + 95,
-          y: this.y - 120,
+          y: this.y - 120
         };
       case Direction.DownLeft:
         return {
           x: this.x - 35,
-          y: this.y - 40,
+          y: this.y - 40
         };
       case Direction.DownRight:
       default:
         return {
           x: this.x + 45,
-          y: this.y - 10,
+          y: this.y - 10
         };
     }
-  }
-
-  public getShootReloadTime(): number {
-    const gun = Guns[this.gunName];
-    return gun.reloadTime;
   }
 }

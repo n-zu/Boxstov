@@ -67,7 +67,7 @@ export class World {
     setInterval(() => {
       this.gameMaster.send("player", {
         id: username,
-        type: "ping",
+        type: "ping"
       });
     }, 500);
 

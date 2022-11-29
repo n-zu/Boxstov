@@ -7,6 +7,7 @@ import { Difficulty, EnemyGroup } from "../groups/enemyGroup.js";
 import { WorldState } from "../../../common/types/state.js";
 import { PlayerUpdate } from "../../../common/types/messages.js";
 import { ENEMY_GROUP_MAX } from "../../../common/constants.js";
+import { SnapshotInterpolation } from "@geckos.io/snapshot-interpolation";
 
 const INACTIVE_THRESHOLD = 60000; // if 60 seconds pass, the player is considered inactive
 
@@ -20,6 +21,7 @@ export class World {
   killsPerPlayer: Record<string, number> = {};
   rage = 0.0;
   onEnd: () => void;
+  playersSI: SnapshotInterpolation;
 
   constructor(scene: Phaser.Scene, gameMaster: GameMaster, onEnd: () => void) {
     this.players = [];
@@ -27,6 +29,7 @@ export class World {
     this.gameMaster = gameMaster;
     this.scene = scene;
     this.onEnd = onEnd;
+    this.playersSI = new SnapshotInterpolation(60);
   }
 
   public create() {
@@ -34,7 +37,7 @@ export class World {
       { x: 100, y: 100 },
       { x: 100, y: 900 },
       { x: 1800, y: 100 },
-      { x: 1800, y: 900 },
+      { x: 1800, y: 900 }
     ];
 
     this.enemies = new EnemyGroup(
@@ -75,13 +78,8 @@ export class World {
       rage: this.rage,
       kills: this.kills,
       killsPerPlayer: this.killsPerPlayer,
-      enemies: this.enemies!.getState(),
+      enemies: this.enemies!.getState()
     };
-  }
-
-  private getPlayer(id: string): Player | undefined {
-    let player = this.players.find((p) => p.id === id);
-    return player;
   }
 
   // Returns false if that id is already taken
@@ -97,6 +95,10 @@ export class World {
     );
     this.players.push(player);
     return true;
+  }
+
+  private getPlayer(id: string): Player | undefined {
+    return this.players.find((p) => p.id === id);
   }
 
   private setupGameMaster(gameMaster: GameMaster) {

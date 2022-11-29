@@ -6,12 +6,10 @@ import { Direction } from "../../../common/types/direction.js";
 import MovementDirection from "../../../common/controls/direction.js";
 import { PlayerState } from "../../../common/types/state.js";
 import { PlayerUpdate } from "../../../common/types/messages.js";
-import { GAME_HEIGHT, GAME_WIDTH } from "../../../common/constants.js";
+import { GAME_HEIGHT, GAME_WIDTH, PLAYER_SPEED } from "../../../common/constants.js";
 import { GunName } from "../../../common/guns.js";
 
-const SPEED = 200;
 
-// @ts-ignore
 export class Player extends Phaser.Physics.Arcade.Sprite {
   scene: Phaser.Scene;
   gameMaster: GameMaster;
@@ -59,7 +57,7 @@ export class Player extends Phaser.Physics.Arcade.Sprite {
 
   public move(direction: MovementDirection) {
     this.movementDirection = direction;
-    this.setVelocity(...this.movementDirection.getSpeed(SPEED));
+    this.setVelocity(...this.movementDirection.getSpeed(PLAYER_SPEED));
   }
 
   public getState(): PlayerState {
