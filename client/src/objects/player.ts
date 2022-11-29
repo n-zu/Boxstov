@@ -3,7 +3,7 @@ import * as Phaser from "phaser";
 import { BulletGroup } from "../groups/bulletGroup";
 import { Direction, UnitVector } from "../../../common/types/direction";
 import MovementDirection from "../../../common/controls/direction";
-import { PlayerState } from "../../../common/types/state";
+import { PlayerRecentEvent, PlayerState } from "../../../common/types/state";
 import { playAnimation } from "../scenes/mainScene";
 import { AnimationSuffix } from "../types/animation";
 import { PlayerUI } from "../controls/playerUi";
@@ -53,13 +53,6 @@ export class Player extends Sprite {
   }
 
   public shoot(emitAlert = true) {
-    {
-      //TODO: depends on gun, also other players should be able to shoot
-      const aud = new Audio("assets/shoot.mp3");
-      aud.volume = 0.1;
-      aud.play();
-    }
-
     const { x: xGun, y: yGun } = this.getGunPosition();
 
     if (emitAlert) {
@@ -69,12 +62,6 @@ export class Player extends Sprite {
         gunName: this.gunName
       });
     }
-    this.bulletGroup.shootBullet(
-      xGun,
-      yGun,
-      this.movementDirection,
-      this.gunName
-    );
   }
 
   public update() {
@@ -107,6 +94,7 @@ export class Player extends Sprite {
 
   public sync(state: PlayerState) {
     this.syncPosition(state.position.x, state.position.y);
+    this.syncEvents(state.events);
     this.health = state.health;
     if (!this.local) {
       this.movementDirection = MovementDirection.decode(
@@ -129,6 +117,31 @@ export class Player extends Sprite {
   public getShootReloadTime(): number {
     const gun = Guns[this.gunName];
     return gun.reloadTime;
+  }
+
+  private syncEvents(events: PlayerRecentEvent[]) {
+    events.forEach(event => {
+      if (event === "shoot") {
+        this.handleShootEvent();
+      }
+    });
+  }
+
+  private handleShootEvent() {
+    {
+      //TODO: depends on gun, also other players should be able to shoot
+      const aud = new Audio("assets/shoot.mp3");
+
+      const camera = this.scene.cameras.main;
+      const cameraX = camera.scrollX + camera.width / 2;
+      const cameraY = camera.scrollY + camera.height / 2;
+
+      const distance = Phaser.Math.Distance.Between(cameraX, cameraY, this.x, this.y);
+      const maxDistance = Math.sqrt(Math.pow(camera.width, 2) + Math.pow(camera.height, 2));
+      aud.volume = 0.1 * (1 - distance / maxDistance);
+
+      aud.play();
+    }
   }
 
   private doStopMovement() {

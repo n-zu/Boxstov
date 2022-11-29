@@ -4,7 +4,7 @@ import { GameMaster } from "../gameMaster/gameMaster.js";
 import { BulletGroup } from "../groups/bulletGroup";
 import { Direction } from "../../../common/types/direction.js";
 import MovementDirection from "../../../common/controls/direction.js";
-import { PlayerState } from "../../../common/types/state.js";
+import { PlayerRecentEvent, PlayerState } from "../../../common/types/state.js";
 import { PlayerUpdate } from "../../../common/types/messages.js";
 import { GAME_HEIGHT, GAME_WIDTH, PLAYER_SPEED } from "../../../common/constants.js";
 import { GunName } from "../../../common/guns.js";
@@ -20,6 +20,7 @@ export class Player extends Phaser.Physics.Arcade.Sprite {
   health = 100;
   lastUpdate = Date.now();
   gunName = GunName.Rifle;
+  recentEvents: PlayerRecentEvent[] = [];
 
   constructor(
     scene: Phaser.Scene,
@@ -48,6 +49,7 @@ export class Player extends Phaser.Physics.Arcade.Sprite {
       playerId,
       gunName
     );
+    this.recentEvents.push("shoot");
   }
 
   public switchGun(gunName: GunName) {
@@ -63,7 +65,7 @@ export class Player extends Phaser.Physics.Arcade.Sprite {
   public getState(): PlayerState {
     this.clampPosition();
 
-    return {
+    const state = {
       id: this.id,
       position: {
         x: this.x,
@@ -71,8 +73,11 @@ export class Player extends Phaser.Physics.Arcade.Sprite {
       },
       movementDirection: this.movementDirection.encode(),
       health: this.health,
-      gunName: this.gunName
+      gunName: this.gunName,
+      events: this.recentEvents
     };
+    this.clearEvents();
+    return state;
   }
 
   public stopMovement() {
@@ -97,6 +102,10 @@ export class Player extends Phaser.Physics.Arcade.Sprite {
   public receiveDamage(damage: number) {
     this.health -= damage;
     if (this.health <= 0) this.health = 0;
+  }
+
+  private clearEvents() {
+    this.recentEvents = [];
   }
 
   private clampPosition() {

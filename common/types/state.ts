@@ -50,7 +50,11 @@ export type PlayerState = {
   health: number;
   movementDirection: EncodedMovementDirection;
   gunName: GunName;
+  events: PlayerRecentEvent[];
 };
+
+export type PlayerRecentEvent = "shoot";
+
 
 // Bullet
 
