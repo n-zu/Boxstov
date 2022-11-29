@@ -7,7 +7,6 @@ import { Difficulty, EnemyGroup } from "../groups/enemyGroup.js";
 import { WorldState } from "../../../common/types/state.js";
 import { PlayerUpdate } from "../../../common/types/messages.js";
 import { ENEMY_GROUP_MAX } from "../../../common/constants.js";
-import { SnapshotInterpolation } from "@geckos.io/snapshot-interpolation";
 
 const INACTIVE_THRESHOLD = 60000; // if 60 seconds pass, the player is considered inactive
 
@@ -21,7 +20,6 @@ export class World {
   killsPerPlayer: Record<string, number> = {};
   rage = 0.0;
   onEnd: () => void;
-  playersSI: SnapshotInterpolation;
 
   constructor(scene: Phaser.Scene, gameMaster: GameMaster, onEnd: () => void) {
     this.players = [];
@@ -29,7 +27,6 @@ export class World {
     this.gameMaster = gameMaster;
     this.scene = scene;
     this.onEnd = onEnd;
-    this.playersSI = new SnapshotInterpolation(60);
   }
 
   public create() {

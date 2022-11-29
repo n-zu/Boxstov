@@ -4,10 +4,6 @@ import { Create, Join } from "../../common/types/packet.js";
 import { MultiplayerGame } from "./game/multiplayerGame.js";
 import { HostMaster } from "./gameMaster/hostMaster.js";
 import { SessionMaster } from "./gameMaster/sessionMaster.js";
-import * as geckosArray from "@geckos.io/typed-array-buffer-schema";
-
-export const BufferSchema = geckosArray.BufferSchema;
-export const geckosArraySchemas = geckosArray;
 
 type Session = {
   game: MultiplayerGame;
