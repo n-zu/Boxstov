@@ -30,15 +30,15 @@ export function playAnimation(
 export default class MainScene extends Phaser.Scene {
   gameMaster?: GameMaster;
   world?: World;
-  observer?: GameObserver;
+  observer: GameObserver;
 
   protected constructor() {
     super({ key: "MainScene" });
+    this.observer = new GameObserver();
   }
 
   create(data: { gameMaster: GameMaster; username: string }) {
     this.gameMaster = data.gameMaster;
-    this.observer = new GameObserver();
     this.world = new World(this, this.observer, data.gameMaster, data.username);
 
     this.add.tileSprite(0, 0, GAME_WIDTH, GAME_HEIGHT, "tiles").setDepth(-9999);

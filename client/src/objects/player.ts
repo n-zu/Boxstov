@@ -97,7 +97,12 @@ export class Player extends Sprite {
       );
       this.move();
     }
-    this.gunName = state.gunName;
+    if (this.gunName !== state.gunName) {
+      this.gunName = state.gunName;
+      this.scene.sound.add("switch_gun", {
+        volume: this.calculateSoundVolume()
+      }).play();
+    }
   }
 
   public getShootReloadTime(): number {
@@ -229,53 +234,5 @@ export class Player extends Sprite {
       type: "move",
       direction: direction.encode()
     });
-  }
-
-  private getGunPosition(): { x: number; y: number } {
-    // We should change this logic so that the bullet receives the position and angle
-    // of shooting, so that the bullet travels parallel to the player's gun
-    switch (this.movementDirection.getFacingDirection()) {
-      case Direction.Up:
-        return {
-          x: this.x + 15,
-          y: this.y - 120
-        };
-      case Direction.Down:
-        return {
-          x: this.x - 16,
-          y: this.y
-        };
-      case Direction.Left:
-        return {
-          x: this.x - 95,
-          y: this.y - 75
-        };
-      case Direction.Right:
-        return {
-          x: this.x + 95,
-          y: this.y - 65
-        };
-      case Direction.UpLeft:
-        return {
-          x: this.x - 75,
-          y: this.y - 120
-        };
-      case Direction.UpRight:
-        return {
-          x: this.x + 95,
-          y: this.y - 120
-        };
-      case Direction.DownLeft:
-        return {
-          x: this.x - 35,
-          y: this.y - 40
-        };
-      case Direction.DownRight:
-      default:
-        return {
-          x: this.x + 45,
-          y: this.y - 10
-        };
-    }
   }
 }
