@@ -67,7 +67,9 @@ class HealthBar {
 
   private subscribeToEvents() {
     this.observer.subscribe("playerUpdate", (player: Player) => {
-      this.draw(player.x, player.y, player.height, player.health, player.maxHealth);
+      if (player.local) {
+        this.draw(player.x, player.y, player.height, player.health, player.maxHealth);
+      }
     });
   }
 }

@@ -124,8 +124,7 @@ export default class UI extends Phaser.Scene {
   create(data: { gameMaster: GameMaster; world: World }) {
     this.gameMaster = data.gameMaster;
     this.addJoinUrl();
-    const game_points = new Points(this);
-    this.points = game_points;
+    this.points = new Points(this);
     this.world = data.world;
     this.minimap = new MiniMap(this);
     this.killsPerPlater = new killsPerPlayer(this);
