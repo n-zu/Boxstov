@@ -16,20 +16,24 @@ export function loadGameAssets(scene: Phaser.Scene) {
   scene.load.image("rocket", "assets/bullets/rocket.png");
   scene.load.spritesheet(GunName.Rifle, "assets/Player/rifle_map.png", {
     frameWidth: 512,
-    frameHeight: 512,
+    frameHeight: 512
   });
   scene.load.spritesheet(GunName.Shotgun, "assets/Player/shotgun_map.png", {
     frameWidth: 512,
-    frameHeight: 512,
+    frameHeight: 512
   });
   scene.load.spritesheet(GunName.Rpg, "assets/Player/rpg_map.png", {
     frameWidth: 512,
-    frameHeight: 512,
+    frameHeight: 512
   });
   scene.load.spritesheet("zombie", "assets/Mobs/zombie_map.png", {
     frameWidth: 512,
-    frameHeight: 512,
+    frameHeight: 512
   });
+  scene.load.audio("shotgun", "assets/audio/shotgun.mp3");
+  scene.load.audio("rifle", "assets/audio/rifle.mp3");
+  scene.load.audio("rpg", "assets/audio/rpg.mp3");
+  scene.load.audio("player_receive_damage", "assets/audio/player_receive_damage.mp3");
 }
 
 export function loadMenuAssets(scene: Phaser.Scene) {
@@ -41,7 +45,7 @@ export function loadMenuAssets(scene: Phaser.Scene) {
 export function loadSpinnerAssets(scene: Phaser.Scene) {
   scene.load.spritesheet("spinner", "assets/img/spinner.png", {
     frameWidth: 200,
-    frameHeight: 200,
+    frameHeight: 200
   });
 }
 
@@ -107,12 +111,12 @@ export default class LoadScene extends Phaser.Scene {
       y: this.cameras.main.height / 2 - 50,
       text: "Loading...",
       style: {
-        font: "24px monospace",
-      },
+        font: "24px monospace"
+      }
     });
     loadingText.setOrigin(0.5);
 
-    this.load.on("progress", function (value: number) {
+    this.load.on("progress", function(value: number) {
       const innerStartX = startX + PROGRESS_PADDING;
       const innerStartY = startY + PROGRESS_PADDING;
       progressBar.clear();
@@ -132,10 +136,10 @@ export default class LoadScene extends Phaser.Scene {
       key: "spinner",
       frames: this.anims.generateFrameNumbers("spinner", {
         start: 0,
-        end: 50,
+        end: 50
       }),
       frameRate: 30,
-      repeat: -1,
+      repeat: -1
     });
 
     const directions = [
@@ -146,7 +150,7 @@ export default class LoadScene extends Phaser.Scene {
       Direction.Up,
       Direction.UpLeft,
       Direction.Left,
-      Direction.DownLeft,
+      Direction.DownLeft
     ];
 
     directions.forEach((direction, index) => {
@@ -201,7 +205,7 @@ export default class LoadScene extends Phaser.Scene {
       Direction.Right,
       Direction.UpRight,
       Direction.Up,
-      Direction.UpLeft,
+      Direction.UpLeft
     ];
 
     directionsDie.forEach((direction, index) => {
@@ -246,10 +250,10 @@ export default class LoadScene extends Phaser.Scene {
       key: `${actor}-${direction}-${suffix}`,
       frames: this.anims.generateFrameNumbers(actor, {
         start: startFrame,
-        end: endFrame,
+        end: endFrame
       }),
       frameRate: frameRateToUse,
-      repeat: suffix == AnimationSuffix.Die ? 0 : -1,
+      repeat: suffix == AnimationSuffix.Die ? 0 : -1
     });
   }
 }

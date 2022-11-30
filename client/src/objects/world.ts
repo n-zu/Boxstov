@@ -55,8 +55,8 @@ export class World {
 
     const player = new Player(
       scene,
-      800,
-      500,
+      0,
+      0,
       username,
       gameMaster,
       this.bulletGroup,

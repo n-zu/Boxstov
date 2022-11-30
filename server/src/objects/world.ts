@@ -30,12 +30,7 @@ export class World {
   }
 
   public create() {
-    const spawnPoints = [
-      { x: 100, y: 100 },
-      { x: 100, y: 900 },
-      { x: 1800, y: 100 },
-      { x: 1800, y: 900 }
-    ];
+    const spawnPoints = this.getSpawnPoints();
 
     this.enemies = new EnemyGroup(
       this.scene,
@@ -84,14 +79,27 @@ export class World {
     if (this.players.some((p) => p.id === id)) return false;
     const player = new Player(
       this.scene,
-      800,
-      500,
+      0,
+      0,
       id,
       this.gameMaster,
       this.bulletGroup
     );
     this.players.push(player);
     return true;
+  }
+
+  private getSpawnPoints(): { x: number; y: number }[] {
+    const center = { x: 0, y: 0 };
+    const radius = 1000;
+    const spawnPoints = [];
+    for (let i = 0; i < 30; i++) {
+      const angle = Math.random() * 2 * Math.PI;
+      const x = center.x + radius * Math.cos(angle);
+      const y = center.y + radius * Math.sin(angle);
+      spawnPoints.push({ x, y });
+    }
+    return spawnPoints;
   }
 
   private getPlayer(id: string): Player | undefined {

@@ -4,7 +4,8 @@ import { Player } from "./player";
 import { GameMaster } from "../gameMaster/gameMaster.js";
 import { EnemyState } from "../../../common/types/state.js";
 import MovementDirection from "../../../common/controls/direction.js";
-const SPEED = 50;
+
+const BASE_SPEED = 80;
 const HEALTH = 100;
 
 export class Enemy extends Phaser.Physics.Arcade.Sprite {
@@ -18,6 +19,7 @@ export class Enemy extends Phaser.Physics.Arcade.Sprite {
   action = "walk";
   dead: boolean = true;
   damagerId = "";
+  speed: number;
   onDeath: (enemy: Enemy) => void;
 
   constructor(
@@ -36,15 +38,11 @@ export class Enemy extends Phaser.Physics.Arcade.Sprite {
 
     this.visible = false;
     this.active = false;
+    this.speed = BASE_SPEED + Math.random() * 20;
 
     this.gameMaster = gameMaster;
     this.id = id;
     this.onDeath = onDeath;
-  }
-
-  // Rounds the angle to one of 8 directions
-  private roundAngle(angle: number) {
-    return (Math.round((angle * 4) / Math.PI) * Math.PI) / 4;
   }
 
   public update(players: Player[]) {
@@ -73,7 +71,7 @@ export class Enemy extends Phaser.Physics.Arcade.Sprite {
     const isFar = distance > 150 ? 1 : 0;
 
     this.movementDirection.update([dx / distance, dy / distance]);
-    this.setVelocity(...this.movementDirection.getSpeed(SPEED * isFar));
+    this.setVelocity(...this.movementDirection.getSpeed(this.speed * isFar));
 
     this.action = isFar ? "walk" : "atk";
     if (!isFar) {
@@ -87,7 +85,7 @@ export class Enemy extends Phaser.Physics.Arcade.Sprite {
     return {
       position: {
         x: this.x,
-        y: this.y,
+        y: this.y
       },
       dead: this.dead,
       health: this.health,
@@ -96,6 +94,7 @@ export class Enemy extends Phaser.Physics.Arcade.Sprite {
       bodyEnabled: this.body.enable,
       action: this.action,
       movementDirection: this.movementDirection.encode(),
+      speed: this.speed
     };
   }
 
@@ -113,6 +112,11 @@ export class Enemy extends Phaser.Physics.Arcade.Sprite {
     this.setVisible(true);
     this.body.enable = true;
     this.dead = false;
+  }
+
+  // Rounds the angle to one of 8 directions
+  private roundAngle(angle: number) {
+    return (Math.round((angle * 4) / Math.PI) * Math.PI) / 4;
   }
 
   /*public handleMessage(payload: EnemyUpdate) {

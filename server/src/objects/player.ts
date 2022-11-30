@@ -15,7 +15,7 @@ export class Player extends Phaser.Physics.Arcade.Sprite {
   gameMaster: GameMaster;
   bulletGroup: BulletGroup;
   id: string;
-  movementDirection: MovementDirection = new MovementDirection(0, 0, [-Math.sqrt(2) / 2, Math.sqrt(2) / 2]);
+  movementDirection: MovementDirection = new MovementDirection();
   maxHealth = 100;
   health = 100;
   lastUpdate = Date.now();
@@ -103,6 +103,7 @@ export class Player extends Phaser.Physics.Arcade.Sprite {
 
   public receiveDamage(damage: number) {
     this.health -= damage;
+    this.recentEvents.push("receive_damage");
     if (this.health <= 0) this.health = 0;
   }
 

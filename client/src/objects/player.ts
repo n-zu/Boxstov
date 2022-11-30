@@ -20,10 +20,11 @@ export class Player extends Sprite {
   id: string;
   maxHealth = 100;
   health = 100;
-  movementDirection: MovementDirection = new MovementDirection(0, 0, [-Math.sqrt(2) / 2, Math.sqrt(2) / 2]);
+  movementDirection: MovementDirection = new MovementDirection();
   ui: PlayerUI;
   local: boolean;
   gunName = GunName.Rifle;
+  soundsAmount = 0;
 
   constructor(
     scene: Phaser.Scene,
@@ -125,26 +126,41 @@ export class Player extends Sprite {
     }
   }
 
+  private handleReceiveDamageEvent() {
+    if (this.soundsAmount < 3) {
+      this.soundsAmount++;
+      this.scene.sound.add("player_receive_damage", {
+        volume: this.calculateSoundVolume()
+      }).once("complete", () => {
+        this.soundsAmount--;
+      }).play();
+    }
+  }
+
   private syncEvents(events: PlayerRecentEvent[]) {
     events.forEach(event => {
-      if (event === "shoot") {
-        this.handleShootEvent();
+      switch (event) {
+        case "shoot":
+          this.handleShootEvent();
+          break;
+        case "receive_damage":
+          this.handleReceiveDamageEvent();
       }
     });
   }
 
+  private calculateSoundVolume(): number {
+    const camera = this.scene.cameras.main;
+    const cameraX = camera.scrollX + camera.width / 2;
+    const cameraY = camera.scrollY + camera.height / 2;
+
+    const distance = Phaser.Math.Distance.Between(cameraX, cameraY, this.x, this.y);
+    const maxDistance = Math.sqrt(Math.pow(camera.width, 2) + Math.pow(camera.height, 2));
+    return 0.1 * (1 - distance / maxDistance);
+  }
+
   private handleShootEvent() {
-    {
-      const camera = this.scene.cameras.main;
-      const cameraX = camera.scrollX + camera.width / 2;
-      const cameraY = camera.scrollY + camera.height / 2;
-
-      const distance = Phaser.Math.Distance.Between(cameraX, cameraY, this.x, this.y);
-      const maxDistance = Math.sqrt(Math.pow(camera.width, 2) + Math.pow(camera.height, 2));
-      const volume = 0.1 * (1 - distance / maxDistance);
-
-      Guns[this.gunName].playSound(volume);
-    }
+    Guns[this.gunName].playSound(this.calculateSoundVolume());
   }
 
   private doStopMovement() {

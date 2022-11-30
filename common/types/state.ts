@@ -26,6 +26,7 @@ export type EnemyState = {
   visible: boolean;
   bodyEnabled: boolean;
   action: string;
+  speed: number;
 };
 
 export type EnemyGroupState = {
@@ -53,7 +54,7 @@ export type PlayerState = {
   events: PlayerRecentEvent[];
 };
 
-export type PlayerRecentEvent = "shoot";
+export type PlayerRecentEvent = "shoot" | "receive_damage";
 
 
 // Bullet

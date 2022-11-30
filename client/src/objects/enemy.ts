@@ -1,10 +1,11 @@
 import { playAnimation } from "../scenes/mainScene";
 import { EnemyState } from "../../../common/types/state";
-import Sprite = Phaser.Physics.Arcade.Sprite;
 import { AnimationActor, AnimationSuffix } from "../types/animation";
 import MovementDirection from "../../../common/controls/direction";
+import Phaser from "phaser";
+import Sprite = Phaser.Physics.Arcade.Sprite;
 
-const SPEED = 50;
+const BASE_SPEED = 50;
 const HEALTH = 100;
 
 export class Enemy extends Sprite {
@@ -14,6 +15,7 @@ export class Enemy extends Sprite {
   redTint = 0;
   action = "";
   dead: boolean = true;
+  speed: number;
 
   constructor(scene: Phaser.Scene, x: number, y: number, id: number) {
     super(scene, x, y, "zombie");
@@ -21,7 +23,7 @@ export class Enemy extends Sprite {
 
     this.visible = false;
     this.active = false;
-
+    this.speed = BASE_SPEED;
     this.id = id;
   }
 
@@ -62,9 +64,9 @@ export class Enemy extends Sprite {
     this.setDepth(state.position.y);
 
     this.movementDirection = MovementDirection.decode(state.movementDirection);
-    this.setVelocity(...this.movementDirection.getSpeed(SPEED));
+    this.setVelocity(...this.movementDirection.getSpeed(this.speed));
 
-    if (this.movementDirection.isMoving() && Math.random() < 0.3) {
+    if (this.movementDirection.isMoving()) {
       playAnimation(
         this,
         AnimationActor.Zombie,

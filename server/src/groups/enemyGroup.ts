@@ -1,12 +1,7 @@
 import { Enemy } from "../objects/enemy.js";
 import { Player } from "../objects/player.js";
 import { GameMaster } from "../gameMaster/gameMaster.js";
-import {
-  EnemyGroupState,
-  EnemyState,
-  SpawnPoint,
-} from "../../../common/types/state.js";
-import { EnemyUpdate } from "../../../common/types/messages.js";
+import { EnemyGroupState, EnemyState, SpawnPoint } from "../../../common/types/state.js";
 
 const TIME_BETWEEN_HORDES = 700;
 
@@ -62,7 +57,7 @@ export class EnemyGroup extends Phaser.Physics.Arcade.Group {
     return {
       enemies: enemyInfo,
       timeUntilNextHorde: this.timeUntilNextHorde,
-      spawnPoints: this.spawnPoints,
+      spawnPoints: this.spawnPoints
     };
   }
 
