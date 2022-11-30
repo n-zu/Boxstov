@@ -1,11 +1,11 @@
 import { GameMaster } from "./gameMaster.js";
 import { ServerChannel } from "@geckos.io/server";
 import {
-  Message,
-  UpdateType,
-  UpdateFor,
-  ActionFnFor,
   Action,
+  ActionFnFor,
+  ClientMessageType,
+  ServerMessageType,
+  UpdateFor
 } from "../../../common/types/messages.js";
 import { HostMaster } from "./hostMaster.js";
 import { Packet } from "../../../common/types/packet.js";
@@ -31,7 +31,7 @@ export class SessionMaster implements GameMaster {
     this.hostMaster.clearGameHandlers(this.id);
   }
 
-  public addAction<T extends UpdateType>(
+  public addAction<T extends ClientMessageType>(
     type: T,
     action: ActionFnFor<T>
   ): void {
@@ -42,24 +42,24 @@ export class SessionMaster implements GameMaster {
     this.channels.push(channel);
   }
 
-  public broadcast<T extends UpdateType>(type: T, payload: UpdateFor<T>) {
+  public broadcast<T extends ServerMessageType>(type: T, payload: UpdateFor<T>) {
     const msg = {
       type,
-      payload,
+      payload
     };
 
     this.channels.forEach((channel) => {
       this.send_async(channel, {
-        type: "gameInfo",
+        type: "gameSync",
         payload: {
           gameId: this.id,
-          payload: msg,
-        },
+          payload: msg
+        }
       });
     });
   }
 
-  private async send_async(channel: ServerChannel, packet: Packet<"gameInfo">) {
+  private async send_async(channel: ServerChannel, packet: Packet<"gameSync">) {
     channel.emit("msg", packet);
   }
 }

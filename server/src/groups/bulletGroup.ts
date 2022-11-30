@@ -1,6 +1,6 @@
 import { Bullet } from "../objects/bullet.js";
 import { BulletGroupState } from "../../../common/types/state.js";
-import DirectionVector from "../../../common/controls/direction.js";
+import { GunName } from "../../../common/guns.js";
 
 export class BulletGroup extends Phaser.Physics.Arcade.Group {
   constructor(scene: Phaser.Scene) {
@@ -11,14 +11,20 @@ export class BulletGroup extends Phaser.Physics.Arcade.Group {
       key: "bullet",
       active: false,
       visible: false,
-      classType: Bullet,
+      classType: Bullet
     });
   }
 
-  public shootBullet(x: number, y: number, direction: DirectionVector) {
+  public shootBullet(
+    x: number,
+    y: number,
+    rotation: number,
+    playerId: string,
+    gunName: GunName
+  ) {
     const bullet = this.getFirstDead(false) as Bullet;
     if (bullet) {
-      bullet.fire(x, y, direction);
+      bullet.fire(x, y, rotation, playerId, gunName);
     }
   }
 

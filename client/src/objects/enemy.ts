@@ -1,19 +1,21 @@
-import { Direction } from "../../../common/types/direction";
 import { playAnimation } from "../scenes/mainScene";
 import { EnemyState } from "../../../common/types/state";
-import Sprite = Phaser.GameObjects.Sprite;
-import { EnemyUpdate } from "../../../common/types/messages";
 import { AnimationActor, AnimationSuffix } from "../types/animation";
+import MovementDirection from "../../../common/controls/direction";
+import Phaser from "phaser";
+import Sprite = Phaser.Physics.Arcade.Sprite;
 
-const SPEED = 50;
+const BASE_SPEED = 50;
 const HEALTH = 100;
 
 export class Enemy extends Sprite {
   id: number;
   health = HEALTH;
-  facing: Direction = Direction.Down;
+  movementDirection: MovementDirection = new MovementDirection();
   redTint = 0;
   action = "";
+  dead: boolean = true;
+  speed: number;
 
   constructor(scene: Phaser.Scene, x: number, y: number, id: number) {
     super(scene, x, y, "zombie");
@@ -21,19 +23,19 @@ export class Enemy extends Sprite {
 
     this.visible = false;
     this.active = false;
-
+    this.speed = BASE_SPEED;
     this.id = id;
   }
 
   public sync(state: EnemyState) {
-    // There is a bug in this method
-    // If the zombie is dead in the guest and revives with a sync
-    // it won't play the movement animation until update() is called with this.cooldownCount = 0
     if (state.health > 0) {
-      this.move(state.position.x, state.position.y);
-      this.takeDamage(state.health);
+      this.updateHealth(state.health);
     }
-
+    this.move(state);
+    if (!this.dead && state.dead) {
+      this.die();
+    }
+    this.dead = state.dead;
     this.setActive(state.active);
     this.setVisible(state.visible);
     this.active = state.active;
@@ -50,49 +52,25 @@ export class Enemy extends Sprite {
     }
   }
 
-  public handleMessage(payload: EnemyUpdate) {
-    if (payload.type === "die") {
-      this.die();
-    }
-  }
-
-  private takeDamage(health: number) {
-    if (health < this.health) this.receiveDamage(this.health - health);
+  private updateHealth(newHealth: number) {
+    if (newHealth < this.health) this.receiveDamage(this.health - newHealth);
     else this.redTint *= 0.9 / this.scene.time.timeScale;
 
     this.setTint(0xff0000 + 0x00ffff * (1 - this.redTint));
   }
 
-  private move(x: number, y: number) {
-    const dx = x - this.x;
-    const dy = y - this.y;
+  private move(state: EnemyState) {
+    this.setPosition(state.position.x, state.position.y);
+    this.setDepth(state.position.y);
 
-    if (dx < 0 && dy < 0) {
-      this.facing = Direction.UpLeft;
-    } else if (dx > 0 && dy < 0) {
-      this.facing = Direction.UpRight;
-    } else if (dx < 0 && dy > 0) {
-      this.facing = Direction.DownLeft;
-    } else if (dx > 0 && dy > 0) {
-      this.facing = Direction.DownRight;
-    } else if (dx < 0) {
-      this.facing = Direction.Left;
-    } else if (dx > 0) {
-      this.facing = Direction.Right;
-    } else if (dy < 0) {
-      this.facing = Direction.Up;
-    } else if (dy > 0) {
-      this.facing = Direction.Down;
-    }
+    this.movementDirection = MovementDirection.decode(state.movementDirection);
+    this.setVelocity(...this.movementDirection.getSpeed(this.speed));
 
-    this.setDepth(this.y);
-    this.setPosition(x, y);
-
-    if (Math.random() < 0.3) {
+    if (this.movementDirection.isMoving()) {
       playAnimation(
         this,
         AnimationActor.Zombie,
-        this.facing,
+        this.movementDirection.getFacingDirection(),
         this.action === AnimationSuffix.Attack
           ? AnimationSuffix.Attack
           : AnimationSuffix.Walk
@@ -109,7 +87,7 @@ export class Enemy extends Sprite {
     playAnimation(
       this,
       AnimationActor.Zombie,
-      this.facing,
+      this.movementDirection.getFacingDirection(),
       AnimationSuffix.Die
     );
     this.setRotation(Math.random() * 0.4 - 0.2);

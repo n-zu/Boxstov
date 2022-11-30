@@ -4,11 +4,7 @@ import { GameMaster } from "../gameMaster/gameMaster";
 import { PlayerControls } from "../controls/playerControls";
 import { EnemyGroup } from "../groups/enemyGroup";
 import { WorldState } from "../../../common/types/state";
-import {
-  EnemyUpdate,
-  PlayerUpdate,
-  SyncUpdate,
-} from "../../../common/types/messages";
+import { SyncUpdate } from "../../../common/types/messages";
 import { ENEMY_GROUP_MAX } from "../../../common/constants";
 
 export class World {
@@ -16,6 +12,7 @@ export class World {
   enemies: EnemyGroup;
   rage = 0;
   kills = 0;
+  killsPerPlayer: Record<string, number> = {};
   playerControls!: PlayerControls;
   bulletGroup!: BulletGroup;
   gameMaster: GameMaster;
@@ -46,6 +43,7 @@ export class World {
 
     this.rage = worldState.rage;
     this.kills = worldState.kills;
+    this.killsPerPlayer = worldState.killsPerPlayer;
   }
 
   private setupFirstPlayer(
@@ -57,20 +55,19 @@ export class World {
 
     const player = new Player(
       scene,
-      800,
-      500,
+      0,
+      0,
       username,
       gameMaster,
-      this.bulletGroup
+      this.bulletGroup,
+      true
     );
     this.playerControls = new PlayerControls(player);
 
     setInterval(() => {
       this.gameMaster.send("player", {
         id: username,
-        payload: {
-          type: "ping",
-        },
+        type: "ping"
       });
     }, 500);
 
@@ -82,6 +79,8 @@ export class World {
     // @ts-ignore
     scene.input.on("wheel", (pointer, gameObjects, deltaX, deltaY) => {
       scene.cameras.main.zoom -= deltaY * 0.001;
+      if (scene.cameras.main.zoom < 0.2) scene.cameras.main.zoom = 0.2;
+      if (scene.cameras.main.zoom > 1) scene.cameras.main.zoom = 1;
     });
   }
 
@@ -102,17 +101,8 @@ export class World {
   }
 
   private setupGameMaster(gameMaster: GameMaster) {
-    gameMaster.addAction("player", (data: PlayerUpdate) => {
-      const player = this.getOrCreatePlayer(data.id);
-      player.handleMessage(data.payload);
-    });
-
     gameMaster.addAction("sync", (data: SyncUpdate) => {
       this.sync(data);
-    });
-
-    gameMaster.addAction("enemy", (data: EnemyUpdate) => {
-      this.enemies.handleMessage(data);
     });
   }
 }

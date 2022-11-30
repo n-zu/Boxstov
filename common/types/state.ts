@@ -1,11 +1,15 @@
 // World
 
+import { EncodedMovementDirection } from "../controls/direction";
+import { GunName } from "../guns";
+
 export type WorldState = {
   players: PlayerState[];
   bullets: BulletGroupState;
   enemies: EnemyGroupState;
   rage: number;
   kills: number;
+  killsPerPlayer: Record<string, number>;
 };
 
 // Enemy
@@ -15,11 +19,14 @@ export type EnemyState = {
     x: number;
     y: number;
   };
+  movementDirection: EncodedMovementDirection;
+  dead: boolean;
   health: number;
   active: boolean;
   visible: boolean;
   bodyEnabled: boolean;
   action: string;
+  speed: number;
 };
 
 export type EnemyGroupState = {
@@ -42,7 +49,13 @@ export type PlayerState = {
     y: number;
   };
   health: number;
+  movementDirection: EncodedMovementDirection;
+  gunName: GunName;
+  events: PlayerRecentEvent[];
 };
+
+export type PlayerRecentEvent = "shoot" | "receive_damage";
+
 
 // Bullet
 
@@ -54,4 +67,5 @@ export type BulletState = {
   rotation: number;
   active: boolean;
   visible: boolean;
+  gunName: GunName;
 };

@@ -2,20 +2,25 @@ import "@geckos.io/phaser-on-nodejs";
 import Phaser from "phaser";
 import { Enemy } from "./enemy";
 import { BulletState } from "../../../common/types/state.js";
-import DirectionVector from "../../../common/controls/direction.js";
-
-const SPEED = 2000;
+import { GunName, Guns } from "../../../common/guns.js";
 
 export class Bullet extends Phaser.Physics.Arcade.Sprite {
-  damage = 50;
+  playerId = "none";
+  gunName = GunName.Rifle;
 
   constructor(scene: Phaser.Scene, x: number, y: number) {
     super(scene, x, y, "");
   }
 
-  public fire(x: number, y: number, direction: DirectionVector) {
-    const [velocityX, velocityY] = direction.getSpeed(SPEED);
-    const rotation = Math.atan2(velocityY, velocityX);
+  public fire(
+    x: number,
+    y: number,
+    rotation: number,
+    playerId: string,
+    gunName: GunName
+  ) {
+    const gun = Guns[gunName];
+    const [velocityX, velocityY] = this.getVelocityFromRotation(rotation);
 
     this.setScale(0.5);
     this.setAlpha(0.3);
@@ -27,14 +32,17 @@ export class Bullet extends Phaser.Physics.Arcade.Sprite {
     this.setVelocityY(velocityY);
     this.setActive(true);
     this.setVisible(true);
+
+    this.gunName = gunName;
     this.body.enable = true;
+    this.playerId = playerId;
 
     this.scene.time.addEvent({
       delay: 3000,
       callback: () => {
         this.setActive(false);
         this.setVisible(false);
-      },
+      }
     });
   }
 
@@ -46,7 +54,8 @@ export class Bullet extends Phaser.Physics.Arcade.Sprite {
 
   // We should use an interface for this
   public collideWith(enemy: Enemy) {
-    enemy.receiveDamage(this.damage);
+    const gun = Guns[this.gunName];
+    enemy.receiveDamage(gun.damage, this.playerId);
     this.die();
   }
 
@@ -57,7 +66,15 @@ export class Bullet extends Phaser.Physics.Arcade.Sprite {
       rotation: this.rotation,
       active: this.active,
       visible: this.visible,
+      gunName: this.gunName
     };
+  }
+
+  public setGunName(gunName: GunName) {
+    if (this.gunName !== gunName) {
+      this.gunName = gunName;
+      this.setTexture(Guns[gunName].bulletTexture);
+    }
   }
 
   public sync(bulletState: BulletState) {
@@ -65,5 +82,13 @@ export class Bullet extends Phaser.Physics.Arcade.Sprite {
     this.setRotation(bulletState.rotation);
     this.setActive(bulletState.active);
     this.setVisible(bulletState.visible);
+    this.setGunName(bulletState.gunName);
+  }
+
+  private getVelocityFromRotation(rotation: number) {
+    const gun = Guns[this.gunName];
+    const velocityX = gun.bulletSpeed * Math.cos(rotation);
+    const velocityY = gun.bulletSpeed * Math.sin(rotation);
+    return [velocityX, velocityY];
   }
 }

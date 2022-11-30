@@ -1,6 +1,8 @@
 import CursorKeys = Phaser.Types.Input.Keyboard.CursorKeys;
 import { Player } from "../objects/player";
-import DirectionVector from "../../../common/controls/direction";
+import MovementDirection from "../../../common/controls/direction";
+import { UnitVector } from "../../../common/types/direction";
+import { numToGunName } from "../../../common/guns";
 
 let lasShot = 0;
 const diagonalFactor = Math.sqrt(2) / 2;
@@ -23,6 +25,14 @@ export class PlayerControls {
       "W,A,S,D"
     ) as LetterKeys;
     this.player = player;
+
+    player.scene.input.keyboard.on("keydown", (event: any) => {
+      if (event.keyCode >= 49 && event.keyCode <= 57) {
+        const num = event.keyCode - 49;
+        const name = numToGunName(num);
+        this.player.setGun(name);
+      }
+    });
   }
 
   public down(): boolean {
@@ -41,21 +51,24 @@ export class PlayerControls {
     return this.cursorKeys.right.isDown || this.letterKeys.D.isDown;
   }
 
-  private getDirection(): DirectionVector {
+  private getKeysDirection(): UnitVector {
+    if (!document.hasFocus()) return [0, 0];
+
     let horizontal = +this.right() - +this.left();
     let vertical = +this.down() - +this.up();
     if (horizontal && vertical) {
       horizontal *= diagonalFactor;
       vertical *= diagonalFactor;
     }
-    return new DirectionVector(horizontal, vertical);
+    return [horizontal, vertical];
   }
 
   update() {
-    this.player.move(this.getDirection());
+    this.player.moveTo(this.getKeysDirection());
+    const reloadTime = this.player.getShootReloadTime();
 
     if (this.cursorKeys.space.isDown) {
-      if (Date.now() - lasShot > 100) {
+      if (Date.now() - lasShot > reloadTime) {
         lasShot = Date.now();
         this.player.shoot();
       }
@@ -64,7 +77,7 @@ export class PlayerControls {
     // if mouse click
     if (this.player.scene.input.activePointer.isDown) {
       const now = Date.now();
-      if (now - lasShot > 100) {
+      if (now - lasShot > reloadTime) {
         lasShot = now;
         this.player.shoot(true);
       }

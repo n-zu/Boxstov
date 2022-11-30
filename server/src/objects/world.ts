@@ -5,7 +5,7 @@ import { Enemy } from "./enemy.js";
 import { Bullet } from "./bullet.js";
 import { Difficulty, EnemyGroup } from "../groups/enemyGroup.js";
 import { WorldState } from "../../../common/types/state.js";
-import { EnemyUpdate, PlayerUpdate } from "../../../common/types/messages.js";
+import { PlayerUpdate } from "../../../common/types/messages.js";
 import { ENEMY_GROUP_MAX } from "../../../common/constants.js";
 
 const INACTIVE_THRESHOLD = 60000; // if 60 seconds pass, the player is considered inactive
@@ -17,6 +17,7 @@ export class World {
   gameMaster: GameMaster;
   scene: Phaser.Scene;
   kills = 0;
+  killsPerPlayer: Record<string, number> = {};
   rage = 0.0;
   onEnd: () => void;
 
@@ -29,12 +30,7 @@ export class World {
   }
 
   public create() {
-    const spawnPoints = [
-      { x: 100, y: 100 },
-      { x: 100, y: 900 },
-      { x: 1800, y: 100 },
-      { x: 1800, y: 900 },
-    ];
+    const spawnPoints = this.getSpawnPoints();
 
     this.enemies = new EnemyGroup(
       this.scene,
@@ -73,13 +69,9 @@ export class World {
       bullets: this.bulletGroup.getState(),
       rage: this.rage,
       kills: this.kills,
-      enemies: this.enemies!.getState(),
+      killsPerPlayer: this.killsPerPlayer,
+      enemies: this.enemies!.getState()
     };
-  }
-
-  private getPlayer(id: string): Player | undefined {
-    let player = this.players.find((p) => p.id === id);
-    return player;
   }
 
   // Returns false if that id is already taken
@@ -87,8 +79,8 @@ export class World {
     if (this.players.some((p) => p.id === id)) return false;
     const player = new Player(
       this.scene,
-      800,
-      500,
+      0,
+      0,
       id,
       this.gameMaster,
       this.bulletGroup
@@ -97,10 +89,27 @@ export class World {
     return true;
   }
 
+  private getSpawnPoints(): { x: number; y: number }[] {
+    const center = { x: 0, y: 0 };
+    const radius = 1000;
+    const spawnPoints = [];
+    for (let i = 0; i < 30; i++) {
+      const angle = Math.random() * 2 * Math.PI;
+      const x = center.x + radius * Math.cos(angle);
+      const y = center.y + radius * Math.sin(angle);
+      spawnPoints.push({ x, y });
+    }
+    return spawnPoints;
+  }
+
+  private getPlayer(id: string): Player | undefined {
+    return this.players.find((p) => p.id === id);
+  }
+
   private setupGameMaster(gameMaster: GameMaster) {
     gameMaster.addAction("player", (data: PlayerUpdate) => {
       const player = this.getPlayer(data.id);
-      player?.handleMessage(data.payload);
+      player?.handleMessage(data);
     });
 
     /*gameMaster.addAction("enemy", (data: EnemyUpdate) => {
@@ -110,6 +119,8 @@ export class World {
 
   private onEnemyKilled(enemy: Enemy) {
     this.kills++;
+    this.killsPerPlayer[enemy.damagerId] =
+      (this.killsPerPlayer[enemy.damagerId] || 0) + 1;
     this.rage = Math.ceil(this.rage) + 1;
   }
 }

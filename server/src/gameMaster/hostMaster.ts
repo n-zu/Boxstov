@@ -4,7 +4,7 @@ import geckos, {
   ServerChannel,
 } from "@geckos.io/server";
 import http from "http";
-import { Message } from "../../../common/types/messages.js";
+import { ClientMessage, Message } from "../../../common/types/messages.js";
 import {
   ClientPacket,
   ClientPacketType,
@@ -27,7 +27,7 @@ export class HostMaster {
   callbacks: Callback[] = [];
   io: GeckosServer;
   lobbyChannels: ServerChannel[] = [];
-  gameHandlers: { [key: string]: (msg: Message) => void } = {};
+  gameHandlers: { [key: string]: (msg: ClientMessage) => void } = {};
 
   constructor(server: http.Server) {
     this.io = geckos({
@@ -56,7 +56,7 @@ export class HostMaster {
     });
   }
 
-  public setGameHandler(gameId: string, handler: (msg: Message) => void) {
+  public setGameHandler(gameId: string, handler: (msg: ClientMessage) => void) {
     this.gameHandlers[gameId] = handler;
   }
 

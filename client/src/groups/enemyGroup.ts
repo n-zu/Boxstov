@@ -20,9 +20,4 @@ export class EnemyGroup extends Phaser.Physics.Arcade.Group {
       enemy.sync(enemyState);
     });
   }
-
-  public handleMessage(message: EnemyUpdate) {
-    const enemy = this.children.entries[message.id] as Enemy;
-    enemy.handleMessage(message);
-  }
 }

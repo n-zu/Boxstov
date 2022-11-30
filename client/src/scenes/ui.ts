@@ -1,5 +1,7 @@
 import Phaser from "phaser";
+import { GAME_HEIGHT, GAME_WIDTH } from "../../../common/constants";
 import { GameMaster } from "../gameMaster/gameMaster";
+import { Enemy } from "../objects/enemy";
 import { World } from "../objects/world";
 import { loadUIAssets } from "./load";
 
@@ -40,10 +42,79 @@ class Points {
     this.barFill(rage % 1);
   }
 }
+
+class killsPerPlayer {
+  text: Phaser.GameObjects.Text;
+
+  constructor(scene: Phaser.Scene) {
+    this.text = scene.add.text(14, 220, "No Kills", {
+      fontFamily: "system-ui",
+      fontSize: "15px",
+      strokeThickness: 0.08,
+    });
+    this.text.setDepth(9999);
+  }
+
+  update(killsPerPlayer: Record<string, number>) {
+    const text = Object.entries(killsPerPlayer)
+      .sort((a, b) => b[1] - a[1])
+      .map(([player, kills]) => {
+        return `${kills} | ${player}`;
+      })
+      .join("\n");
+
+    this.text.setText(`Leader Board\n${text}`);
+  }
+}
+
+class MiniMap {
+  scene: Phaser.Scene;
+  map: Phaser.GameObjects.Graphics;
+  players: Phaser.GameObjects.Graphics;
+  enemies: Phaser.GameObjects.Graphics;
+
+  constructor(scene: Phaser.Scene) {
+    this.scene = scene;
+    this.map = scene.add.graphics();
+    this.players = scene.add.graphics();
+    this.enemies = scene.add.graphics();
+
+    this.map.setDepth(9999);
+    this.players.setDepth(9999);
+  }
+
+  update(world?: World) {
+    if (!world) return;
+    this.map.clear();
+    this.map.fillStyle(0x000000, 0.5);
+    this.map.fillRect(10, 100, 110, 110);
+
+    this.players.clear();
+    this.players.fillStyle(0xffffff, 1);
+    world.players.forEach((player) => {
+      const px = (player.x * 110) / GAME_WIDTH;
+      const py = (player.y * 110) / GAME_HEIGHT;
+
+      this.players.fillRect(10 + 55 + px, 100 + 55 + py, 2, 2);
+    });
+
+    this.enemies.clear();
+    this.enemies.fillStyle(0xff5555, 1);
+    world.enemies.getChildren().forEach((enemy) => {
+      const e = enemy as Enemy;
+      if (!e.active || e.dead) return;
+      const ex = (e.x * 110) / GAME_WIDTH;
+      const ey = (e.y * 110) / GAME_HEIGHT;
+      this.enemies.fillRect(10 + 55 + ex, 100 + 55 + ey, 2, 2);
+    });
+  }
+}
 export default class UI extends Phaser.Scene {
   gameMaster?: GameMaster;
   world?: World;
   points?: Points;
+  minimap?: MiniMap;
+  killsPerPlater?: killsPerPlayer;
 
   constructor() {
     super({ key: "UI" });
@@ -55,6 +126,9 @@ export default class UI extends Phaser.Scene {
     const game_points = new Points(this);
     this.points = game_points;
     this.world = data.world;
+    this.minimap = new MiniMap(this);
+    this.killsPerPlater = new killsPerPlayer(this);
+
     // TODO: Why doesnt this work?
     /*data.gameMaster.addAction("sync", (state) => {
       console.log("sync", state);
@@ -68,13 +142,14 @@ export default class UI extends Phaser.Scene {
 
   update() {
     this.points?.update(this.world?.kills || 0, this.world?.rage || 0);
+    this.minimap?.update(this.world);
+    this.killsPerPlater?.update(this.world?.killsPerPlayer || {});
   }
 
   private addJoinUrl() {
     const loc = window.location;
-    const url = `${loc.protocol}//${
-      loc.host
-    }/?join=${this.gameMaster?.getGameId()}`;
+    const url = `${loc.protocol}//${loc.host}${loc.pathname}
+      ?join=${this.gameMaster?.getGameId()}`;
 
     const icon = this.add
       .image(0, 0, "invite")
@@ -87,7 +162,7 @@ export default class UI extends Phaser.Scene {
         const { x, y } = icon.getCenter();
         const txt = this.add
           .text(x, y, "Copied!", {
-            color: "white",
+            color: "#55ff55",
             fontSize: "18px",
           })
           .setOrigin(0.5);

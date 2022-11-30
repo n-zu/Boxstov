@@ -1,9 +1,10 @@
 import {
   Action,
   ActionFnFor,
-  Message,
+  ClientMessage,
+  ClientMessageType,
+  ServerMessageType,
   UpdateFor,
-  UpdateType,
 } from "../../../common/types/messages";
 import { GameMaster } from "./gameMaster";
 import { GuestMaster } from "./guestMaster";
@@ -23,11 +24,14 @@ export class SessionMaster implements GameMaster {
     });
   }
 
-  public addAction<T extends UpdateType>(type: T, action: ActionFnFor<T>) {
+  public addAction<T extends ServerMessageType>(
+    type: T,
+    action: ActionFnFor<T>
+  ) {
     this.actions.push({ type, action });
   }
 
-  public send<T extends UpdateType>(type: T, payload: UpdateFor<T>) {
+  public send<T extends ClientMessageType>(type: T, payload: UpdateFor<T>) {
     const msg = {
       type,
       payload,
@@ -36,7 +40,7 @@ export class SessionMaster implements GameMaster {
     this.send_async(msg);
   }
 
-  private async send_async(msg: Message) {
+  private async send_async(msg: ClientMessage) {
     this.guestMaster.send("gameInfo", {
       gameId: this.guestMaster.gameId,
       payload: msg,

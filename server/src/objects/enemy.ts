@@ -2,21 +2,24 @@ import "@geckos.io/phaser-on-nodejs";
 import Phaser from "phaser";
 import { Player } from "./player";
 import { GameMaster } from "../gameMaster/gameMaster.js";
-import { Direction } from "../../../common/types/direction.js";
 import { EnemyState } from "../../../common/types/state.js";
-import { EnemyUpdate } from "../../../common/types/messages";
-const SPEED = 50;
+import MovementDirection from "../../../common/controls/direction.js";
+
+const BASE_SPEED = 80;
 const HEALTH = 100;
 
 export class Enemy extends Phaser.Physics.Arcade.Sprite {
   id: number;
   health = HEALTH;
   strength = 3;
-  facing: Direction = Direction.Down;
+  movementDirection: MovementDirection = new MovementDirection();
   gameMaster: GameMaster;
   cooldown = Math.random() * 100;
   cooldownCount = this.cooldown;
   action = "walk";
+  dead: boolean = true;
+  damagerId = "";
+  speed: number;
   onDeath: (enemy: Enemy) => void;
 
   constructor(
@@ -35,6 +38,7 @@ export class Enemy extends Phaser.Physics.Arcade.Sprite {
 
     this.visible = false;
     this.active = false;
+    this.speed = BASE_SPEED + Math.random() * 20;
 
     this.gameMaster = gameMaster;
     this.id = id;
@@ -60,36 +64,14 @@ export class Enemy extends Phaser.Physics.Arcade.Sprite {
 
     this.cooldownCount = this.cooldown;
     const closestPlayer = this.getClosestPlayer(players);
-    const angle = Phaser.Math.Angle.Between(
-      this.x,
-      this.y,
-      closestPlayer.x,
-      closestPlayer.y
-    );
-    const distance = Phaser.Math.Distance.Between(
-      this.x,
-      this.y,
-      closestPlayer.x,
-      closestPlayer.y
-    );
+    const dx = closestPlayer.x - this.x;
+    const dy = closestPlayer.y - this.y;
+
+    const distance = Math.sqrt(dx * dx + dy * dy);
     const isFar = distance > 150 ? 1 : 0;
-    let xUnit = Math.cos(angle);
-    let yUnit = Math.sin(angle);
 
-    xUnit = Math.abs(xUnit) < 0.3 ? 0 : xUnit;
-    yUnit = Math.abs(yUnit) < 0.3 ? 0 : yUnit;
-
-    const velocityX = xUnit * SPEED;
-    const velocityY = yUnit * SPEED;
-
-    this.setVelocityX(velocityX * isFar);
-    this.setVelocityY(velocityY * isFar);
-
-    const direction = this.getMovementDirection(velocityX, velocityY);
-
-    if (direction) {
-      this.facing = direction;
-    }
+    this.movementDirection.update([dx / distance, dy / distance]);
+    this.setVelocity(...this.movementDirection.getSpeed(this.speed * isFar));
 
     this.action = isFar ? "walk" : "atk";
     if (!isFar) {
@@ -103,20 +85,24 @@ export class Enemy extends Phaser.Physics.Arcade.Sprite {
     return {
       position: {
         x: this.x,
-        y: this.y,
+        y: this.y
       },
+      dead: this.dead,
       health: this.health,
       active: this.active,
       visible: this.visible,
       bodyEnabled: this.body.enable,
       action: this.action,
+      movementDirection: this.movementDirection.encode(),
+      speed: this.speed
     };
   }
 
-  public receiveDamage(damage: number) {
+  public receiveDamage(damage: number, damagerId: string) {
     if (this.health <= 0) return;
 
     this.health -= damage;
+    this.damagerId = damagerId;
   }
 
   public spawn(x: number, y: number) {
@@ -125,6 +111,12 @@ export class Enemy extends Phaser.Physics.Arcade.Sprite {
     this.setActive(true);
     this.setVisible(true);
     this.body.enable = true;
+    this.dead = false;
+  }
+
+  // Rounds the angle to one of 8 directions
+  private roundAngle(angle: number) {
+    return (Math.round((angle * 4) / Math.PI) * Math.PI) / 4;
   }
 
   /*public handleMessage(payload: EnemyUpdate) {
@@ -132,37 +124,6 @@ export class Enemy extends Phaser.Physics.Arcade.Sprite {
       this.die();
     }
   }*/
-
-  private getMovementDirection(
-    xMovement: number,
-    yMovement: number
-  ): Direction {
-    if (xMovement > 0 && yMovement > 0) {
-      return Direction.DownRight;
-    }
-    if (xMovement > 0 && yMovement < 0) {
-      return Direction.UpRight;
-    }
-    if (xMovement < 0 && yMovement > 0) {
-      return Direction.DownLeft;
-    }
-    if (xMovement < 0 && yMovement < 0) {
-      return Direction.UpLeft;
-    }
-    if (xMovement > 0) {
-      return Direction.Right;
-    }
-    if (xMovement < 0) {
-      return Direction.Left;
-    }
-    if (yMovement > 0) {
-      return Direction.Down;
-    }
-    if (yMovement < 0) {
-      return Direction.Up;
-    }
-    return Direction.Down;
-  }
 
   private getClosestPlayer(players: Player[]): Player {
     let closestPlayer: Player = players[0];
@@ -188,11 +149,9 @@ export class Enemy extends Phaser.Physics.Arcade.Sprite {
   private die() {
     this.health = 0;
     this.setVelocity(0, 0);
+    this.movementDirection.update([0, 0]);
     this.body.enable = false;
-    this.gameMaster.broadcast("enemy", {
-      id: this.id,
-      type: "die",
-    });
+    this.dead = true;
     this.onDeath(this);
 
     this.setRotation(Math.random() * 0.4 - 0.2);

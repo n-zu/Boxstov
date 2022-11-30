@@ -33,6 +33,9 @@ export default class Menu extends Phaser.Scene {
     this.guestMaster = guestMaster;
     this.addCallbacks();
 
+    const returnKey = this.input.keyboard.addKey(
+      Phaser.Input.Keyboard.KeyCodes.ENTER
+    );
     const params = new URLSearchParams(window.location.search);
     const joinId = params.get("join");
 
@@ -49,8 +52,10 @@ export default class Menu extends Phaser.Scene {
     if (joinId) {
       this.addJoinIdText(joinId, 50);
       this.addPlayButton("Join Game", () => this.joinGame(joinId), 150);
+      returnKey.on("down", () => this.joinGame(joinId));
     } else {
       this.addPlayButton("New Game", () => this.newGame(), 150);
+      returnKey.on("down", () => this.newGame());
     }
     this.addErrorText(300);
 
@@ -132,7 +137,7 @@ export default class Menu extends Phaser.Scene {
 
   private addCallbacks() {
     let done = false;
-    this.guestMaster?.addCallback("gameInfo", () => {
+    this.guestMaster?.addCallback("gameSync", () => {
       if (done) return false; // make sure we only do this once
 
       done = true;
@@ -203,12 +208,3 @@ export default class Menu extends Phaser.Scene {
     return true;
   }
 }
-
-/*
-  const returnKey = this.input.keyboard.addKey(
-    Phaser.Input.Keyboard.KeyCodes.ENTER
-  );
-  returnKey.on("down", () => {
-    console.log("Enter pressed");
-  });
-*/

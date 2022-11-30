@@ -1,4 +1,5 @@
-import DirectionVector from "../../../common/controls/direction";
+import MovementDirection from "../../../common/controls/direction";
+import { GunName } from "../../../common/guns";
 import { BulletGroupState } from "../../../common/types/state";
 import { Bullet } from "../objects/bullet";
 
@@ -15,21 +16,22 @@ export class BulletGroup extends Phaser.GameObjects.Group {
     });
   }
 
-  public shootBullet(x: number, y: number, direction: DirectionVector) {
+  public shootBullet(
+    x: number,
+    y: number,
+    direction: MovementDirection,
+    gunName: GunName
+  ) {
     const bullet = this.getFirstDead(false) as Bullet;
     if (bullet) {
-      bullet.fire(x, y, direction);
+      bullet.fire(x, y, direction, gunName);
     }
   }
 
   public sync(bulletGroupState: BulletGroupState) {
     bulletGroupState.forEach((bulletState, i) => {
       const bullet = this.children.entries[i] as Bullet;
-      bullet.setDepth(bulletState.y);
-      bullet.setPosition(bulletState.x, bulletState.y);
-      bullet.setRotation(bulletState.rotation);
-      bullet.setActive(bulletState.active);
-      bullet.setVisible(bulletState.visible);
+      bullet.sync(bulletState);
     });
   }
 }

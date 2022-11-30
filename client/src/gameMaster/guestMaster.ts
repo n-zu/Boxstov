@@ -1,11 +1,11 @@
 import geckos, { ClientChannel } from "@geckos.io/client";
-import { Action, Message } from "../../../common/types/messages";
+import { Action, ServerMessage } from "../../../common/types/messages";
 import {
   ClientPacket,
   ClientPacketType,
   PayloadFor,
   ServerPacket,
-  ServerPacketType,
+  ServerPacketType
 } from "../../../common/types/packet";
 
 const SERVER_PORT = 9208;
@@ -25,12 +25,12 @@ export class GuestMaster {
   actions: Action[] = [];
   channel: ClientChannel;
   gameId: string = "";
-  gameHandler?: (msg: Message) => void;
+  gameHandler?: (msg: ServerMessage) => void;
 
   constructor() {
     this.channel = geckos({
       url: process.env.SERVER_URL,
-      port: SERVER_PORT,
+      port: SERVER_PORT
     });
     this.addHandlerCallback();
 
@@ -48,15 +48,8 @@ export class GuestMaster {
     });
   }
 
-  public setGameHandler(handler: (msg: Message) => void) {
+  public setGameHandler(handler: (msg: ServerMessage) => void) {
     this.gameHandler = handler;
-  }
-
-  private addHandlerCallback() {
-    this.addCallback("gameInfo", (payload) => {
-      this.gameHandler?.(payload.payload);
-      return true;
-    });
   }
 
   public addCallback<T extends ServerPacketType>(
@@ -69,14 +62,21 @@ export class GuestMaster {
   public send<T extends ClientPacketType>(
     type: T,
     payload: PayloadFor<T>,
-    reliable: boolean = true
+    reliable: boolean = false
   ) {
     const msg = {
       type,
-      payload,
+      payload
     };
 
     this.send_async(msg, reliable);
+  }
+
+  private addHandlerCallback() {
+    this.addCallback("gameSync", (payload) => {
+      this.gameHandler?.(payload.payload);
+      return true;
+    });
   }
 
   private async send_async(msg: ClientPacket, reliable: boolean = true) {
