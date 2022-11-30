@@ -8,6 +8,7 @@ import UI from "./ui";
 import { GAME_HEIGHT, GAME_WIDTH } from "../../../common/constants";
 import { GunName } from "../../../common/guns";
 import GameObserver from "../../../common/observer/gameObserver.js";
+import GameUI from "../controls/gameUi";
 import Sprite = Phaser.GameObjects.Sprite;
 
 
@@ -31,6 +32,7 @@ export default class MainScene extends Phaser.Scene {
   gameMaster?: GameMaster;
   world?: World;
   observer: GameObserver;
+  gameUi?: GameUI;
 
   protected constructor() {
     super({ key: "MainScene" });
@@ -39,6 +41,7 @@ export default class MainScene extends Phaser.Scene {
 
   create(data: { gameMaster: GameMaster; username: string }) {
     this.gameMaster = data.gameMaster;
+    this.gameUi = new GameUI(this, this.observer);
     this.world = new World(this, this.observer, data.gameMaster, data.username);
 
     this.add.tileSprite(0, 0, GAME_WIDTH, GAME_HEIGHT, "tiles").setDepth(-9999);

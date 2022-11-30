@@ -1,6 +1,3 @@
-import { Player } from "../objects/player";
-import Observer from "../../../common/observer/observer.js";
-
 const Y_OFFSET_BAR = 60;
 const Y_OFFSET_TEXT = 40;
 const BAR_HEIGHT = 12;
@@ -15,9 +12,9 @@ const NAMETAG_STYLE = {
 class HealthBar {
   bar: Phaser.GameObjects.Graphics;
   name: Phaser.GameObjects.Text;
-  observer: Observer;
+  username: string;
 
-  constructor(scene: Phaser.Scene, observer: Observer, username: string) {
+  constructor(scene: Phaser.Scene, username: string) {
     this.bar = new Phaser.GameObjects.Graphics(scene);
     this.bar.setDepth(9999);
     this.name = new Phaser.GameObjects.Text(
@@ -30,8 +27,7 @@ class HealthBar {
 
     scene.add.existing(this.bar);
     scene.add.existing(this.name);
-    this.observer = observer;
-    this.subscribeToEvents();
+    this.username = username;
   }
 
   draw(xPos: number, yPos: number, height: number, health: number, maxHealth: number) {
@@ -64,51 +60,20 @@ class HealthBar {
     this.name.setPosition(x, y + Y_OFFSET_TEXT);
     this.name.setDepth(TAG_DEPTH_BASE + y);
   }
-
-  private subscribeToEvents() {
-    this.observer.subscribe("playerUpdate", (player: Player) => {
-      if (player.local) {
-        this.draw(player.x, player.y, player.height, player.health, player.maxHealth);
-      }
-    });
-  }
 }
-
-const motivationalMessages = [
-  "GIT GUD",
-  "You've been killed to death",
-  "💀💀💀"
-];
 
 export class PlayerUI {
   scene: Phaser.Scene;
-  observer: Observer;
   healthBar: HealthBar;
-  over = false;
+  username: string;
 
-  constructor(scene: Phaser.Scene, playerId: string, observer: Observer) {
+  constructor(scene: Phaser.Scene, playerId: string) {
     this.scene = scene;
-    this.observer = observer;
-    this.healthBar = new HealthBar(scene, observer, playerId);
-
-    this.subscribeToEvents();
+    this.healthBar = new HealthBar(scene, playerId);
+    this.username = playerId;
   }
 
-  subscribeToEvents() {
-    this.observer.subscribe("playerUpdate", (player: Player) => {
-      this.update(player.x, player.y, player.health);
-    });
-  }
-
-  public update(x: number, y: number, health: number) {
-    if (health <= 0 && !this.over) {
-      this.over = true;
-      alert(
-        motivationalMessages[
-          Math.floor(Math.random() * motivationalMessages.length)
-          ]
-      );
-      window.location.reload();
-    }
+  public update(x: number, y: number, height: number, health: number, maxHealth: number) {
+    this.healthBar.draw(x, y, height, health, maxHealth);
   }
 }
