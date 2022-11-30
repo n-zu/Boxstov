@@ -1,6 +1,8 @@
 import { World } from "../objects/world.js";
 import { GameMaster } from "../gameMaster/gameMaster.js";
 import { MS_BETWEEN_SYNCS } from "../../../common/constants.js";
+import GameObserver from "../../../common/observer/gameObserver.js";
+import Observer from "../../../common/observer/observer.js";
 
 type MainSceneData = {
   gameMaster: GameMaster;
@@ -11,15 +13,17 @@ export default class MainScene extends Phaser.Scene {
   world!: World;
   gameMaster?: GameMaster;
   onEnd?: () => void;
+  observer: Observer;
   lastSyncTimestamp = 0;
 
   protected constructor() {
     super({ key: "MainScene" });
+    this.observer = new GameObserver();
   }
 
   create({ gameMaster, onEnd }: MainSceneData) {
     this.gameMaster = gameMaster;
-    this.world = new World(this, gameMaster, onEnd);
+    this.world = new World(this, this.observer, gameMaster, onEnd);
     this.world.create();
   }
 

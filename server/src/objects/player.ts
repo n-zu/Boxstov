@@ -1,42 +1,43 @@
 import "@geckos.io/phaser-on-nodejs";
 import Phaser from "phaser";
 import { GameMaster } from "../gameMaster/gameMaster.js";
-import { BulletGroup } from "../groups/bulletGroup";
-import { Direction } from "../../../common/types/direction.js";
 import MovementDirection from "../../../common/controls/direction.js";
 import { PlayerRecentEvent, PlayerState } from "../../../common/types/state.js";
 import { PlayerUpdate } from "../../../common/types/messages.js";
-import { GAME_HEIGHT, GAME_WIDTH, PLAYER_SPEED } from "../../../common/constants.js";
+import { GAME_HEIGHT, GAME_WIDTH, KILLS_TO_UNLOCK, PLAYER_SPEED } from "../../../common/constants.js";
 import { GunName, Guns } from "../../../common/guns.js";
+import Observer from "../../../common/observer/observer.js";
 
 
 export class Player extends Phaser.Physics.Arcade.Sprite {
   scene: Phaser.Scene;
   gameMaster: GameMaster;
-  bulletGroup: BulletGroup;
+  observer: Observer;
   id: string;
   movementDirection: MovementDirection = new MovementDirection();
   maxHealth = 100;
   health = 100;
+  kills = 0;
   lastUpdate = Date.now();
   gunName = GunName.Rifle;
   recentEvents: PlayerRecentEvent[] = [];
 
   constructor(
     scene: Phaser.Scene,
-    x: number,
-    y: number,
+    observer: Observer,
     id: string,
     gameMaster: GameMaster,
-    bulletGroup: BulletGroup
+    x: number = 0,
+    y: number = 0
   ) {
     super(scene, x, y, "");
     scene.physics.add.existing(this);
 
+    this.observer = observer;
     this.id = id;
     this.scene = scene;
     this.gameMaster = gameMaster;
-    this.bulletGroup = bulletGroup;
+    this.subscribeToEvents();
   }
 
   public shoot(playerId: string, gunName: GunName = this.gunName) {
@@ -44,19 +45,20 @@ export class Player extends Phaser.Physics.Arcade.Sprite {
     const rotation = gun.getGunRotation(this.movementDirection);
     const [xGun, yGun] = gun.getGunOffset(this.movementDirection);
 
-    this.bulletGroup.shootBullet(
-      this.x + xGun,
-      this.y + yGun,
+    this.observer.notify("shootBullet", {
+      x: this.x + xGun,
+      y: this.y + yGun,
       rotation,
-      playerId,
-      gunName
-    );
+      gunName,
+      playerId
+    });
     this.recentEvents.push("shoot");
   }
 
   public switchGun(gunName: GunName) {
-    // TODO: check if the gun is available
-    this.gunName = gunName;
+    if (this.kills >= KILLS_TO_UNLOCK[gunName]) {
+      this.gunName = gunName;
+    }
   }
 
   public move(direction: MovementDirection) {
@@ -82,10 +84,6 @@ export class Player extends Phaser.Physics.Arcade.Sprite {
     return state;
   }
 
-  public stopMovement() {
-    this.setVelocity(0, 0);
-  }
-
   public handleMessage(message: PlayerUpdate) {
     this.lastUpdate = Date.now();
     switch (message.type) {
@@ -107,6 +105,20 @@ export class Player extends Phaser.Physics.Arcade.Sprite {
     if (this.health <= 0) this.health = 0;
   }
 
+  private subscribeToEvents() {
+    this.observer.subscribe("enemyKilled", (killerId: string) => {
+      if (this.id === killerId) {
+        this.kills++;
+        this.recentEvents.push("kill");
+        for (const gunName of Object.keys(Guns)) {
+          if (this.kills === KILLS_TO_UNLOCK[gunName as GunName]) {
+            this.recentEvents.push("unlocked_gun");
+          }
+        }
+      }
+    });
+  }
+
   private clearEvents() {
     this.recentEvents = [];
   }
@@ -118,52 +130,5 @@ export class Player extends Phaser.Physics.Arcade.Sprite {
     if (this.x < -w) this.x = -w;
     if (this.y > h) this.y = h;
     if (this.y < -h) this.y = -h;
-  }
-
-  private getGunPosition(): { x: number; y: number } {
-    // We should change this logic so that the bullet receives the position and angle
-    // of shooting, so that the bullet travels parallel to the player's gun
-    switch (this.movementDirection.getFacingDirection()) {
-      case Direction.Up:
-        return {
-          x: this.x + 15,
-          y: this.y - 120
-        };
-      case Direction.Down:
-        return {
-          x: this.x - 16,
-          y: this.y
-        };
-      case Direction.Left:
-        return {
-          x: this.x - 95,
-          y: this.y - 75
-        };
-      case Direction.Right:
-        return {
-          x: this.x + 95,
-          y: this.y - 65
-        };
-      case Direction.UpLeft:
-        return {
-          x: this.x - 75,
-          y: this.y - 120
-        };
-      case Direction.UpRight:
-        return {
-          x: this.x + 95,
-          y: this.y - 120
-        };
-      case Direction.DownLeft:
-        return {
-          x: this.x - 35,
-          y: this.y - 40
-        };
-      case Direction.DownRight:
-        return {
-          x: this.x + 45,
-          y: this.y - 10
-        };
-    }
   }
 }

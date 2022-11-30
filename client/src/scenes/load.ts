@@ -34,6 +34,8 @@ export function loadGameAssets(scene: Phaser.Scene) {
   scene.load.audio("rifle", "assets/audio/rifle.mp3");
   scene.load.audio("rpg", "assets/audio/rpg.mp3");
   scene.load.audio("player_receive_damage", "assets/audio/player_receive_damage.mp3");
+  scene.load.audio("unlocked_gun", "assets/audio/unlocked_gun.mp3");
+  scene.load.audio("switch_gun", "assets/audio/switch_gun.mp3");
 }
 
 export function loadMenuAssets(scene: Phaser.Scene) {

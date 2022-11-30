@@ -32,7 +32,7 @@ export class Bullet extends Sprite {
       callback: () => {
         this.setActive(false);
         this.setVisible(false);
-      },
+      }
     });
   }
 

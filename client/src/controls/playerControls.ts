@@ -1,10 +1,9 @@
 import CursorKeys = Phaser.Types.Input.Keyboard.CursorKeys;
-import { Player } from "../objects/player";
-import MovementDirection from "../../../common/controls/direction";
+import InputPlugin = Phaser.Input.InputPlugin;
 import { UnitVector } from "../../../common/types/direction";
 import { numToGunName } from "../../../common/guns";
+import Observer from "../../../common/observer/observer.js";
 
-let lasShot = 0;
 const diagonalFactor = Math.sqrt(2) / 2;
 
 interface LetterKeys {
@@ -17,20 +16,22 @@ interface LetterKeys {
 export class PlayerControls {
   cursorKeys: CursorKeys;
   letterKeys: LetterKeys;
-  player: Player;
+  observer: Observer;
+  input: InputPlugin;
 
-  constructor(player: Player) {
-    this.cursorKeys = player.scene.input.keyboard.createCursorKeys();
-    this.letterKeys = player.scene.input.keyboard.addKeys(
+  constructor(scene: Phaser.Scene, observer: Observer) {
+    this.cursorKeys = scene.input.keyboard.createCursorKeys();
+    this.letterKeys = scene.input.keyboard.addKeys(
       "W,A,S,D"
     ) as LetterKeys;
-    this.player = player;
+    this.observer = observer;
+    this.input = scene.input;
 
-    player.scene.input.keyboard.on("keydown", (event: any) => {
+    scene.input.keyboard.on("keydown", (event: any) => {
       if (event.keyCode >= 49 && event.keyCode <= 57) {
         const num = event.keyCode - 49;
         const name = numToGunName(num);
-        this.player.setGun(name);
+        this.observer.notify("changeGun", name);
       }
     });
   }
@@ -51,6 +52,19 @@ export class PlayerControls {
     return this.cursorKeys.right.isDown || this.letterKeys.D.isDown;
   }
 
+  update() {
+    const direction = this.getKeysDirection();
+    this.observer.notify("playerMove", direction);
+
+    if (this.wantsToShoot()) {
+      this.observer.notify("playerShoot");
+    }
+  }
+
+  private wantsToShoot(): boolean {
+    return this.cursorKeys.space.isDown || this.input.activePointer.isDown;
+  }
+
   private getKeysDirection(): UnitVector {
     if (!document.hasFocus()) return [0, 0];
 
@@ -61,26 +75,5 @@ export class PlayerControls {
       vertical *= diagonalFactor;
     }
     return [horizontal, vertical];
-  }
-
-  update() {
-    this.player.moveTo(this.getKeysDirection());
-    const reloadTime = this.player.getShootReloadTime();
-
-    if (this.cursorKeys.space.isDown) {
-      if (Date.now() - lasShot > reloadTime) {
-        lasShot = Date.now();
-        this.player.shoot();
-      }
-    }
-
-    // if mouse click
-    if (this.player.scene.input.activePointer.isDown) {
-      const now = Date.now();
-      if (now - lasShot > reloadTime) {
-        lasShot = now;
-        this.player.shoot(true);
-      }
-    }
   }
 }

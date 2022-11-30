@@ -1,31 +1,23 @@
 import { Bullet } from "../objects/bullet.js";
 import { BulletGroupState } from "../../../common/types/state.js";
-import { GunName } from "../../../common/guns.js";
+import Observer from "../../../common/observer/observer.js";
+
+const MAX_BULLETS = 30;
 
 export class BulletGroup extends Phaser.Physics.Arcade.Group {
-  constructor(scene: Phaser.Scene) {
+  observer: Observer;
+
+  constructor(scene: Phaser.Scene, observer: Observer) {
     super(scene.physics.world, scene);
 
-    this.createMultiple({
-      frameQuantity: 30,
-      key: "bullet",
-      active: false,
-      visible: false,
-      classType: Bullet
-    });
-  }
+    this.observer = observer;
 
-  public shootBullet(
-    x: number,
-    y: number,
-    rotation: number,
-    playerId: string,
-    gunName: GunName
-  ) {
-    const bullet = this.getFirstDead(false) as Bullet;
-    if (bullet) {
-      bullet.fire(x, y, rotation, playerId, gunName);
+    const bullets: Bullet[] = [];
+    for (let i = 0; i < MAX_BULLETS; i++) {
+      bullets.push(new Bullet(scene, observer));
     }
+    this.addMultiple(bullets);
+    this.subscribeToEvents();
   }
 
   public getState(): BulletGroupState {
@@ -42,6 +34,15 @@ export class BulletGroup extends Phaser.Physics.Arcade.Group {
       bullet.setRotation(bulletState.rotation);
       bullet.setActive(bulletState.active);
       bullet.setVisible(bulletState.visible);
+    });
+  }
+
+  private subscribeToEvents() {
+    this.observer.subscribe("shootBullet", (args) => {
+      const bullet = this.getFirstDead(false) as Bullet;
+      if (bullet) {
+        bullet.fire(args.x, args.y, args.rotation, args.playerId, args.gunName);
+      }
     });
   }
 }

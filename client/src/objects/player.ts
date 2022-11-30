@@ -9,6 +9,7 @@ import { AnimationSuffix } from "../types/animation";
 import { PlayerUI } from "../controls/playerUi";
 import { GunName, Guns } from "../../../common/guns";
 import { PLAYER_SPEED } from "../../../common/constants";
+import Observer from "../../../common/observer/observer.js";
 import Sprite = Phaser.Physics.Arcade.Sprite;
 
 const SYNC_DIFF_TOLERANCE = 0.001;
@@ -17,6 +18,8 @@ export class Player extends Sprite {
   scene: Phaser.Scene;
   gameMaster: GameMaster;
   bulletGroup: BulletGroup;
+  observer: Observer;
+
   id: string;
   maxHealth = 100;
   health = 100;
@@ -24,16 +27,18 @@ export class Player extends Sprite {
   ui: PlayerUI;
   local: boolean;
   gunName = GunName.Rifle;
+  lastShootTime = 0;
   soundsAmount = 0;
 
   constructor(
     scene: Phaser.Scene,
-    x: number,
-    y: number,
+    observer: Observer,
     id: string,
     gameMaster: GameMaster,
     bulletGroup: BulletGroup,
-    local: boolean = false
+    local: boolean = false,
+    x: number = 0,
+    y: number = 0
   ) {
     super(scene, x, y, "player");
     this.scene = scene;
@@ -43,31 +48,19 @@ export class Player extends Sprite {
     this.id = id;
     this.gameMaster = gameMaster;
     this.bulletGroup = bulletGroup;
-    this.ui = new PlayerUI(scene, this);
+    this.ui = new PlayerUI(scene, this.id, observer);
     this.local = local;
+    this.observer = observer;
 
     playAnimation(this, this.gunName, Direction.Down, AnimationSuffix.Idle);
-  }
-
-  public getId() {
-    return this.id;
-  }
-
-  public shoot(emitAlert = true) {
-    if (emitAlert) {
-      this.gameMaster.send("player", {
-        id: this.id,
-        type: "shoot",
-        gunName: this.gunName
-      });
-    }
+    this.subscribeToEvents();
   }
 
   public update() {
-    this.ui.update();
+    this.observer.notify("playerUpdate", this);
   }
 
-  public moveTo(direction: UnitVector) {
+  moveTo(direction: UnitVector) {
     const previous = this.movementDirection.getUnitVector();
     this.movementDirection.update(direction);
     if (this.local && previous !== this.movementDirection.getUnitVector())
@@ -76,7 +69,7 @@ export class Player extends Sprite {
     this.move();
   }
 
-  public move() {
+  move() {
     this.setVelocity(...this.movementDirection.getSpeed(PLAYER_SPEED));
     if (!this.movementDirection.isMoving()) {
       this.doStopMovement();
@@ -104,20 +97,54 @@ export class Player extends Sprite {
       );
       this.move();
     }
-    this.gunName = state.gunName;
-  }
-
-  public setGun(gunName: GunName) {
-    this.gameMaster.send("player", {
-      id: this.id,
-      type: "switch_gun",
-      gunName
-    });
+    if (this.gunName !== state.gunName) {
+      this.gunName = state.gunName;
+      this.scene.sound.add("switch_gun", {
+        volume: this.calculateSoundVolume()
+      }).play();
+    }
   }
 
   public getShootReloadTime(): number {
     const gun = Guns[this.gunName];
     return gun.reloadTime;
+  }
+
+  private isReloading(): boolean {
+    return this.lastShootTime + this.getShootReloadTime() > Date.now();
+  }
+
+  private shoot() {
+    if (this.isReloading()) return;
+
+    this.lastShootTime = Date.now();
+    this.gameMaster.send("player", {
+      id: this.id,
+      type: "shoot",
+      gunName: this.gunName
+    });
+  }
+
+  private subscribeToEvents() {
+    if (this.local) {
+      this.observer.subscribe("changeGun", (gunName: GunName) => {
+        this.setGun(gunName);
+      });
+      this.observer.subscribe("playerMove", (direction: UnitVector) => {
+        this.moveTo(direction);
+      });
+      this.observer.subscribe("playerShoot", () => {
+        this.shoot();
+      });
+    }
+  }
+
+  private setGun(gunName: GunName) {
+    this.gameMaster.send("player", {
+      id: this.id,
+      type: "switch_gun",
+      gunName
+    });
   }
 
   private notifyInconsistencies(state: PlayerState) {
@@ -137,6 +164,16 @@ export class Player extends Sprite {
     }
   }
 
+  private handleKillEvent() {
+    // TODO: Kill sound
+  }
+
+  private handleUnlockGunEvent() {
+    this.scene.sound.add("unlocked_gun", {
+      volume: this.calculateSoundVolume()
+    }).play();
+  }
+
   private syncEvents(events: PlayerRecentEvent[]) {
     events.forEach(event => {
       switch (event) {
@@ -145,6 +182,13 @@ export class Player extends Sprite {
           break;
         case "receive_damage":
           this.handleReceiveDamageEvent();
+          break;
+        case "kill":
+          this.handleKillEvent();
+          break;
+        case "unlocked_gun":
+          this.handleUnlockGunEvent();
+          break;
       }
     });
   }
@@ -190,53 +234,5 @@ export class Player extends Sprite {
       type: "move",
       direction: direction.encode()
     });
-  }
-
-  private getGunPosition(): { x: number; y: number } {
-    // We should change this logic so that the bullet receives the position and angle
-    // of shooting, so that the bullet travels parallel to the player's gun
-    switch (this.movementDirection.getFacingDirection()) {
-      case Direction.Up:
-        return {
-          x: this.x + 15,
-          y: this.y - 120
-        };
-      case Direction.Down:
-        return {
-          x: this.x - 16,
-          y: this.y
-        };
-      case Direction.Left:
-        return {
-          x: this.x - 95,
-          y: this.y - 75
-        };
-      case Direction.Right:
-        return {
-          x: this.x + 95,
-          y: this.y - 65
-        };
-      case Direction.UpLeft:
-        return {
-          x: this.x - 75,
-          y: this.y - 120
-        };
-      case Direction.UpRight:
-        return {
-          x: this.x + 95,
-          y: this.y - 120
-        };
-      case Direction.DownLeft:
-        return {
-          x: this.x - 35,
-          y: this.y - 40
-        };
-      case Direction.DownRight:
-      default:
-        return {
-          x: this.x + 45,
-          y: this.y - 10
-        };
-    }
   }
 }

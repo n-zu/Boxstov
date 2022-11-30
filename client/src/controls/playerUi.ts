@@ -1,4 +1,5 @@
 import { Player } from "../objects/player";
+import Observer from "../../../common/observer/observer.js";
 
 const Y_OFFSET_BAR = 60;
 const Y_OFFSET_TEXT = 40;
@@ -8,14 +9,15 @@ const TAG_DEPTH_BASE = 10000;
 
 const NAMETAG_STYLE = {
   align: "center",
-  font: "bold 20px monospace",
+  font: "bold 20px monospace"
 };
 
 class HealthBar {
   bar: Phaser.GameObjects.Graphics;
   name: Phaser.GameObjects.Text;
+  observer: Observer;
 
-  constructor(scene: Phaser.Scene, username: string) {
+  constructor(scene: Phaser.Scene, observer: Observer, username: string) {
     this.bar = new Phaser.GameObjects.Graphics(scene);
     this.bar.setDepth(9999);
     this.name = new Phaser.GameObjects.Text(
@@ -28,18 +30,20 @@ class HealthBar {
 
     scene.add.existing(this.bar);
     scene.add.existing(this.name);
+    this.observer = observer;
+    this.subscribeToEvents();
   }
 
-  draw(player: Player) {
+  draw(xPos: number, yPos: number, height: number, health: number, maxHealth: number) {
     this.bar.clear();
-    const x = player.x;
-    const y = player.y - player.height / 2;
+    const x = xPos;
+    const y = yPos - height / 2;
 
-    const barX = x - player.maxHealth / 2 - BAR_PADDING;
+    const barX = x - maxHealth / 2 - BAR_PADDING;
     const barY = y + Y_OFFSET_BAR;
 
-    const width = player.health;
-    const maxWidth = player.maxHealth;
+    const width = health;
+    const maxWidth = maxHealth;
     const pad = BAR_PADDING;
 
     //  BG
@@ -60,42 +64,51 @@ class HealthBar {
     this.name.setPosition(x, y + Y_OFFSET_TEXT);
     this.name.setDepth(TAG_DEPTH_BASE + y);
   }
+
+  private subscribeToEvents() {
+    this.observer.subscribe("playerUpdate", (player: Player) => {
+      if (player.local) {
+        this.draw(player.x, player.y, player.height, player.health, player.maxHealth);
+      }
+    });
+  }
 }
 
 const motivationalMessages = [
   "GIT GUD",
   "You've been killed to death",
-  "💀💀💀",
+  "💀💀💀"
 ];
 
 export class PlayerUI {
   scene: Phaser.Scene;
-  player: Player;
+  observer: Observer;
   healthBar: HealthBar;
   over = false;
 
-  constructor(scene: Phaser.Scene, player: Player) {
+  constructor(scene: Phaser.Scene, playerId: string, observer: Observer) {
     this.scene = scene;
-    this.player = player;
-    this.healthBar = new HealthBar(scene, player.id);
+    this.observer = observer;
+    this.healthBar = new HealthBar(scene, observer, playerId);
+
+    this.subscribeToEvents();
   }
 
-  public update() {
-    // TODO: player death
-    // - Where should player death & other main player logic go?
-    // - What should happen on death ? -> reloads page rn
-    // - Should the player be responsible for its own death? <- sugerencia de copilot :)
-    const { health, x, y } = this.player;
-    const camera = this.scene.cameras.main;
+  subscribeToEvents() {
+    this.observer.subscribe("playerUpdate", (player: Player) => {
+      this.update(player.x, player.y, player.health);
+    });
+  }
+
+  public update(x: number, y: number, health: number) {
     if (health <= 0 && !this.over) {
       this.over = true;
       alert(
         motivationalMessages[
           Math.floor(Math.random() * motivationalMessages.length)
-        ]
+          ]
       );
       window.location.reload();
     }
-    this.healthBar.draw(this.player);
   }
 }

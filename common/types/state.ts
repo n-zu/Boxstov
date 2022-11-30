@@ -7,10 +7,14 @@ export type WorldState = {
   players: PlayerState[];
   bullets: BulletGroupState;
   enemies: EnemyGroupState;
+  stats: WorldStats;
+};
+
+export type WorldStats = {
   rage: number;
   kills: number;
   killsPerPlayer: Record<string, number>;
-};
+}
 
 // Enemy
 
@@ -54,7 +58,7 @@ export type PlayerState = {
   events: PlayerRecentEvent[];
 };
 
-export type PlayerRecentEvent = "shoot" | "receive_damage";
+export type PlayerRecentEvent = "shoot" | "receive_damage" | "kill" | "unlocked_gun";
 
 
 // Bullet

@@ -2,6 +2,7 @@ import { Enemy } from "../objects/enemy.js";
 import { Player } from "../objects/player.js";
 import { GameMaster } from "../gameMaster/gameMaster.js";
 import { EnemyGroupState, EnemyState, SpawnPoint } from "../../../common/types/state.js";
+import Observer from "../../../common/observer/observer.js";
 
 const TIME_BETWEEN_HORDES = 700;
 
@@ -15,20 +16,22 @@ export class EnemyGroup extends Phaser.Physics.Arcade.Group {
   difficulty: Difficulty;
   timeUntilNextHorde = 0;
   spawnPoints: SpawnPoint[];
+  observer: Observer;
 
   constructor(
     scene: Phaser.Scene,
+    observer: Observer,
     maxEnemies: number,
     difficulty: Difficulty,
     spawnPoints: SpawnPoint[],
     gameMaster: GameMaster,
-    onDeath: (enemy: Enemy) => void
   ) {
     super(scene.physics.world, scene);
+    this.observer = observer;
 
     const enemies: Enemy[] = [];
     for (let i = 0; i < maxEnemies; i++) {
-      enemies.push(new Enemy(scene, 0, 0, gameMaster, i, onDeath));
+      enemies.push(new Enemy(scene, 0, 0, gameMaster, i, observer));
     }
 
     this.addMultiple(enemies);
@@ -60,11 +63,6 @@ export class EnemyGroup extends Phaser.Physics.Arcade.Group {
       spawnPoints: this.spawnPoints
     };
   }
-
-  /*public handleMessage(message: EnemyUpdate) {
-    const enemy = this.children.entries[message.id] as Enemy;
-    enemy.handleMessage(message);
-  }*/
 
   private getEnemiesToSpawn() {
     const deadEnemies = this.getMatching("active", false).length;
