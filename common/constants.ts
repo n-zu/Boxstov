@@ -1,6 +1,6 @@
 import { GunName } from "./guns.js";
 
-export const ENEMY_GROUP_MAX = 50;
+export const ENEMY_GROUP_MAX = 20;
 
 export const GAME_WIDTH = 5000;
 export const GAME_HEIGHT = 5000;

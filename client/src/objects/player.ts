@@ -6,7 +6,6 @@ import MovementDirection from "../../../common/controls/direction";
 import { PlayerRecentEvent, PlayerState } from "../../../common/types/state";
 import { playAnimation } from "../scenes/mainScene";
 import { AnimationSuffix } from "../types/animation";
-import { PlayerUI } from "../controls/playerUi";
 import { GunName, Guns } from "../../../common/guns";
 import { PLAYER_SPEED } from "../../../common/constants";
 import Observer from "../../../common/observer/observer.js";
@@ -24,7 +23,6 @@ export class Player extends Sprite {
   maxHealth = 100;
   health = 100;
   movementDirection: MovementDirection = new MovementDirection();
-  ui: PlayerUI;
   local: boolean;
   gunName = GunName.Rifle;
   lastShootTime = 0;
@@ -36,9 +34,9 @@ export class Player extends Sprite {
     id: string,
     gameMaster: GameMaster,
     bulletGroup: BulletGroup,
-    local: boolean = false,
-    x: number = 0,
-    y: number = 0
+    local = false,
+    x = 0,
+    y = 0
   ) {
     super(scene, x, y, "player");
     this.scene = scene;
@@ -48,9 +46,9 @@ export class Player extends Sprite {
     this.id = id;
     this.gameMaster = gameMaster;
     this.bulletGroup = bulletGroup;
-    this.ui = new PlayerUI(scene, this.id, observer);
     this.local = local;
     this.observer = observer;
+    this.observer.notify("newPlayer", this);
 
     playAnimation(this, this.gunName, Direction.Down, AnimationSuffix.Idle);
     this.subscribeToEvents();
@@ -89,6 +87,10 @@ export class Player extends Sprite {
     this.syncEvents(state.events);
 
     this.health = state.health;
+    if (this.health <= 0) {
+      this.observer.notify("playerDied", this);
+    }
+
     if (this.local) {
       this.notifyInconsistencies(state);
     } else {
