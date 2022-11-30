@@ -39,11 +39,11 @@ export class World {
 
     this.enemies = new EnemyGroup(
       this.scene,
+      this.observer,
       ENEMY_GROUP_MAX,
       Difficulty.Hard,
       spawnPoints,
-      this.gameMaster,
-      this.onEnemyKilled.bind(this)
+      this.gameMaster
     );
 
     this.scene.physics.add.overlap(this.enemies, this.bulletGroup, (e, b) => {
@@ -57,6 +57,8 @@ export class World {
     // Enemies repel each other
     this.scene.physics.add.collider(this.enemies, this.enemies);
     this.setupGameMaster(this.gameMaster);
+
+    this.subscribeToEvents();
   }
 
   public update() {
@@ -94,6 +96,12 @@ export class World {
     return true;
   }
 
+  private subscribeToEvents() {
+    this.observer.subscribe("enemyKilled", killerId =>
+      this.onEnemyKilled(killerId)
+    );
+  }
+
   private getSpawnPoints(): { x: number; y: number }[] {
     const center = { x: 0, y: 0 };
     const radius = 1000;
@@ -122,10 +130,10 @@ export class World {
     });*/
   }
 
-  private onEnemyKilled(enemy: Enemy) {
+  private onEnemyKilled(killerId: string) {
     this.stats.kills++;
-    this.stats.killsPerPlayer[enemy.damagerId] =
-      (this.stats.killsPerPlayer[enemy.damagerId] || 0) + 1;
+    this.stats.killsPerPlayer[killerId] =
+      (this.stats.killsPerPlayer[killerId] || 0) + 1;
     this.stats.rage = Math.ceil(this.stats.rage) + 1;
   }
 }

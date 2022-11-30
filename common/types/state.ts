@@ -58,7 +58,7 @@ export type PlayerState = {
   events: PlayerRecentEvent[];
 };
 
-export type PlayerRecentEvent = "shoot" | "receive_damage";
+export type PlayerRecentEvent = "shoot" | "receive_damage" | "kill" | "unlocked_gun";
 
 
 // Bullet

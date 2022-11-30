@@ -159,6 +159,16 @@ export class Player extends Sprite {
     }
   }
 
+  private handleKillEvent() {
+    // TODO: Kill sound
+  }
+
+  private handleUnlockGunEvent() {
+    this.scene.sound.add("unlocked_gun", {
+      volume: this.calculateSoundVolume()
+    }).play();
+  }
+
   private syncEvents(events: PlayerRecentEvent[]) {
     events.forEach(event => {
       switch (event) {
@@ -167,6 +177,13 @@ export class Player extends Sprite {
           break;
         case "receive_damage":
           this.handleReceiveDamageEvent();
+          break;
+        case "kill":
+          this.handleKillEvent();
+          break;
+        case "unlocked_gun":
+          this.handleUnlockGunEvent();
+          break;
       }
     });
   }

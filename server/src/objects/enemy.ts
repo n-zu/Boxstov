@@ -4,6 +4,8 @@ import { Player } from "./player";
 import { GameMaster } from "../gameMaster/gameMaster.js";
 import { EnemyState } from "../../../common/types/state.js";
 import MovementDirection from "../../../common/controls/direction.js";
+import Observer from "../../../common/observer/observer.js";
+import EnemyBrain from "./enemyBrain.js";
 
 const BASE_SPEED = 80;
 const HEALTH = 100;
@@ -14,13 +16,11 @@ export class Enemy extends Phaser.Physics.Arcade.Sprite {
   strength = 3;
   movementDirection: MovementDirection = new MovementDirection();
   gameMaster: GameMaster;
-  cooldown = Math.random() * 100;
-  cooldownCount = this.cooldown;
+  observer: Observer;
+  brain: EnemyBrain;
   action = "walk";
   dead: boolean = true;
-  damagerId = "";
   speed: number;
-  onDeath: (enemy: Enemy) => void;
 
   constructor(
     scene: Phaser.Scene,
@@ -28,7 +28,7 @@ export class Enemy extends Phaser.Physics.Arcade.Sprite {
     y: number,
     gameMaster: GameMaster,
     id: number,
-    onDeath: (enemy: Enemy) => void
+    observer: Observer
   ) {
     super(scene, x, y, "zombie");
     scene.add.existing(this);
@@ -40,9 +40,10 @@ export class Enemy extends Phaser.Physics.Arcade.Sprite {
     this.active = false;
     this.speed = BASE_SPEED + Math.random() * 20;
 
+    this.brain = new EnemyBrain();
     this.gameMaster = gameMaster;
     this.id = id;
-    this.onDeath = onDeath;
+    this.observer = observer;
   }
 
   public update(players: Player[]) {
@@ -51,18 +52,11 @@ export class Enemy extends Phaser.Physics.Arcade.Sprite {
     // randomness, because the guest will calculate a different path. Maybe
     // we should use a seed
     if (!this.body.enable) return;
-    if (this.health <= 0) {
-      this.die();
-      return;
-    }
 
-    if (this.cooldownCount > 0) {
-      this.cooldownCount--;
-      return;
-    }
+    const canThink = this.brain.think();
+    if (!canThink) return;
     if (players.length === 0) return;
 
-    this.cooldownCount = this.cooldown;
     const closestPlayer = this.getClosestPlayer(players);
     const dx = closestPlayer.x - this.x;
     const dy = closestPlayer.y - this.y;
@@ -102,7 +96,9 @@ export class Enemy extends Phaser.Physics.Arcade.Sprite {
     if (this.health <= 0) return;
 
     this.health -= damage;
-    this.damagerId = damagerId;
+    if (this.health <= 0) {
+      this.beKilledBy(damagerId);
+    }
   }
 
   public spawn(x: number, y: number) {
@@ -140,13 +136,13 @@ export class Enemy extends Phaser.Physics.Arcade.Sprite {
     return closestPlayer;
   }
 
-  private die() {
+  private beKilledBy(killerId: string) {
     this.health = 0;
     this.setVelocity(0, 0);
     this.movementDirection.update([0, 0]);
     this.body.enable = false;
     this.dead = true;
-    this.onDeath(this);
+    this.observer.notify("enemyKilled", killerId);
 
     this.setRotation(Math.random() * 0.4 - 0.2);
 
