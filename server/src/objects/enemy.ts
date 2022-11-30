@@ -119,12 +119,6 @@ export class Enemy extends Phaser.Physics.Arcade.Sprite {
     return (Math.round((angle * 4) / Math.PI) * Math.PI) / 4;
   }
 
-  /*public handleMessage(payload: EnemyUpdate) {
-    if (payload.type === "die") {
-      this.die();
-    }
-  }*/
-
   private getClosestPlayer(players: Player[]): Player {
     let closestPlayer: Player = players[0];
     let distanceToClosestPlayer: number | null = null;

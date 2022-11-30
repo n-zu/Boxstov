@@ -1,19 +1,19 @@
 import "@geckos.io/phaser-on-nodejs";
 import Phaser from "phaser";
 import { GameMaster } from "../gameMaster/gameMaster.js";
-import { BulletGroup } from "../groups/bulletGroup";
 import { Direction } from "../../../common/types/direction.js";
 import MovementDirection from "../../../common/controls/direction.js";
 import { PlayerRecentEvent, PlayerState } from "../../../common/types/state.js";
 import { PlayerUpdate } from "../../../common/types/messages.js";
 import { GAME_HEIGHT, GAME_WIDTH, PLAYER_SPEED } from "../../../common/constants.js";
 import { GunName, Guns } from "../../../common/guns.js";
+import Observer from "../../../common/observer/observer.js";
 
 
 export class Player extends Phaser.Physics.Arcade.Sprite {
   scene: Phaser.Scene;
   gameMaster: GameMaster;
-  bulletGroup: BulletGroup;
+  observer: Observer;
   id: string;
   movementDirection: MovementDirection = new MovementDirection();
   maxHealth = 100;
@@ -24,19 +24,19 @@ export class Player extends Phaser.Physics.Arcade.Sprite {
 
   constructor(
     scene: Phaser.Scene,
-    x: number,
-    y: number,
+    observer: Observer,
     id: string,
     gameMaster: GameMaster,
-    bulletGroup: BulletGroup
+    x: number = 0,
+    y: number = 0
   ) {
     super(scene, x, y, "");
     scene.physics.add.existing(this);
 
+    this.observer = observer;
     this.id = id;
     this.scene = scene;
     this.gameMaster = gameMaster;
-    this.bulletGroup = bulletGroup;
   }
 
   public shoot(playerId: string, gunName: GunName = this.gunName) {
@@ -44,13 +44,13 @@ export class Player extends Phaser.Physics.Arcade.Sprite {
     const rotation = gun.getGunRotation(this.movementDirection);
     const [xGun, yGun] = gun.getGunOffset(this.movementDirection);
 
-    this.bulletGroup.shootBullet(
-      this.x + xGun,
-      this.y + yGun,
+    this.observer.notify("shootBullet", {
+      x: this.x + xGun,
+      y: this.y + yGun,
       rotation,
-      playerId,
-      gunName
-    );
+      gunName,
+      playerId
+    });
     this.recentEvents.push("shoot");
   }
 
@@ -80,10 +80,6 @@ export class Player extends Phaser.Physics.Arcade.Sprite {
     };
     this.clearEvents();
     return state;
-  }
-
-  public stopMovement() {
-    this.setVelocity(0, 0);
   }
 
   public handleMessage(message: PlayerUpdate) {

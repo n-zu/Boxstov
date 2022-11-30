@@ -3,13 +3,20 @@ import Phaser from "phaser";
 import { Enemy } from "./enemy";
 import { BulletState } from "../../../common/types/state.js";
 import { GunName, Guns } from "../../../common/guns.js";
+import Observer from "../../../common/observer/observer.js";
 
 export class Bullet extends Phaser.Physics.Arcade.Sprite {
   playerId = "none";
   gunName = GunName.Rifle;
+  observer: Observer;
 
-  constructor(scene: Phaser.Scene, x: number, y: number) {
-    super(scene, x, y, "");
+  constructor(scene: Phaser.Scene, observer: Observer) {
+    super(scene, 0, 0, "");
+    this.setActive(false);
+    this.setVisible(false);
+    this.setPosition(0, 0);
+
+    this.observer = observer;
   }
 
   public fire(
@@ -19,7 +26,6 @@ export class Bullet extends Phaser.Physics.Arcade.Sprite {
     playerId: string,
     gunName: GunName
   ) {
-    const gun = Guns[gunName];
     const [velocityX, velocityY] = this.getVelocityFromRotation(rotation);
 
     this.setScale(0.5);

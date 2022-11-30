@@ -4,9 +4,10 @@ import { GameMaster } from "../gameMaster/gameMaster.js";
 import { Enemy } from "./enemy.js";
 import { Bullet } from "./bullet.js";
 import { Difficulty, EnemyGroup } from "../groups/enemyGroup.js";
-import { WorldState } from "../../../common/types/state.js";
+import { WorldState, WorldStats } from "../../../common/types/state.js";
 import { PlayerUpdate } from "../../../common/types/messages.js";
 import { ENEMY_GROUP_MAX } from "../../../common/constants.js";
+import Observer from "../../../common/observer/observer.js";
 
 const INACTIVE_THRESHOLD = 60000; // if 60 seconds pass, the player is considered inactive
 
@@ -16,14 +17,18 @@ export class World {
   bulletGroup: BulletGroup;
   gameMaster: GameMaster;
   scene: Phaser.Scene;
-  kills = 0;
-  killsPerPlayer: Record<string, number> = {};
-  rage = 0.0;
+  observer: Observer;
+  stats: WorldStats = {
+    kills: 0,
+    killsPerPlayer: {},
+    rage: 0
+  };
   onEnd: () => void;
 
-  constructor(scene: Phaser.Scene, gameMaster: GameMaster, onEnd: () => void) {
+  constructor(scene: Phaser.Scene, observer: Observer, gameMaster: GameMaster, onEnd: () => void) {
     this.players = [];
-    this.bulletGroup = new BulletGroup(scene);
+    this.observer = observer;
+    this.bulletGroup = new BulletGroup(scene, observer);
     this.gameMaster = gameMaster;
     this.scene = scene;
     this.onEnd = onEnd;
@@ -60,16 +65,18 @@ export class World {
     this.players = this.players.filter(isActive);
     if (!this.players.length) this.onEnd();
     this.enemies?.update(this.players);
-    this.rage = Math.max(0, this.rage - 0.002);
+    this.stats.rage = Math.max(0, this.stats.rage - 0.002);
   }
 
   public getState(): WorldState {
     return {
       players: this.players.map((player) => player.getState()),
       bullets: this.bulletGroup.getState(),
-      rage: this.rage,
-      kills: this.kills,
-      killsPerPlayer: this.killsPerPlayer,
+      stats: {
+        rage: this.stats.rage,
+        kills: this.stats.kills,
+        killsPerPlayer: this.stats.killsPerPlayer
+      },
       enemies: this.enemies!.getState()
     };
   }
@@ -79,11 +86,9 @@ export class World {
     if (this.players.some((p) => p.id === id)) return false;
     const player = new Player(
       this.scene,
-      0,
-      0,
+      this.observer,
       id,
-      this.gameMaster,
-      this.bulletGroup
+      this.gameMaster
     );
     this.players.push(player);
     return true;
@@ -118,9 +123,9 @@ export class World {
   }
 
   private onEnemyKilled(enemy: Enemy) {
-    this.kills++;
-    this.killsPerPlayer[enemy.damagerId] =
-      (this.killsPerPlayer[enemy.damagerId] || 0) + 1;
-    this.rage = Math.ceil(this.rage) + 1;
+    this.stats.kills++;
+    this.stats.killsPerPlayer[enemy.damagerId] =
+      (this.stats.killsPerPlayer[enemy.damagerId] || 0) + 1;
+    this.stats.rage = Math.ceil(this.stats.rage) + 1;
   }
 }

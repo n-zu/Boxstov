@@ -3,25 +3,30 @@ import { BulletGroup } from "../groups/bulletGroup";
 import { GameMaster } from "../gameMaster/gameMaster";
 import { PlayerControls } from "../controls/playerControls";
 import { EnemyGroup } from "../groups/enemyGroup";
-import { WorldState } from "../../../common/types/state";
+import { WorldState, WorldStats } from "../../../common/types/state";
 import { SyncUpdate } from "../../../common/types/messages";
 import { ENEMY_GROUP_MAX } from "../../../common/constants";
+import Observer from "../../../common/observer/observer.js";
 
 export class World {
   players!: Player[];
   enemies: EnemyGroup;
-  rage = 0;
-  kills = 0;
-  killsPerPlayer: Record<string, number> = {};
+  observer: Observer;
+  stats: WorldStats = {
+    kills: 0,
+    killsPerPlayer: {},
+    rage: 0
+  };
   playerControls!: PlayerControls;
   bulletGroup!: BulletGroup;
   gameMaster: GameMaster;
   scene: Phaser.Scene;
 
-  constructor(scene: Phaser.Scene, gameMaster: GameMaster, username: string) {
+  constructor(scene: Phaser.Scene, observer: Observer, gameMaster: GameMaster, username: string) {
     this.gameMaster = gameMaster;
     this.scene = scene;
     this.enemies = new EnemyGroup(scene, ENEMY_GROUP_MAX);
+    this.observer = observer;
 
     this.setupGameMaster(gameMaster);
     this.setupFirstPlayer(scene, gameMaster, username);
@@ -41,9 +46,9 @@ export class World {
 
     this.bulletGroup.sync(worldState.bullets);
 
-    this.rage = worldState.rage;
-    this.kills = worldState.kills;
-    this.killsPerPlayer = worldState.killsPerPlayer;
+    this.stats.rage = worldState.stats.rage;
+    this.stats.kills = worldState.stats.kills;
+    this.stats.killsPerPlayer = worldState.stats.killsPerPlayer;
   }
 
   private setupFirstPlayer(
@@ -55,14 +60,13 @@ export class World {
 
     const player = new Player(
       scene,
-      0,
-      0,
+      this.observer,
       username,
       gameMaster,
       this.bulletGroup,
       true
     );
-    this.playerControls = new PlayerControls(player);
+    this.playerControls = new PlayerControls(this.scene, this.observer);
 
     setInterval(() => {
       this.gameMaster.send("player", {
@@ -72,6 +76,7 @@ export class World {
     }, 500);
 
     this.players = [player];
+
 
     scene.cameras.main.startFollow(player);
     scene.cameras.main.zoom = 0.6;
@@ -89,8 +94,7 @@ export class World {
     if (player === undefined) {
       player = new Player(
         this.scene,
-        800,
-        500,
+        this.observer,
         id,
         this.gameMaster,
         this.bulletGroup

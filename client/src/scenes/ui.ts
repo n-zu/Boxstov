@@ -13,11 +13,11 @@ class Points {
   constructor(scene: Phaser.Scene) {
     this.kills = scene.add.text(10, 10, "Kills: 0", {
       fontFamily: "system-ui",
-      fontSize: "40px",
+      fontSize: "40px"
     });
     this.rage = scene.add.text(10, 50, "Multiplier", {
       fontFamily: "system-ui",
-      fontSize: "30px",
+      fontSize: "30px"
     });
 
     this.bar = scene.add.graphics();
@@ -50,7 +50,7 @@ class killsPerPlayer {
     this.text = scene.add.text(14, 220, "No Kills", {
       fontFamily: "system-ui",
       fontSize: "15px",
-      strokeThickness: 0.08,
+      strokeThickness: 0.08
     });
     this.text.setDepth(9999);
   }
@@ -109,6 +109,7 @@ class MiniMap {
     });
   }
 }
+
 export default class UI extends Phaser.Scene {
   gameMaster?: GameMaster;
   world?: World;
@@ -141,9 +142,9 @@ export default class UI extends Phaser.Scene {
   }
 
   update() {
-    this.points?.update(this.world?.kills || 0, this.world?.rage || 0);
+    this.points?.update(this.world?.stats.kills || 0, this.world?.stats.rage || 0);
     this.minimap?.update(this.world);
-    this.killsPerPlater?.update(this.world?.killsPerPlayer || {});
+    this.killsPerPlater?.update(this.world?.stats.killsPerPlayer || {});
   }
 
   private addJoinUrl() {
@@ -163,14 +164,14 @@ export default class UI extends Phaser.Scene {
         const txt = this.add
           .text(x, y, "Copied!", {
             color: "#55ff55",
-            fontSize: "18px",
+            fontSize: "18px"
           })
           .setOrigin(0.5);
         this.tweens.add({
           targets: txt,
           alpha: 0,
           duration: 1000,
-          onComplete: () => txt.destroy(),
+          onComplete: () => txt.destroy()
         });
       })
       .on("pointerover", () => icon.setTintFill(0x383838))
