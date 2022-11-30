@@ -26,19 +26,24 @@ export default class MovementDirection {
     this.facing = this.movement;
   }
 
-  public encode(): EncodedMovementDirection {
-    return [this.movement, this.facing];
+  public static decode([
+                         [x, y],
+                         initial
+                       ]: EncodedMovementDirection): MovementDirection {
+    return new MovementDirection(x, y, initial);
   }
 
-  public static decode([
-    [x, y],
-    initial,
-  ]: EncodedMovementDirection): MovementDirection {
-    return new MovementDirection(x, y, initial);
+  private static getSpeed([x, y]: UnitVector, speed: number): UnitVector {
+    return [x * speed, y * speed];
   }
 
   // Updates the movement according to the given direction.
   // If it's a null vector, it stops the movement but doesn't
+
+  public encode(): EncodedMovementDirection {
+    return [this.movement, this.facing];
+  }
+
   // change the direction that the entity is facing
   public update(newDirection: UnitVector) {
     this.movement = newDirection;
@@ -50,6 +55,8 @@ export default class MovementDirection {
     const [x, y] = this.movement;
     return Boolean(x || y);
   }
+
+  // Returns a unit vector of the current movement direction.
 
   // Gets the current facing direction
   public getFacingDirection(): Direction {
@@ -74,18 +81,14 @@ export default class MovementDirection {
     return Direction.UpLeft;
   }
 
-  // Returns an unit vector of the current movement direction.
   // If there's no movement, it returns a null vector.
   public getUnitVector(): UnitVector {
     return this.movement;
   }
 
-  private static getSpeed([x, y]: UnitVector, speed: number): UnitVector {
-    return [x * speed, y * speed];
-  }
-
   // Returns a speed vector in with the given magnitude at the movement direction
-  // Might be a null vector if it isn't curently moving
+
+  // Might be a null vector if it isn't currently moving
   public getSpeed(speed: number): UnitVector {
     return MovementDirection.getSpeed(this.movement, speed);
   }

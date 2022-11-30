@@ -20,7 +20,7 @@ export class Player extends Sprite {
   id: string;
   maxHealth = 100;
   health = 100;
-  movementDirection: MovementDirection = new MovementDirection();
+  movementDirection: MovementDirection = new MovementDirection(0, 0, [-Math.sqrt(2) / 2, Math.sqrt(2) / 2]);
   ui: PlayerUI;
   local: boolean;
   gunName = GunName.Rifle;
@@ -53,8 +53,6 @@ export class Player extends Sprite {
   }
 
   public shoot(emitAlert = true) {
-    const { x: xGun, y: yGun } = this.getGunPosition();
-
     if (emitAlert) {
       this.gameMaster.send("player", {
         id: this.id,
@@ -95,8 +93,11 @@ export class Player extends Sprite {
   public sync(state: PlayerState) {
     this.syncPosition(state.position.x, state.position.y);
     this.syncEvents(state.events);
+
     this.health = state.health;
-    if (!this.local) {
+    if (this.local) {
+      this.notifyInconsistencies(state);
+    } else {
       this.movementDirection = MovementDirection.decode(
         state.movementDirection
       );
@@ -117,6 +118,12 @@ export class Player extends Sprite {
   public getShootReloadTime(): number {
     const gun = Guns[this.gunName];
     return gun.reloadTime;
+  }
+
+  private notifyInconsistencies(state: PlayerState) {
+    if (this.movementDirection.encode() !== state.movementDirection) {
+      this.sendMovementMessage(this.movementDirection);
+    }
   }
 
   private syncEvents(events: PlayerRecentEvent[]) {

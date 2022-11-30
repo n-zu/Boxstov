@@ -7,7 +7,7 @@ import MovementDirection from "../../../common/controls/direction.js";
 import { PlayerRecentEvent, PlayerState } from "../../../common/types/state.js";
 import { PlayerUpdate } from "../../../common/types/messages.js";
 import { GAME_HEIGHT, GAME_WIDTH, PLAYER_SPEED } from "../../../common/constants.js";
-import { GunName } from "../../../common/guns.js";
+import { GunName, Guns } from "../../../common/guns.js";
 
 
 export class Player extends Phaser.Physics.Arcade.Sprite {
@@ -15,7 +15,7 @@ export class Player extends Phaser.Physics.Arcade.Sprite {
   gameMaster: GameMaster;
   bulletGroup: BulletGroup;
   id: string;
-  movementDirection: MovementDirection = new MovementDirection();
+  movementDirection: MovementDirection = new MovementDirection(0, 0, [-Math.sqrt(2) / 2, Math.sqrt(2) / 2]);
   maxHealth = 100;
   health = 100;
   lastUpdate = Date.now();
@@ -40,12 +40,14 @@ export class Player extends Phaser.Physics.Arcade.Sprite {
   }
 
   public shoot(playerId: string, gunName: GunName = this.gunName) {
-    const { x: xGun, y: yGun } = this.getGunPosition();
+    const gun = Guns[gunName];
+    const rotation = gun.getGunRotation(this.movementDirection);
+    const [xGun, yGun] = gun.getGunOffset(this.movementDirection);
 
     this.bulletGroup.shootBullet(
-      xGun,
-      yGun,
-      this.movementDirection,
+      this.x + xGun,
+      this.y + yGun,
+      rotation,
       playerId,
       gunName
     );

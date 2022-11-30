@@ -2,7 +2,6 @@ import "@geckos.io/phaser-on-nodejs";
 import Phaser from "phaser";
 import { Enemy } from "./enemy";
 import { BulletState } from "../../../common/types/state.js";
-import MovementDirection from "../../../common/controls/direction.js";
 import { GunName, Guns } from "../../../common/guns.js";
 
 export class Bullet extends Phaser.Physics.Arcade.Sprite {
@@ -16,13 +15,12 @@ export class Bullet extends Phaser.Physics.Arcade.Sprite {
   public fire(
     x: number,
     y: number,
-    direction: MovementDirection,
+    rotation: number,
     playerId: string,
     gunName: GunName
   ) {
     const gun = Guns[gunName];
-    const [velocityX, velocityY] = direction.getFacingSpeed(gun.bulletSpeed);
-    const rotation = Math.atan2(velocityY, velocityX);
+    const [velocityX, velocityY] = this.getVelocityFromRotation(rotation);
 
     this.setScale(0.5);
     this.setAlpha(0.3);
@@ -44,7 +42,7 @@ export class Bullet extends Phaser.Physics.Arcade.Sprite {
       callback: () => {
         this.setActive(false);
         this.setVisible(false);
-      },
+      }
     });
   }
 
@@ -68,7 +66,7 @@ export class Bullet extends Phaser.Physics.Arcade.Sprite {
       rotation: this.rotation,
       active: this.active,
       visible: this.visible,
-      gunName: this.gunName,
+      gunName: this.gunName
     };
   }
 
@@ -85,5 +83,12 @@ export class Bullet extends Phaser.Physics.Arcade.Sprite {
     this.setActive(bulletState.active);
     this.setVisible(bulletState.visible);
     this.setGunName(bulletState.gunName);
+  }
+
+  private getVelocityFromRotation(rotation: number) {
+    const gun = Guns[this.gunName];
+    const velocityX = gun.bulletSpeed * Math.cos(rotation);
+    const velocityY = gun.bulletSpeed * Math.sin(rotation);
+    return [velocityX, velocityY];
   }
 }
