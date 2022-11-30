@@ -107,7 +107,6 @@ export class Player extends Sprite {
   }
 
   public setGun(gunName: GunName) {
-    this.gunName = gunName;
     this.gameMaster.send("player", {
       id: this.id,
       type: "switch_gun",
@@ -136,18 +135,15 @@ export class Player extends Sprite {
 
   private handleShootEvent() {
     {
-      //TODO: depends on gun, also other players should be able to shoot
-      const aud = new Audio("assets/shoot.mp3");
-
       const camera = this.scene.cameras.main;
       const cameraX = camera.scrollX + camera.width / 2;
       const cameraY = camera.scrollY + camera.height / 2;
 
       const distance = Phaser.Math.Distance.Between(cameraX, cameraY, this.x, this.y);
       const maxDistance = Math.sqrt(Math.pow(camera.width, 2) + Math.pow(camera.height, 2));
-      aud.volume = 0.1 * (1 - distance / maxDistance);
+      const volume = 0.1 * (1 - distance / maxDistance);
 
-      aud.play();
+      Guns[this.gunName].playSound(volume);
     }
   }
 
