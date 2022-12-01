@@ -1,4 +1,4 @@
-export type Events = {
+export interface Events {
   [type: string]: (...args: any[]) => void;
 }
 

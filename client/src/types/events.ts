@@ -1,8 +1,9 @@
 import { GunName } from "../../../common/guns";
+import { Events } from "../../../common/observer/observer";
 import { UnitVector } from "../../../common/types/direction";
 import { Player } from "../objects/player";
 
-export type GameEvents = {
+export interface GameEvents extends Events {
     changeGun: (name: GunName) => void;
     playerMove: (direction: UnitVector) => void;
     playerShoot: () => void;
