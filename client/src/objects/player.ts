@@ -141,10 +141,10 @@ export class Player extends Sprite {
 
   private subscribeToEvents() {
     if (this.local) {
-      this.observer.subscribe("changeGun", (gunName: GunName) => {
+      this.observer.subscribe("triggerChangeGun", (gunName: GunName) => {
         this.setGun(gunName);
       });
-      this.observer.subscribe("playerMove", (direction) => {
+      this.observer.subscribe("triggerMove", (direction) => {
         this.moveTo(direction);
       });
       this.observer.subscribe("triggerShoot", () => {

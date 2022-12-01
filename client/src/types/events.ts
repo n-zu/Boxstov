@@ -4,8 +4,8 @@ import { UnitVector } from "../../../common/types/direction";
 import { Player } from "../objects/player";
 
 export interface GameEvents extends Events {
-  changeGun: (name: GunName) => void;
-  playerMove: (direction: UnitVector) => void;
+  triggerChangeGun: (name: GunName) => void;
+  triggerMove: (direction: UnitVector) => void;
   triggerShoot: () => void;
   playerShoot: (player: Player) => void;
   newPlayer: (player: Player) => void;

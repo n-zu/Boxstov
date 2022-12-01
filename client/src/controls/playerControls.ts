@@ -32,7 +32,7 @@ export class PlayerControls {
       if (event.keyCode >= 49 && event.keyCode <= 57) {
         const num = event.keyCode - 49;
         const name = numToGunName(num);
-        this.observer.notify("changeGun", name);
+        this.observer.notify("triggerChangeGun", name);
       }
     });
   }
@@ -55,7 +55,7 @@ export class PlayerControls {
 
   update() {
     const direction = this.getKeysDirection();
-    this.observer.notify("playerMove", direction);
+    this.observer.notify("triggerMove", direction);
 
     if (this.wantsToShoot()) {
       this.observer.notify("triggerShoot");
