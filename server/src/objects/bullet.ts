@@ -1,10 +1,10 @@
 import "@geckos.io/phaser-on-nodejs";
 import Phaser from "phaser";
-import { Enemy } from "./enemy";
+import { Enemy } from "./enemy.js";
 import { BulletState } from "../../../common/types/state.js";
 import { GunName, Guns } from "../../../common/guns.js";
 import Observer from "../../../common/observer/observer.js";
-import { GameEvents } from "../types/events";
+import { GameEvents } from "../types/events.js";
 
 export class Bullet extends Phaser.Physics.Arcade.Sprite {
   playerId = "none";

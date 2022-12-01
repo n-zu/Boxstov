@@ -1,13 +1,13 @@
 import "@geckos.io/phaser-on-nodejs";
 import Phaser from "phaser";
-import { Player } from "./player";
+import { Player } from "./player.js";
 import { GameMaster } from "../gameMaster/gameMaster.js";
 import { EnemyRecentEvents, EnemyState } from "../../../common/types/state.js";
 import MovementDirection from "../../../common/controls/direction.js";
 import Observer from "../../../common/observer/observer.js";
 import EnemyBrain from "./enemyBrain.js";
-import { GameEvents } from "../types/events";
-import { ZOMBIE_SIZE } from "../../../common/constants";
+import { GameEvents } from "../types/events.js";
+import { ZOMBIE_SIZE } from "../../../common/constants.js";
 
 const BASE_SPEED = 80;
 const HEALTH = 100;
