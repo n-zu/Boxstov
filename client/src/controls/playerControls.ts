@@ -3,6 +3,7 @@ import InputPlugin = Phaser.Input.InputPlugin;
 import { UnitVector } from "../../../common/types/direction";
 import { numToGunName } from "../../../common/guns";
 import Observer from "../../../common/observer/observer.js";
+import { GameEvents } from "../types/events";
 
 const diagonalFactor = Math.sqrt(2) / 2;
 
@@ -16,10 +17,10 @@ interface LetterKeys {
 export class PlayerControls {
   cursorKeys: CursorKeys;
   letterKeys: LetterKeys;
-  observer: Observer;
+  observer: Observer<GameEvents>;
   input: InputPlugin;
 
-  constructor(scene: Phaser.Scene, observer: Observer) {
+  constructor(scene: Phaser.Scene, observer: Observer<GameEvents>) {
     this.cursorKeys = scene.input.keyboard.createCursorKeys();
     this.letterKeys = scene.input.keyboard.addKeys(
       "W,A,S,D"

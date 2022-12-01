@@ -10,6 +10,7 @@ import { GunName, Guns } from "../../../common/guns";
 import { PLAYER_SPEED } from "../../../common/constants";
 import Observer from "../../../common/observer/observer.js";
 import Sprite = Phaser.Physics.Arcade.Sprite;
+import { GameEvents } from "../types/events";
 
 const SYNC_DIFF_TOLERANCE = 0.001;
 
@@ -17,7 +18,7 @@ export class Player extends Sprite {
   scene: Phaser.Scene;
   gameMaster: GameMaster;
   bulletGroup: BulletGroup;
-  observer: Observer;
+  observer: Observer<GameEvents>;
 
   id: string;
   maxHealth = 100;
@@ -30,7 +31,7 @@ export class Player extends Sprite {
 
   constructor(
     scene: Phaser.Scene,
-    observer: Observer,
+    observer: Observer<GameEvents>,
     id: string,
     gameMaster: GameMaster,
     bulletGroup: BulletGroup,

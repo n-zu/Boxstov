@@ -1,19 +1,19 @@
-import Observer from "./observer.js";
+import Observer, { Events } from "./observer.js";
 
-export default class GameObserver extends Observer {
-  private readonly subscribers: { [key: string]: Function[] } = {};
+type Subscribers<E extends Events> = {
+  [type in keyof E]?: E[type][];
+};
 
-  public subscribe(event: string, callback: (...args: any[]) => void): void {
-    if (!this.subscribers[event]) {
-      this.subscribers[event] = [];
-    }
-    this.subscribers[event].push(callback);
+export default class GameObserver<E extends Events> extends Observer<E> {
+  private readonly subscribers: Subscribers<E> = {};
+
+  public subscribe<T extends keyof E>(event: T, callback: E[T]): void {
+    const subscribers = this.subscribers[event] || [];
+    subscribers.push(callback);
+    this.subscribers[event] = subscribers;
   }
 
-  public notify(event: string, ...args: any[]): void {
-    if (!this.subscribers[event]) {
-      return;
-    }
-    this.subscribers[event].forEach((callback) => callback(...args));
+  public notify<T extends keyof E>(event: T, ...args: Parameters<E[T]>): void {
+    this.subscribers[event]?.forEach((callback) => callback(...args));
   }
 }

@@ -7,12 +7,13 @@ import { PlayerUpdate } from "../../../common/types/messages.js";
 import { GAME_HEIGHT, GAME_WIDTH, KILLS_TO_UNLOCK, PLAYER_SPEED } from "../../../common/constants.js";
 import { GunName, Guns } from "../../../common/guns.js";
 import Observer from "../../../common/observer/observer.js";
+import { GameEvents } from "../types/events.js";
 
 
 export class Player extends Phaser.Physics.Arcade.Sprite {
   scene: Phaser.Scene;
   gameMaster: GameMaster;
-  observer: Observer;
+  observer: Observer<GameEvents>;
   id: string;
   movementDirection: MovementDirection = new MovementDirection();
   maxHealth = 100;
@@ -24,7 +25,7 @@ export class Player extends Phaser.Physics.Arcade.Sprite {
 
   constructor(
     scene: Phaser.Scene,
-    observer: Observer,
+    observer: Observer<GameEvents>,
     id: string,
     gameMaster: GameMaster,
     x: number = 0,

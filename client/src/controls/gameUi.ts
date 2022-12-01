@@ -1,6 +1,7 @@
 import { PlayerUI } from "./playerUi.js";
 import Observer from "../../../common/observer/observer";
 import { Player } from "../objects/player";
+import { GameEvents } from "../types/events.js";
 
 const motivationalMessages = [
   "GIT GUD",
@@ -11,10 +12,10 @@ const motivationalMessages = [
 export default class GameUI {
   scene: Phaser.Scene;
   playerUis: PlayerUI[] = [];
-  observer: Observer;
+  observer: Observer<GameEvents>;
   gameOver = false;
 
-  constructor(scene: Phaser.Scene, observer: Observer) {
+  constructor(scene: Phaser.Scene, observer: Observer<GameEvents>) {
     this.scene = scene;
     this.observer = observer;
 
