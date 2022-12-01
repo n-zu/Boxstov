@@ -93,7 +93,7 @@ export class Rifle extends Gun {
 
 export class Shotgun extends Gun {
   constructor() {
-    super(60, 1500, "shell", 800);
+    super(10, 1500, "shell", 800);
   }
 }
 

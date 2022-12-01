@@ -30,8 +30,7 @@ export class Bullet extends Sprite {
     this.scene.time.addEvent({
       delay: 3000,
       callback: () => {
-        this.setActive(false);
-        this.setVisible(false);
+        this.die();
       }
     });
   }
@@ -60,7 +59,6 @@ export class Bullet extends Sprite {
     this.setRotation(bulletState.rotation);
     this.setActive(bulletState.active);
     this.setVisible(bulletState.visible);
-    this.setGunName(bulletState.gunName);
     this.setGunName(bulletState.gunName);
   }
 }

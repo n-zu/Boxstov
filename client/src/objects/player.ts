@@ -167,15 +167,10 @@ export class Player extends Sprite {
     }
   }
 
-  private handleKillEvent() {
-    // TODO: Kill sound
-  }
-
   private syncEvents(events: PlayerRecentEvent[]) {
     events.forEach(event => {
       switch (event) {
         case "shoot":
-          console.log("Event shoot");
           this.observer.notify("playerShoot", this);
           break;
         case "receive_damage":
