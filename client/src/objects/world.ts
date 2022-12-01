@@ -62,7 +62,7 @@ export class World {
       this.bulletGroup,
       true
     );
-    this.playerControls = new PlayerControls(this.scene, this.observer);
+    this.playerControls = new PlayerControls(this.scene, player, this.observer);
 
     setInterval(() => {
       this.gameMaster.send("player", {
@@ -72,17 +72,6 @@ export class World {
     }, 500);
 
     this.players = [player];
-
-
-    scene.cameras.main.startFollow(player);
-    scene.cameras.main.zoom = 0.6;
-
-    // @ts-ignore
-    scene.input.on("wheel", (pointer, gameObjects, deltaX, deltaY) => {
-      scene.cameras.main.zoom -= deltaY * 0.001;
-      if (scene.cameras.main.zoom < 0.2) scene.cameras.main.zoom = 0.2;
-      if (scene.cameras.main.zoom > 1) scene.cameras.main.zoom = 1;
-    });
   }
 
   private getOrCreatePlayer(id: string): Player {

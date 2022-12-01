@@ -13,19 +13,19 @@ const gameConfig: GameConfig = {
     mode: Phaser.Scale.FIT,
     autoCenter: Phaser.Scale.CENTER_BOTH,
     width: DEFAULT_WIDTH,
-    height: DEFAULT_HEIGHT,
+    height: DEFAULT_HEIGHT
   },
   antialias: true,
   physics: {
     default: "arcade",
     arcade: {
-      debug: false,
-    },
+      debug: false
+    }
   },
   dom: {
-    createContainer: true,
+    createContainer: true
   },
-  transparent: true,
+  transparent: true
 };
 
 window.addEventListener("load", () => {

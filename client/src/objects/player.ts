@@ -27,7 +27,6 @@ export class Player extends Sprite {
   local: boolean;
   gunName = GunName.Rifle;
   lastShootTime = 0;
-  soundsAmount = 0;
 
   constructor(
     scene: Phaser.Scene,

@@ -4,6 +4,7 @@ import { UnitVector } from "../../../common/types/direction";
 import { numToGunName } from "../../../common/guns";
 import Observer from "../../../common/observer/observer.js";
 import { GameEvents } from "../types/events";
+import { Player } from "../objects/player.js";
 
 const diagonalFactor = Math.sqrt(2) / 2;
 
@@ -20,7 +21,7 @@ export class PlayerControls {
   observer: Observer<GameEvents>;
   input: InputPlugin;
 
-  constructor(scene: Phaser.Scene, observer: Observer<GameEvents>) {
+  constructor(scene: Phaser.Scene, localPlayer: Player, observer: Observer<GameEvents>) {
     this.cursorKeys = scene.input.keyboard.createCursorKeys();
     this.letterKeys = scene.input.keyboard.addKeys(
       "W,A,S,D"
@@ -35,6 +36,8 @@ export class PlayerControls {
         this.observer.notify("triggerChangeGun", name);
       }
     });
+
+    this.setUpCameraFor(scene, localPlayer);
   }
 
   public down(): boolean {
@@ -60,6 +63,17 @@ export class PlayerControls {
     if (this.wantsToShoot()) {
       this.observer.notify("triggerShoot");
     }
+  }
+
+  private setUpCameraFor(scene: Phaser.Scene, player: Player) {
+    scene.cameras.main.startFollow(player);
+    scene.cameras.main.zoom = 0.6;
+
+    scene.input.on("wheel", (pointer: any, gameObjects: any, deltaX: number, deltaY: number) => {
+      scene.cameras.main.zoom -= deltaY * 0.001;
+      if (scene.cameras.main.zoom < 0.2) scene.cameras.main.zoom = 0.2;
+      if (scene.cameras.main.zoom > 1) scene.cameras.main.zoom = 1;
+    });
   }
 
   private wantsToShoot(): boolean {
