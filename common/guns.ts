@@ -87,7 +87,7 @@ export abstract class Gun {
 
 export class Rifle extends Gun {
   constructor() {
-    super(30, 2000, "bullet", 100);
+    super(10, 2000, "bullet", 100);
   }
 }
 
