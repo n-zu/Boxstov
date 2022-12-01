@@ -7,11 +7,12 @@ import { WorldState, WorldStats } from "../../../common/types/state";
 import { SyncUpdate } from "../../../common/types/messages";
 import { ENEMY_GROUP_MAX } from "../../../common/constants";
 import Observer from "../../../common/observer/observer.js";
+import { GameEvents } from "../types/events";
 
 export class World {
   players!: Player[];
   enemies: EnemyGroup;
-  observer: Observer;
+  observer: Observer<GameEvents>;
   stats: WorldStats = {
     kills: 0,
     killsPerPlayer: {},
@@ -22,7 +23,7 @@ export class World {
   gameMaster: GameMaster;
   scene: Phaser.Scene;
 
-  constructor(scene: Phaser.Scene, observer: Observer, gameMaster: GameMaster, username: string) {
+  constructor(scene: Phaser.Scene, observer: Observer<GameEvents>, gameMaster: GameMaster, username: string) {
     this.gameMaster = gameMaster;
     this.scene = scene;
     this.enemies = new EnemyGroup(scene, ENEMY_GROUP_MAX);

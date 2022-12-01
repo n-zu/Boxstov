@@ -1,13 +1,14 @@
 import { Bullet } from "../objects/bullet.js";
 import { BulletGroupState } from "../../../common/types/state.js";
 import Observer from "../../../common/observer/observer.js";
+import { GameEvents } from "../types/events.js";
 
 const MAX_BULLETS = 30;
 
 export class BulletGroup extends Phaser.Physics.Arcade.Group {
-  observer: Observer;
+  observer: Observer<GameEvents>;
 
-  constructor(scene: Phaser.Scene, observer: Observer) {
+  constructor(scene: Phaser.Scene, observer: Observer<GameEvents>) {
     super(scene.physics.world, scene);
 
     this.observer = observer;

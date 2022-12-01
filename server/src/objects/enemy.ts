@@ -6,6 +6,7 @@ import { EnemyState } from "../../../common/types/state.js";
 import MovementDirection from "../../../common/controls/direction.js";
 import Observer from "../../../common/observer/observer.js";
 import EnemyBrain from "./enemyBrain.js";
+import { GameEvents } from "../types/events";
 
 const BASE_SPEED = 80;
 const HEALTH = 100;
@@ -16,7 +17,7 @@ export class Enemy extends Phaser.Physics.Arcade.Sprite {
   strength = 3;
   movementDirection: MovementDirection = new MovementDirection();
   gameMaster: GameMaster;
-  observer: Observer;
+  observer: Observer<GameEvents>;
   brain: EnemyBrain;
   action = "walk";
   dead: boolean = true;
@@ -28,7 +29,7 @@ export class Enemy extends Phaser.Physics.Arcade.Sprite {
     y: number,
     gameMaster: GameMaster,
     id: number,
-    observer: Observer
+    observer: Observer<GameEvents>
   ) {
     super(scene, x, y, "zombie");
     scene.add.existing(this);

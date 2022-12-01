@@ -3,6 +3,7 @@ import { Player } from "../objects/player.js";
 import { GameMaster } from "../gameMaster/gameMaster.js";
 import { EnemyGroupState, EnemyState, SpawnPoint } from "../../../common/types/state.js";
 import Observer from "../../../common/observer/observer.js";
+import { GameEvents } from "../types/events.js";
 
 const TIME_BETWEEN_HORDES = 700;
 
@@ -16,11 +17,11 @@ export class EnemyGroup extends Phaser.Physics.Arcade.Group {
   difficulty: Difficulty;
   timeUntilNextHorde = 0;
   spawnPoints: SpawnPoint[];
-  observer: Observer;
+  observer: Observer<GameEvents>;
 
   constructor(
     scene: Phaser.Scene,
-    observer: Observer,
+    observer: Observer<GameEvents>,
     maxEnemies: number,
     difficulty: Difficulty,
     spawnPoints: SpawnPoint[],

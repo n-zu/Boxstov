@@ -10,6 +10,8 @@ import { GunName } from "../../../common/guns";
 import GameObserver from "../../../common/observer/gameObserver.js";
 import GameUI from "../controls/gameUi";
 import Sprite = Phaser.GameObjects.Sprite;
+import { GameEvents } from "../types/events";
+import Observer from "../../../common/observer/observer";
 
 
 export function playAnimation(
@@ -31,7 +33,7 @@ export function playAnimation(
 export default class MainScene extends Phaser.Scene {
   gameMaster?: GameMaster;
   world?: World;
-  observer: GameObserver;
+  observer: Observer<GameEvents>;
   gameUi?: GameUI;
 
   protected constructor() {

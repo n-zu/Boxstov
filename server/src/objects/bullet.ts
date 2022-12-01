@@ -4,13 +4,14 @@ import { Enemy } from "./enemy";
 import { BulletState } from "../../../common/types/state.js";
 import { GunName, Guns } from "../../../common/guns.js";
 import Observer from "../../../common/observer/observer.js";
+import { GameEvents } from "../types/events";
 
 export class Bullet extends Phaser.Physics.Arcade.Sprite {
   playerId = "none";
   gunName = GunName.Rifle;
-  observer: Observer;
+  observer: Observer<GameEvents>;
 
-  constructor(scene: Phaser.Scene, observer: Observer) {
+  constructor(scene: Phaser.Scene, observer: Observer<GameEvents>) {
     super(scene, 0, 0, "");
     this.setActive(false);
     this.setVisible(false);

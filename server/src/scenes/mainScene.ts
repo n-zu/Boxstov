@@ -3,6 +3,7 @@ import { GameMaster } from "../gameMaster/gameMaster.js";
 import { MS_BETWEEN_SYNCS } from "../../../common/constants.js";
 import GameObserver from "../../../common/observer/gameObserver.js";
 import Observer from "../../../common/observer/observer.js";
+import { GameEvents } from "../types/events.js";
 
 type MainSceneData = {
   gameMaster: GameMaster;
@@ -13,7 +14,7 @@ export default class MainScene extends Phaser.Scene {
   world!: World;
   gameMaster?: GameMaster;
   onEnd?: () => void;
-  observer: Observer;
+  observer: Observer<GameEvents>;
   lastSyncTimestamp = 0;
 
   protected constructor() {

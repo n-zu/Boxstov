@@ -8,6 +8,7 @@ import { WorldState, WorldStats } from "../../../common/types/state.js";
 import { PlayerUpdate } from "../../../common/types/messages.js";
 import { ENEMY_GROUP_MAX } from "../../../common/constants.js";
 import Observer from "../../../common/observer/observer.js";
+import { GameEvents } from "../types/events.js";
 
 const INACTIVE_THRESHOLD = 60000; // if 60 seconds pass, the player is considered inactive
 
@@ -17,7 +18,7 @@ export class World {
   bulletGroup: BulletGroup;
   gameMaster: GameMaster;
   scene: Phaser.Scene;
-  observer: Observer;
+  observer: Observer<GameEvents>;
   stats: WorldStats = {
     kills: 0,
     killsPerPlayer: {},
@@ -25,7 +26,7 @@ export class World {
   };
   onEnd: () => void;
 
-  constructor(scene: Phaser.Scene, observer: Observer, gameMaster: GameMaster, onEnd: () => void) {
+  constructor(scene: Phaser.Scene, observer: Observer<GameEvents>, gameMaster: GameMaster, onEnd: () => void) {
     this.players = [];
     this.observer = observer;
     this.bulletGroup = new BulletGroup(scene, observer);
