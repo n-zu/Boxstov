@@ -31,7 +31,10 @@ export type EnemyState = {
   bodyEnabled: boolean;
   action: string;
   speed: number;
+  events: EnemyRecentEvents[]
 };
+
+export type EnemyRecentEvents = "receive_damage";
 
 export type EnemyGroupState = {
   enemies: EnemyState[];

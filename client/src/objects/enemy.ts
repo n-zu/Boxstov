@@ -1,8 +1,10 @@
 import { playAnimation } from "../scenes/mainScene";
-import { EnemyState } from "../../../common/types/state";
+import { EnemyRecentEvents, EnemyState } from "../../../common/types/state";
 import { AnimationActor, AnimationSuffix } from "../types/animation";
 import MovementDirection from "../../../common/controls/direction";
 import Phaser from "phaser";
+import { GameEvents } from "../types/events";
+import Observer from "../../../common/observer/observer";
 import Sprite = Phaser.Physics.Arcade.Sprite;
 
 const BASE_SPEED = 50;
@@ -16,18 +18,35 @@ export class Enemy extends Sprite {
   action = "";
   dead = true;
   speed: number;
+  observer: Observer<GameEvents>;
 
-  constructor(scene: Phaser.Scene, x: number, y: number, id: number) {
+  constructor(scene: Phaser.Scene, observer: Observer<GameEvents>, x: number, y: number, id: number) {
     super(scene, x, y, "zombie");
     scene.add.existing(this);
 
+    this.observer = observer;
     this.visible = false;
     this.active = false;
     this.speed = BASE_SPEED;
     this.id = id;
   }
 
+  public getDistanceToCamera(): number {
+    const camera = this.scene.cameras.main;
+    const cameraX = camera.scrollX + camera.width / 2;
+    const cameraY = camera.scrollY + camera.height / 2;
+
+    return Phaser.Math.Distance.Between(cameraX, cameraY, this.x, this.y);
+  }
+
+  public getMaxDistanceToCamera(): number {
+    const camera = this.scene.cameras.main;
+    return Math.sqrt(Math.pow(camera.width, 2) + Math.pow(camera.height, 2));
+  }
+
   public sync(state: EnemyState) {
+    this.syncEvents(state.events);
+
     if (state.health > 0) {
       this.updateHealth(state.health);
     }
@@ -50,6 +69,18 @@ export class Enemy extends Sprite {
     if (this.health <= 0) {
       this.die();
     }
+  }
+
+  private syncEvents(events: EnemyRecentEvents[]) {
+    console.log(events);
+    events.forEach((event) => {
+      switch (event) {
+        case "receive_damage":
+          console.log("switch case receive_damage");
+          this.observer.notify("enemyReceivedDamage", this);
+          break;
+      }
+    });
   }
 
   private updateHealth(newHealth: number) {

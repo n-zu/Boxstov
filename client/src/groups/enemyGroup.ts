@@ -1,14 +1,15 @@
-import { EnemyUpdate } from "../../../common/types/messages";
 import { EnemyGroupState } from "../../../common/types/state";
 import { Enemy } from "../objects/enemy";
+import { GameEvents } from "../types/events";
+import Observer from "../../../common/observer/observer";
 
 export class EnemyGroup extends Phaser.Physics.Arcade.Group {
-  constructor(scene: Phaser.Scene, maxEnemies: number) {
+  constructor(scene: Phaser.Scene, observer: Observer<GameEvents>, maxEnemies: number) {
     super(scene.physics.world, scene);
 
     const enemies: Enemy[] = [];
     for (let i = 0; i < maxEnemies; i++) {
-      enemies.push(new Enemy(scene, 0, 0, i));
+      enemies.push(new Enemy(scene, observer, 0, 0, i));
     }
 
     this.addMultiple(enemies);

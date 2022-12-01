@@ -23,7 +23,7 @@ export class World {
   constructor(scene: Phaser.Scene, observer: Observer<GameEvents>, gameMaster: GameMaster, username: string) {
     this.gameMaster = gameMaster;
     this.scene = scene;
-    this.enemies = new EnemyGroup(scene, ENEMY_GROUP_MAX);
+    this.enemies = new EnemyGroup(scene, observer, ENEMY_GROUP_MAX);
     this.stats = new WorldStats(observer);
     this.observer = observer;
 

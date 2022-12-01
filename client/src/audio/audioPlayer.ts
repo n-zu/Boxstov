@@ -2,14 +2,17 @@ import { GameEvents } from "../types/events";
 import Observer from "../../../common/observer/observer.js";
 import { GunName } from "../../../common/guns.js";
 import { Player } from "../objects/player";
+import { Enemy } from "../objects/enemy";
 
 const MAX_ATTACK_SOUND_AMOUNT = 3;
+const MAX_DMG_SOUND_AMOUNT = 3;
 const MIN_VOLUME = 0.01;
 
 export default class AudioPlayer {
   scene: Phaser.Scene;
   observer: Observer<GameEvents>;
   attackSoundsAmount = 0;
+  dmgSoundsAmount = 0;
 
   constructor(scene: Phaser.Scene, observer: Observer<GameEvents>) {
     this.scene = scene;
@@ -23,6 +26,31 @@ export default class AudioPlayer {
     this.observer.subscribe("playerSwitchedGun", (player) => this.playSwitchGunSound(player));
     this.observer.subscribe("playerUnlockedGun", (player) => this.playUnlockGunSound(player));
     this.observer.subscribe("playerReceiveDamage", (player) => this.playPlayerReceivedDamageSound(player));
+    this.observer.subscribe("enemyReceivedDamage", (enemy) => this.playEnemyReceivedDamageSound(enemy));
+  }
+
+  private playEnemyReceivedDamageSound(enemy: Enemy) {
+    const volume = this.calculateEnemySoundVolume(enemy);
+    if (volume < MIN_VOLUME) return;
+
+    if (this.dmgSoundsAmount < MAX_ATTACK_SOUND_AMOUNT) {
+      this.dmgSoundsAmount++;
+      console.log("play dmg sound");
+      this.scene.sound.add("bullet_hit", {
+        volume
+      }).once("complete", () => {
+        this.dmgSoundsAmount--;
+      }).play();
+    }
+  }
+
+  private calculateEnemySoundVolume(enemy: Enemy): number {
+    const distanceToCamera = enemy.getDistanceToCamera();
+    const maxDistance = enemy.getMaxDistanceToCamera();
+    return this.calculateSoundVolume(
+      distanceToCamera,
+      maxDistance
+    );
   }
 
   private playPlayerReceivedDamageSound(player: Player) {

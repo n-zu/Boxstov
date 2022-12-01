@@ -2,7 +2,7 @@ import "@geckos.io/phaser-on-nodejs";
 import Phaser from "phaser";
 import { Player } from "./player";
 import { GameMaster } from "../gameMaster/gameMaster.js";
-import { EnemyState } from "../../../common/types/state.js";
+import { EnemyRecentEvents, EnemyState } from "../../../common/types/state.js";
 import MovementDirection from "../../../common/controls/direction.js";
 import Observer from "../../../common/observer/observer.js";
 import EnemyBrain from "./enemyBrain.js";
@@ -20,8 +20,9 @@ export class Enemy extends Phaser.Physics.Arcade.Sprite {
   observer: Observer<GameEvents>;
   brain: EnemyBrain;
   action = "walk";
-  dead: boolean = true;
+  dead = true;
   speed: number;
+  events: EnemyRecentEvents[] = [];
 
   constructor(
     scene: Phaser.Scene,
@@ -77,7 +78,7 @@ export class Enemy extends Phaser.Physics.Arcade.Sprite {
   }
 
   public getState(): EnemyState {
-    return {
+    const state = {
       position: {
         x: this.x,
         y: this.y
@@ -89,8 +90,11 @@ export class Enemy extends Phaser.Physics.Arcade.Sprite {
       bodyEnabled: this.body.enable,
       action: this.action,
       movementDirection: this.movementDirection.encode(),
-      speed: this.speed
+      speed: this.speed,
+      events: this.events
     };
+    this.events = [];
+    return state;
   }
 
   public receiveDamage(damage: number, damagerId: string) {
