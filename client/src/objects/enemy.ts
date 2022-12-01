@@ -14,7 +14,6 @@ export class Enemy extends Sprite {
   id: number;
   health = HEALTH;
   movementDirection: MovementDirection = new MovementDirection();
-  redTint = 0;
   action = "";
   dead = true;
   speed: number;
@@ -62,7 +61,6 @@ export class Enemy extends Sprite {
   }
 
   public receiveDamage(damage: number) {
-    this.redTint = 1;
     if (this.health <= 0) return;
 
     this.health -= damage;
@@ -77,16 +75,21 @@ export class Enemy extends Sprite {
         case "receive_damage":
           console.log("switch case receive_damage");
           this.observer.notify("enemyReceivedDamage", this);
+          this.changeColor();
           break;
       }
     });
   }
 
+  private changeColor() {
+    this.setTint(0xff0000);
+    this.scene.time.delayedCall(100, () => this.setTint(0xff5555));
+    this.scene.time.delayedCall(200, () => this.setTint(0xffaaaa));
+    this.scene.time.delayedCall(300, () => this.setTint(0xffffff));
+  }
+
   private updateHealth(newHealth: number) {
     if (newHealth < this.health) this.receiveDamage(this.health - newHealth);
-    else this.redTint *= 0.9 / this.scene.time.timeScale;
-
-    this.setTint(0xff0000 + 0x00ffff * (1 - this.redTint));
   }
 
   private move(state: EnemyState) {
