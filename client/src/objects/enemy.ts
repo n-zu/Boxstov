@@ -72,7 +72,6 @@ export class Enemy extends Sprite {
   }
 
   private syncEvents(events: EnemyRecentEvents[]) {
-    console.log(events);
     events.forEach((event) => {
       switch (event) {
         case "receive_damage":

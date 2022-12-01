@@ -8,6 +8,10 @@ import { Player } from "../objects/player.js";
 
 const diagonalFactor = Math.sqrt(2) / 2;
 
+// zoom-in: MAX_ZOOM is closest to player, MIN_ZOOM furthest
+const MIN_ZOOM = 0.5;
+const MAX_ZOOM = 1;
+
 interface LetterKeys {
   W: Phaser.Input.Keyboard.Key;
   A: Phaser.Input.Keyboard.Key;
@@ -71,8 +75,8 @@ export class PlayerControls {
 
     scene.input.on("wheel", (pointer: any, gameObjects: any, deltaX: number, deltaY: number) => {
       scene.cameras.main.zoom -= deltaY * 0.001;
-      if (scene.cameras.main.zoom < 0.2) scene.cameras.main.zoom = 0.2;
-      if (scene.cameras.main.zoom > 1) scene.cameras.main.zoom = 1;
+      if (scene.cameras.main.zoom < MIN_ZOOM) scene.cameras.main.zoom = MIN_ZOOM;
+      if (scene.cameras.main.zoom > MAX_ZOOM) scene.cameras.main.zoom = MAX_ZOOM;
     });
   }
 
