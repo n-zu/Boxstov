@@ -9,9 +9,10 @@ import { GAME_HEIGHT, GAME_WIDTH } from "../../../common/constants";
 import { GunName } from "../../../common/guns";
 import GameObserver from "../../../common/observer/gameObserver.js";
 import GameUI from "../controls/gameUi";
-import Sprite = Phaser.GameObjects.Sprite;
 import { GameEvents } from "../types/events";
 import Observer from "../../../common/observer/observer";
+import AudioPlayer from "../audio/audioPlayer";
+import Sprite = Phaser.GameObjects.Sprite;
 
 
 export function playAnimation(
@@ -35,10 +36,12 @@ export default class MainScene extends Phaser.Scene {
   world?: World;
   observer: Observer<GameEvents>;
   gameUi?: GameUI;
+  audioPlayer: AudioPlayer;
 
   protected constructor() {
     super({ key: "MainScene" });
     this.observer = new GameObserver();
+    this.audioPlayer = new AudioPlayer(this, this.observer);
   }
 
   create(data: { gameMaster: GameMaster; username: string }) {

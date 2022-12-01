@@ -9,8 +9,8 @@ import { AnimationSuffix } from "../types/animation";
 import { GunName, Guns } from "../../../common/guns";
 import { PLAYER_SPEED } from "../../../common/constants";
 import Observer from "../../../common/observer/observer.js";
-import Sprite = Phaser.Physics.Arcade.Sprite;
 import { GameEvents } from "../types/events";
+import Sprite = Phaser.Physics.Arcade.Sprite;
 
 const SYNC_DIFF_TOLERANCE = 0.001;
 
@@ -102,15 +102,26 @@ export class Player extends Sprite {
     }
     if (this.gunName !== state.gunName) {
       this.gunName = state.gunName;
-      this.scene.sound.add("switch_gun", {
-        volume: this.calculateSoundVolume()
-      }).play();
+      this.observer.notify("playerSwitchedGun", this);
     }
   }
 
   public getShootReloadTime(): number {
     const gun = Guns[this.gunName];
     return gun.reloadTime;
+  }
+
+  public getDistanceToCamera(): number {
+    const camera = this.scene.cameras.main;
+    const cameraX = camera.scrollX + camera.width / 2;
+    const cameraY = camera.scrollY + camera.height / 2;
+
+    return Phaser.Math.Distance.Between(cameraX, cameraY, this.x, this.y);
+  }
+
+  public getMaxDistanceToCamera(): number {
+    const camera = this.scene.cameras.main;
+    return Math.sqrt(Math.pow(camera.width, 2) + Math.pow(camera.height, 2));
   }
 
   private isReloading(): boolean {
@@ -133,10 +144,10 @@ export class Player extends Sprite {
       this.observer.subscribe("changeGun", (gunName: GunName) => {
         this.setGun(gunName);
       });
-      this.observer.subscribe("playerMove", (direction: UnitVector) => {
+      this.observer.subscribe("playerMove", (direction) => {
         this.moveTo(direction);
       });
-      this.observer.subscribe("playerShoot", () => {
+      this.observer.subscribe("triggerShoot", () => {
         this.shoot();
       });
     }
@@ -156,58 +167,28 @@ export class Player extends Sprite {
     }
   }
 
-  private handleReceiveDamageEvent() {
-    if (this.soundsAmount < 3) {
-      this.soundsAmount++;
-      this.scene.sound.add("player_receive_damage", {
-        volume: this.calculateSoundVolume()
-      }).once("complete", () => {
-        this.soundsAmount--;
-      }).play();
-    }
-  }
-
   private handleKillEvent() {
     // TODO: Kill sound
-  }
-
-  private handleUnlockGunEvent() {
-    this.scene.sound.add("unlocked_gun", {
-      volume: this.calculateSoundVolume()
-    }).play();
   }
 
   private syncEvents(events: PlayerRecentEvent[]) {
     events.forEach(event => {
       switch (event) {
         case "shoot":
-          this.handleShootEvent();
+          console.log("Event shoot");
+          this.observer.notify("playerShoot", this);
           break;
         case "receive_damage":
-          this.handleReceiveDamageEvent();
+          this.observer.notify("playerReceiveDamage", this);
           break;
         case "kill":
-          this.handleKillEvent();
+          this.observer.notify("playerKill", this);
           break;
         case "unlocked_gun":
-          this.handleUnlockGunEvent();
+          this.observer.notify("playerUnlockedGun", this);
           break;
       }
     });
-  }
-
-  private calculateSoundVolume(): number {
-    const camera = this.scene.cameras.main;
-    const cameraX = camera.scrollX + camera.width / 2;
-    const cameraY = camera.scrollY + camera.height / 2;
-
-    const distance = Phaser.Math.Distance.Between(cameraX, cameraY, this.x, this.y);
-    const maxDistance = Math.sqrt(Math.pow(camera.width, 2) + Math.pow(camera.height, 2));
-    return 0.1 * (1 - distance / maxDistance);
-  }
-
-  private handleShootEvent() {
-    Guns[this.gunName].playSound(this.calculateSoundVolume());
   }
 
   private doStopMovement() {

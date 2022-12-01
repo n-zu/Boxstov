@@ -58,7 +58,7 @@ export class PlayerControls {
     this.observer.notify("playerMove", direction);
 
     if (this.wantsToShoot()) {
-      this.observer.notify("playerShoot");
+      this.observer.notify("triggerShoot");
     }
   }
 

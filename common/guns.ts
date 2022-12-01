@@ -83,19 +83,11 @@ export abstract class Gun {
   public getGunRotation(movementDirection: MovementDirection): number {
     return GUN_ROTATIONS[movementDirection.getFacingDirection()] as number;
   }
-
-  public abstract playSound(volume: number): void;
 }
 
 export class Rifle extends Gun {
   constructor() {
     super(30, 2000, "bullet", 100);
-  }
-
-  public playSound(volume: number): void {
-    const aud = new Audio("assets/audio/rifle.mp3");
-    aud.volume = volume;
-    aud.play();
   }
 }
 
@@ -103,23 +95,11 @@ export class Shotgun extends Gun {
   constructor() {
     super(60, 1500, "shell", 800);
   }
-
-  public playSound(volume: number): void {
-    const aud = new Audio("assets/audio/shotgun.mp3");
-    aud.volume = volume;
-    aud.play();
-  }
 }
 
 export class Rpg extends Gun {
   constructor() {
     super(200, 1000, "rocket", 1200);
-  }
-
-  public playSound(volume: number): void {
-    const aud = new Audio("assets/audio/rpg.mp3");
-    aud.volume = volume;
-    aud.play();
   }
 }
 

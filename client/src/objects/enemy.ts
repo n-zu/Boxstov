@@ -14,7 +14,7 @@ export class Enemy extends Sprite {
   movementDirection: MovementDirection = new MovementDirection();
   redTint = 0;
   action = "";
-  dead: boolean = true;
+  dead = true;
   speed: number;
 
   constructor(scene: Phaser.Scene, x: number, y: number, id: number) {
