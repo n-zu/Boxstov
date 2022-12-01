@@ -34,8 +34,8 @@ export class Enemy extends Phaser.Physics.Arcade.Sprite {
     observer: Observer<GameEvents>
   ) {
     super(scene, x, y, "zombie");
-    scene.add.existing(this);
     scene.physics.add.existing(this);
+    scene.add.existing(this);
     this.setBodySize(...ZOMBIE_SIZE);
 
     this.visible = false;
