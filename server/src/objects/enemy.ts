@@ -99,6 +99,7 @@ export class Enemy extends Phaser.Physics.Arcade.Sprite {
 
   public receiveDamage(damage: number, damagerId: string) {
     if (this.health <= 0) return;
+    this.events.push("receive_damage");
 
     this.health -= damage;
     if (this.health <= 0) {

@@ -5,7 +5,7 @@ import { Player } from "../objects/player";
 import { Enemy } from "../objects/enemy";
 
 const MAX_ATTACK_SOUND_AMOUNT = 3;
-const MAX_DMG_SOUND_AMOUNT = 3;
+const MAX_DMG_SOUND_AMOUNT = 5;
 const MIN_VOLUME = 0.01;
 
 export default class AudioPlayer {
@@ -57,7 +57,7 @@ export default class AudioPlayer {
     const volume = this.calculatePlayerSoundVolume(player);
     if (volume < MIN_VOLUME) return;
 
-    if (this.attackSoundsAmount < MAX_ATTACK_SOUND_AMOUNT) {
+    if (this.attackSoundsAmount < MAX_DMG_SOUND_AMOUNT) {
       this.attackSoundsAmount++;
       this.scene.sound.add("player_receive_damage", {
         volume
