@@ -4,7 +4,7 @@ import { GameMaster } from "../gameMaster/gameMaster.js";
 import MovementDirection from "../../../common/controls/direction.js";
 import { PlayerRecentEvent, PlayerState } from "../../../common/types/state.js";
 import { PlayerUpdate } from "../../../common/types/messages.js";
-import { GAME_HEIGHT, GAME_WIDTH, KILLS_TO_UNLOCK, PLAYER_SPEED } from "../../../common/constants.js";
+import { GAME_HEIGHT, GAME_WIDTH, KILLS_TO_UNLOCK, PLAYER_SIZE, PLAYER_SPEED } from "../../../common/constants.js";
 import { GunName, Guns } from "../../../common/guns.js";
 import Observer from "../../../common/observer/observer.js";
 import { GameEvents } from "../types/events.js";
@@ -33,6 +33,9 @@ export class Player extends Phaser.Physics.Arcade.Sprite {
   ) {
     super(scene, x, y, "");
     scene.physics.add.existing(this);
+    scene.add.existing(this);
+    this.setBodySize(...PLAYER_SIZE);
+    this.setCollideWorldBounds(true);
 
     this.observer = observer;
     this.id = id;
@@ -68,8 +71,6 @@ export class Player extends Phaser.Physics.Arcade.Sprite {
   }
 
   public getState(): PlayerState {
-    this.clampPosition();
-
     const state = {
       id: this.id,
       position: {
@@ -122,14 +123,5 @@ export class Player extends Phaser.Physics.Arcade.Sprite {
 
   private clearEvents() {
     this.recentEvents = [];
-  }
-
-  private clampPosition() {
-    const w = GAME_WIDTH / 2 - 50;
-    const h = GAME_HEIGHT / 2 - 50;
-    if (this.x > w) this.x = w;
-    if (this.x < -w) this.x = -w;
-    if (this.y > h) this.y = h;
-    if (this.y < -h) this.y = -h;
   }
 }

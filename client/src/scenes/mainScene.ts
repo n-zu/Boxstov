@@ -5,7 +5,7 @@ import { World } from "../objects/world";
 import { loadGameAssets } from "./load";
 import { GameMaster } from "../gameMaster/gameMaster";
 import UI from "./ui";
-import { GAME_HEIGHT, GAME_WIDTH } from "../../../common/constants";
+import { GAME_HEIGHT, GAME_WIDTH, WORLD_BOUNDS } from "../../../common/constants";
 import { GunName } from "../../../common/guns";
 import GameObserver from "../../../common/observer/gameObserver.js";
 import GameUI from "../controls/gameUi";
@@ -48,7 +48,8 @@ export default class MainScene extends Phaser.Scene {
     this.gameMaster = data.gameMaster;
     this.gameUi = new GameUI(this, this.observer);
     this.world = new World(this, this.observer, data.gameMaster, data.username);
-    this.cameras.main.setBounds(-GAME_WIDTH/2, -GAME_HEIGHT/2, GAME_WIDTH, GAME_HEIGHT);
+    this.cameras.main.setBounds(...WORLD_BOUNDS);
+    this.physics.world.setBounds(...WORLD_BOUNDS)
 
     this.add.tileSprite(0, 0, GAME_WIDTH, GAME_HEIGHT, "tiles").setDepth(-9999);
     this.scene.add("UI", UI, true, {

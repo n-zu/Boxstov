@@ -7,6 +7,7 @@ import MovementDirection from "../../../common/controls/direction.js";
 import Observer from "../../../common/observer/observer.js";
 import EnemyBrain from "./enemyBrain.js";
 import { GameEvents } from "../types/events";
+import { ZOMBIE_SIZE } from "../../../common/constants";
 
 const BASE_SPEED = 80;
 const HEALTH = 100;
@@ -35,8 +36,7 @@ export class Enemy extends Phaser.Physics.Arcade.Sprite {
     super(scene, x, y, "zombie");
     scene.add.existing(this);
     scene.physics.add.existing(this);
-
-    this.setBodySize(80, 180);
+    this.setBodySize(...ZOMBIE_SIZE);
 
     this.visible = false;
     this.active = false;

@@ -6,6 +6,7 @@ import Phaser from "phaser";
 import { GameEvents } from "../types/events";
 import Observer from "../../../common/observer/observer";
 import Sprite = Phaser.Physics.Arcade.Sprite;
+import { ZOMBIE_SIZE } from "../../../common/constants";
 
 const BASE_SPEED = 50;
 const HEALTH = 100;
@@ -21,7 +22,9 @@ export class Enemy extends Sprite {
 
   constructor(scene: Phaser.Scene, observer: Observer<GameEvents>, x: number, y: number, id: number) {
     super(scene, x, y, "zombie");
+    scene.physics.add.existing(this);
     scene.add.existing(this);
+    this.setBodySize(...ZOMBIE_SIZE);
 
     this.observer = observer;
     this.visible = false;

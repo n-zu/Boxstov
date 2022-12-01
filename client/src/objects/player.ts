@@ -7,7 +7,7 @@ import { PlayerRecentEvent, PlayerState } from "../../../common/types/state";
 import { playAnimation } from "../scenes/mainScene";
 import { AnimationSuffix } from "../types/animation";
 import { GunName, Guns } from "../../../common/guns";
-import { PLAYER_SPEED } from "../../../common/constants";
+import { PLAYER_SIZE, PLAYER_SPEED } from "../../../common/constants";
 import Observer from "../../../common/observer/observer.js";
 import { GameEvents } from "../types/events";
 import Sprite = Phaser.Physics.Arcade.Sprite;
@@ -38,11 +38,14 @@ export class Player extends Sprite {
     x = 0,
     y = 0
   ) {
-    super(scene, x, y, "player");
+    super(scene, x, y, GunName.Rifle);
     this.scene = scene;
-    scene.add.existing(this);
-    scene.physics.add.existing(this);
 
+    scene.physics.add.existing(this);
+    scene.add.existing(this);
+    this.setBodySize(...PLAYER_SIZE);
+    this.setCollideWorldBounds(true);
+    
     this.id = id;
     this.gameMaster = gameMaster;
     this.bulletGroup = bulletGroup;

@@ -1,6 +1,6 @@
 import { World } from "../objects/world.js";
 import { GameMaster } from "../gameMaster/gameMaster.js";
-import { MS_BETWEEN_SYNCS } from "../../../common/constants.js";
+import { MS_BETWEEN_SYNCS, WORLD_BOUNDS } from "../../../common/constants.js";
 import GameObserver from "../../../common/observer/gameObserver.js";
 import Observer from "../../../common/observer/observer.js";
 import { GameEvents } from "../types/events.js";
@@ -26,6 +26,7 @@ export default class MainScene extends Phaser.Scene {
     this.gameMaster = gameMaster;
     this.world = new World(this, this.observer, gameMaster, onEnd);
     this.world.create();
+    this.physics.world.setBounds(...WORLD_BOUNDS)
   }
 
   update() {

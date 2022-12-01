@@ -11,3 +11,7 @@ export const KILLS_TO_UNLOCK = {
   [GunName.Shotgun]: 10,
   [GunName.Rpg]: 50
 };
+
+export const ZOMBIE_SIZE = [80, 200] as const;
+export const PLAYER_SIZE = [80, 240] as const;
+export const WORLD_BOUNDS = [-GAME_WIDTH/2, -GAME_HEIGHT/2, GAME_WIDTH, GAME_HEIGHT] as const;
