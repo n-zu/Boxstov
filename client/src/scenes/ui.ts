@@ -115,7 +115,7 @@ export default class UI extends Phaser.Scene {
   world?: World;
   points?: Points;
   minimap?: MiniMap;
-  killsPerPlater?: killsPerPlayer;
+  killsPerPlayer?: killsPerPlayer;
 
   constructor() {
     super({ key: "UI" });
@@ -127,7 +127,7 @@ export default class UI extends Phaser.Scene {
     this.points = new Points(this);
     this.world = data.world;
     this.minimap = new MiniMap(this);
-    this.killsPerPlater = new killsPerPlayer(this);
+    this.killsPerPlayer = new killsPerPlayer(this);
 
     // TODO: Why doesnt this work?
     /*data.gameMaster.addAction("sync", (state) => {
@@ -143,7 +143,7 @@ export default class UI extends Phaser.Scene {
   update() {
     this.points?.update(this.world?.stats.kills || 0, this.world?.stats.rage || 0);
     this.minimap?.update(this.world);
-    this.killsPerPlater?.update(this.world?.stats.killsPerPlayer || {});
+    this.killsPerPlayer?.update(this.world?.stats.killsPerPlayer || {});
   }
 
   private addJoinUrl() {

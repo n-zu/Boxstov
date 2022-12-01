@@ -28,8 +28,8 @@ export class Player extends Phaser.Physics.Arcade.Sprite {
     observer: Observer<GameEvents>,
     id: string,
     gameMaster: GameMaster,
-    x: number = 0,
-    y: number = 0
+    x = 0,
+    y = 0
   ) {
     super(scene, x, y, "");
     scene.physics.add.existing(this);

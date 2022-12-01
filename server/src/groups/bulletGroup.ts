@@ -56,12 +56,10 @@ export class BulletGroup extends Phaser.Physics.Arcade.Group {
     for (let i = 0; i < 5; i++) {
       const bullet = this.getFirstDead(false) as Bullet;
       if (bullet) {
-        const rotation = bulletInfo.rotation + (i - 2) * 0.1;
-        console.log(rotation);
         bullet.fire(
           bulletInfo.x,
           bulletInfo.y,
-          rotation,
+          bulletInfo.rotation + (i - 2) * 0.1,
           bulletInfo.playerId,
           bulletInfo.gunName
         );

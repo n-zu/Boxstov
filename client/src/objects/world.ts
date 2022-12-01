@@ -3,21 +3,18 @@ import { BulletGroup } from "../groups/bulletGroup";
 import { GameMaster } from "../gameMaster/gameMaster";
 import { PlayerControls } from "../controls/playerControls";
 import { EnemyGroup } from "../groups/enemyGroup";
-import { WorldState, WorldStats } from "../../../common/types/state";
+import { WorldState } from "../../../common/types/state";
 import { SyncUpdate } from "../../../common/types/messages";
 import { ENEMY_GROUP_MAX } from "../../../common/constants";
 import Observer from "../../../common/observer/observer.js";
 import { GameEvents } from "../types/events";
+import WorldStats from "./worldStats.js";
 
 export class World {
   players!: Player[];
   enemies: EnemyGroup;
   observer: Observer<GameEvents>;
-  stats: WorldStats = {
-    kills: 0,
-    killsPerPlayer: {},
-    rage: 0
-  };
+  stats: WorldStats;
   playerControls!: PlayerControls;
   bulletGroup!: BulletGroup;
   gameMaster: GameMaster;
@@ -27,6 +24,7 @@ export class World {
     this.gameMaster = gameMaster;
     this.scene = scene;
     this.enemies = new EnemyGroup(scene, ENEMY_GROUP_MAX);
+    this.stats = new WorldStats(observer);
     this.observer = observer;
 
     this.setupGameMaster(gameMaster);
@@ -46,10 +44,7 @@ export class World {
     this.enemies.sync(worldState.enemies);
 
     this.bulletGroup.sync(worldState.bullets);
-
-    this.stats.rage = worldState.stats.rage;
-    this.stats.kills = worldState.stats.kills;
-    this.stats.killsPerPlayer = worldState.stats.killsPerPlayer;
+    this.stats.sync(worldState.stats);
   }
 
   private setupFirstPlayer(

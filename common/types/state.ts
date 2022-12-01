@@ -7,10 +7,10 @@ export type WorldState = {
   players: PlayerState[];
   bullets: BulletGroupState;
   enemies: EnemyGroupState;
-  stats: WorldStats;
+  stats: WorldStatsState;
 };
 
-export type WorldStats = {
+export type WorldStatsState = {
   rage: number;
   kills: number;
   killsPerPlayer: Record<string, number>;

@@ -84,7 +84,7 @@ export default class LoadScene extends Phaser.Scene {
   }
 
   preload() {
-    let menu = import("./menu");
+    const menu = import("./menu");
     this.loadingBar(() => {
       console.log("Loaded all assets!");
       this.createAnimations();

@@ -4,38 +4,34 @@ import { GameMaster } from "../gameMaster/gameMaster.js";
 import { Enemy } from "./enemy.js";
 import { Bullet } from "./bullet.js";
 import { Difficulty, EnemyGroup } from "../groups/enemyGroup.js";
-import { WorldState, WorldStats } from "../../../common/types/state.js";
+import { WorldState } from "../../../common/types/state.js";
 import { PlayerUpdate } from "../../../common/types/messages.js";
 import { ENEMY_GROUP_MAX } from "../../../common/constants.js";
 import Observer from "../../../common/observer/observer.js";
 import { GameEvents } from "../types/events.js";
+import WorldStats from "./worldStats.js";
 
 const INACTIVE_THRESHOLD = 60000; // if 60 seconds pass, the player is considered inactive
 
 export class World {
   players: Player[];
-  enemies?: EnemyGroup;
+  enemies: EnemyGroup;
   bulletGroup: BulletGroup;
   gameMaster: GameMaster;
   scene: Phaser.Scene;
   observer: Observer<GameEvents>;
-  stats: WorldStats = {
-    kills: 0,
-    killsPerPlayer: {},
-    rage: 0
-  };
+  stats: WorldStats;
   onEnd: () => void;
 
   constructor(scene: Phaser.Scene, observer: Observer<GameEvents>, gameMaster: GameMaster, onEnd: () => void) {
     this.players = [];
     this.observer = observer;
     this.bulletGroup = new BulletGroup(scene, observer);
+    this.stats = new WorldStats(observer);
     this.gameMaster = gameMaster;
     this.scene = scene;
     this.onEnd = onEnd;
-  }
 
-  public create() {
     const spawnPoints = this.getSpawnPoints();
 
     this.enemies = new EnemyGroup(
@@ -46,7 +42,9 @@ export class World {
       spawnPoints,
       this.gameMaster
     );
+  }
 
+  public create() {
     this.scene.physics.add.overlap(this.enemies, this.bulletGroup, (e, b) => {
       const bullet = b as Bullet;
       const enemy = e as Enemy;
@@ -58,8 +56,6 @@ export class World {
     // Enemies repel each other
     this.scene.physics.add.collider(this.enemies, this.enemies);
     this.setupGameMaster(this.gameMaster);
-
-    this.subscribeToEvents();
   }
 
   public update() {
@@ -68,19 +64,15 @@ export class World {
     this.players = this.players.filter(isActive);
     if (!this.players.length) this.onEnd();
     this.enemies?.update(this.players);
-    this.stats.rage = Math.max(0, this.stats.rage - 0.002);
+    this.stats.update();
   }
 
   public getState(): WorldState {
     return {
       players: this.players.map((player) => player.getState()),
       bullets: this.bulletGroup.getState(),
-      stats: {
-        rage: this.stats.rage,
-        kills: this.stats.kills,
-        killsPerPlayer: this.stats.killsPerPlayer
-      },
-      enemies: this.enemies!.getState()
+      stats: this.stats.getState(),
+      enemies: this.enemies.getState()
     };
   }
 
@@ -95,12 +87,6 @@ export class World {
     );
     this.players.push(player);
     return true;
-  }
-
-  private subscribeToEvents() {
-    this.observer.subscribe("enemyKilled", killerId =>
-      this.onEnemyKilled(killerId)
-    );
   }
 
   private getSpawnPoints(): { x: number; y: number }[] {
@@ -125,16 +111,5 @@ export class World {
       const player = this.getPlayer(data.id);
       player?.handleMessage(data);
     });
-
-    /*gameMaster.addAction("enemy", (data: EnemyUpdate) => {
-      this.enemies?.handleMessage(data);
-    });*/
-  }
-
-  private onEnemyKilled(killerId: string) {
-    this.stats.kills++;
-    this.stats.killsPerPlayer[killerId] =
-      (this.stats.killsPerPlayer[killerId] || 0) + 1;
-    this.stats.rage = Math.ceil(this.stats.rage) + 1;
   }
 }

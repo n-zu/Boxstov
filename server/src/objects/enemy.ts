@@ -47,7 +47,7 @@ export class Enemy extends Phaser.Physics.Arcade.Sprite {
     this.observer = observer;
   }
 
-  public update(players: Player[]) {
+  public async update(players: Player[]) {
     // This allows random movement and improves performance by not updating
     // the enemy every frame. We should consider the consequences of using
     // randomness, because the guest will calculate a different path. Maybe
