@@ -1,3 +1,4 @@
+import "@geckos.io/phaser-on-nodejs";
 import { ServerChannel } from "@geckos.io/server";
 import http from "http";
 import { Create, Join } from "../../common/types/packet.js";
