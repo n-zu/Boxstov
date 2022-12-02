@@ -4,7 +4,7 @@ import { GameMaster } from "../gameMaster/gameMaster.js";
 import MovementDirection from "../../../common/controls/direction.js";
 import { PlayerRecentEvent, PlayerState } from "../../../common/types/state.js";
 import { PlayerUpdate } from "../../../common/types/messages.js";
-import { GAME_HEIGHT, GAME_WIDTH, KILLS_TO_UNLOCK, PLAYER_SIZE, PLAYER_SPEED } from "../../../common/constants.js";
+import { KILLS_TO_UNLOCK, PLAYER_SIZE, PLAYER_SPEED } from "../../../common/constants.js";
 import { GunName, Guns } from "../../../common/guns.js";
 import Observer from "../../../common/observer/observer.js";
 import { GameEvents } from "../types/events.js";
@@ -32,14 +32,15 @@ export class Player extends Phaser.Physics.Arcade.Sprite {
     y = 0
   ) {
     super(scene, x, y, "");
-    scene.physics.add.existing(this);
+    this.scene = scene;
+    
     scene.add.existing(this);
+    scene.physics.add.existing(this);
     this.setBodySize(...PLAYER_SIZE);
     this.setCollideWorldBounds(true);
 
     this.observer = observer;
     this.id = id;
-    this.scene = scene;
     this.gameMaster = gameMaster;
     this.subscribeToEvents();
   }
