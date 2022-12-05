@@ -9,7 +9,7 @@ export type BulletInfo = {
   playerId: string;
 };
 
-export interface GameEvents extends Events {
+export type GameEvents = {
   enemyKilled: (killerId: string) => void;
   shootBullet: (info: BulletInfo) => void;
 }

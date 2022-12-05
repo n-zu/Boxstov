@@ -176,7 +176,7 @@ export class Player extends Sprite {
           this.observer.notify("playerShoot", this);
           break;
         case "receive_damage":
-          this.observer.notify("playerReceiveDamage", this);
+          this.observer.notify("playerReceivedDamage", this);
           break;
         case "kill":
           this.observer.notify("playerKill", this);

@@ -25,7 +25,7 @@ export default class AudioPlayer {
     this.observer.subscribe("playerShoot", (player) => this.playShootSound(player));
     this.observer.subscribe("playerSwitchedGun", (player) => this.playSwitchGunSound(player));
     this.observer.subscribe("playerUnlockedGun", (player) => this.playUnlockGunSound(player));
-    this.observer.subscribe("playerReceiveDamage", (player) => this.playPlayerReceivedDamageSound(player));
+    this.observer.subscribe("playerReceivedDamage", (player) => this.playPlayerReceivedDamageSound(player));
     this.observer.subscribe("enemyReceivedDamage", (enemy) => this.playEnemyReceivedDamageSound(enemy));
   }
 

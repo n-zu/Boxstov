@@ -1,10 +1,9 @@
 import { GunName } from "../../../common/guns";
-import { Events } from "../../../common/observer/observer";
 import { UnitVector } from "../../../common/types/direction";
 import { Player } from "../objects/player";
 import { Enemy } from "../objects/enemy";
 
-export interface GameEvents extends Events {
+export type GameEvents = {
   /// Local player wants to change gun
   triggerChangeGun: (name: GunName) => void;
   /// Local player wants to move in a direction
@@ -31,4 +30,4 @@ export interface GameEvents extends Events {
   playerReceivedDamage: (player: Player) => void;
   /// Some enemy has received damage
   enemyReceivedDamage: (enemy: Enemy) => void;
-}
+};
