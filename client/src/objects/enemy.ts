@@ -6,9 +6,8 @@ import Phaser from "phaser";
 import { GameEvents } from "../types/events";
 import Observer from "../../../common/observer/observer";
 import Sprite = Phaser.Physics.Arcade.Sprite;
-import { ZOMBIE_SIZE } from "../../../common/constants";
+import { ZOMBIE_SIZE, ZOMBIE_SPEED } from "../../../common/constants";
 
-const BASE_SPEED = 50;
 const HEALTH = 100;
 
 export class Enemy extends Sprite {
@@ -20,7 +19,13 @@ export class Enemy extends Sprite {
   speed: number;
   observer: Observer<GameEvents>;
 
-  constructor(scene: Phaser.Scene, observer: Observer<GameEvents>, x: number, y: number, id: number) {
+  constructor(
+    scene: Phaser.Scene,
+    observer: Observer<GameEvents>,
+    x: number,
+    y: number,
+    id: number
+  ) {
     super(scene, x, y, "zombie");
     scene.physics.add.existing(this);
     scene.add.existing(this);
@@ -29,7 +34,7 @@ export class Enemy extends Sprite {
     this.observer = observer;
     this.visible = false;
     this.active = false;
-    this.speed = BASE_SPEED;
+    this.speed = ZOMBIE_SPEED.SLOW;
     this.id = id;
   }
 
@@ -61,6 +66,7 @@ export class Enemy extends Sprite {
     this.setVisible(state.visible);
     this.active = state.active;
     this.action = state.action;
+    this.speed = state.speed;
   }
 
   public receiveDamage(damage: number) {
@@ -76,7 +82,6 @@ export class Enemy extends Sprite {
     events.forEach((event) => {
       switch (event) {
         case "receive_damage":
-          console.log("switch case receive_damage");
           this.observer.notify("enemyReceivedDamage", this);
           this.changeColor();
           break;
@@ -102,14 +107,19 @@ export class Enemy extends Sprite {
     this.movementDirection = MovementDirection.decode(state.movementDirection);
     this.setVelocity(...this.movementDirection.getSpeed(this.speed));
 
+    const action =
+      this.action === AnimationSuffix.Attack
+        ? AnimationSuffix.Attack
+        : this.speed >= ZOMBIE_SPEED.FAST
+        ? AnimationSuffix.Run
+        : AnimationSuffix.Walk;
+
     if (this.movementDirection.isMoving()) {
       playAnimation(
         this,
         AnimationActor.Zombie,
         this.movementDirection.getFacingDirection(),
-        this.action === AnimationSuffix.Attack
-          ? AnimationSuffix.Attack
-          : AnimationSuffix.Walk
+        action
       );
     }
   }

@@ -7,9 +7,8 @@ import MovementDirection from "../../../common/controls/direction.js";
 import Observer from "../../../common/observer/observer.js";
 import EnemyBrain from "./enemyBrain.js";
 import { GameEvents } from "../types/events.js";
-import { ZOMBIE_SIZE } from "../../../common/constants.js";
+import { ZOMBIE_SIZE, ZOMBIE_SPEED } from "../../../common/constants.js";
 
-const BASE_SPEED = 80;
 const HEALTH = 100;
 
 export class Enemy extends Phaser.Physics.Arcade.Sprite {
@@ -40,7 +39,8 @@ export class Enemy extends Phaser.Physics.Arcade.Sprite {
 
     this.visible = false;
     this.active = false;
-    this.speed = BASE_SPEED + Math.random() * 20;
+    const isFast = Math.random() > 0.8;
+    this.speed = isFast ? ZOMBIE_SPEED.FAST : ZOMBIE_SPEED.SLOW;
 
     this.brain = new EnemyBrain();
     this.gameMaster = gameMaster;
@@ -81,7 +81,7 @@ export class Enemy extends Phaser.Physics.Arcade.Sprite {
     const state = {
       position: {
         x: this.x,
-        y: this.y
+        y: this.y,
       },
       dead: this.dead,
       health: this.health,
@@ -91,7 +91,7 @@ export class Enemy extends Phaser.Physics.Arcade.Sprite {
       action: this.action,
       movementDirection: this.movementDirection.encode(),
       speed: this.speed,
-      events: this.events
+      events: this.events,
     };
     this.events = [];
     return state;
