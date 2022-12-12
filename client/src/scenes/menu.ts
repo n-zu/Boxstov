@@ -57,6 +57,7 @@ export default class Menu extends Phaser.Scene {
       this.addPlayButton("New Game", () => this.newGame(), 150);
       returnKey.on("down", () => this.newGame());
     }
+    this.addControlsButton(220);
     this.addErrorText(300);
 
     this.scene.add("MainScene", MainScene, false);
@@ -117,6 +118,38 @@ export default class Menu extends Phaser.Scene {
       .on("pointerdown", () => callback())
       .on("pointerover", () => button.setStyle({ fill: "#ccc" }))
       .on("pointerout", () => button.setStyle({ fill: "#fff" }));
+  }
+
+  private addControlsButton(offsetY: number = 0) {
+    const button = this.add
+      .text(this.getX(), this.getY(offsetY), "Controls", TEXT_STYLE)
+      .setPadding(20, 10)
+      .setOrigin(0.5)
+      .setStyle({ backgroundColor: "#03989E", fill: "#fff" })
+      .setInteractive({ useHandCursor: true })
+      .on("pointerdown", () => this.showControls())
+      .on("pointerover", () => button.setStyle({ fill: "#ccc" }))
+      .on("pointerout", () => button.setStyle({ fill: "#fff" }));
+  }
+
+  private showControls() {
+    console.log("CONTROLS");
+    const controls = this.add.sprite(this.getX(), this.getY(), "controls");
+    const inputs = document.getElementsByTagName("input");
+
+    controls.displayHeight = this.cameras.main.height * 0.8;
+    controls.displayWidth = (this.cameras.main.height * 0.8 * 1182) / 1222;
+
+    for (let i = 0; i < inputs.length; i++)
+      inputs[i].style.visibility = "hidden";
+
+    controls.setInteractive();
+    controls.on("pointerdown", () => {
+      for (let i = 0; i < inputs.length; i++)
+        inputs[i].style.visibility = "visible";
+      controls.destroy();
+    });
+    // had to hide inputs as they show in DOM
   }
 
   private addJoinIdText(joinId: string, offsetY: number = 0) {

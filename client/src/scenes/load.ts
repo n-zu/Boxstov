@@ -45,6 +45,8 @@ export function loadGameAssets(scene: Phaser.Scene) {
 export function loadMenuAssets(scene: Phaser.Scene) {
   scene.load.image("squares", "assets/img/background.png");
   scene.load.image("logo", "assets/img/logo.png");
+  scene.load.image("controls", "assets/controls/controls.png");
+  scene.load.image("cog", "assets/controls/cog.png");
   scene.load.html("input", "html/input.html");
 }
 

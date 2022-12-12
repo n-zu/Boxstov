@@ -13,11 +13,11 @@ class Points {
   constructor(scene: Phaser.Scene) {
     this.kills = scene.add.text(10, 10, "Kills: 0", {
       fontFamily: "system-ui",
-      fontSize: "40px"
+      fontSize: "40px",
     });
     this.rage = scene.add.text(10, 50, "Multiplier", {
       fontFamily: "system-ui",
-      fontSize: "30px"
+      fontSize: "30px",
     });
 
     this.bar = scene.add.graphics();
@@ -50,7 +50,7 @@ class killsPerPlayer {
     this.text = scene.add.text(14, 220, "No Kills", {
       fontFamily: "system-ui",
       fontSize: "15px",
-      strokeThickness: 0.08
+      strokeThickness: 0.08,
     });
     this.text.setDepth(9999);
   }
@@ -124,6 +124,7 @@ export default class UI extends Phaser.Scene {
   create(data: { gameMaster: GameMaster; world: World }) {
     this.gameMaster = data.gameMaster;
     this.addJoinUrl();
+    this.addControls();
     this.points = new Points(this);
     this.world = data.world;
     this.minimap = new MiniMap(this);
@@ -141,14 +142,19 @@ export default class UI extends Phaser.Scene {
   }
 
   update() {
-    this.points?.update(this.world?.stats.kills || 0, this.world?.stats.rage || 0);
+    this.points?.update(
+      this.world?.stats.kills || 0,
+      this.world?.stats.rage || 0
+    );
     this.minimap?.update(this.world);
     this.killsPerPlayer?.update(this.world?.stats.killsPerPlayer || {});
   }
 
   private addJoinUrl() {
     const loc = window.location;
-    const url = `${loc.protocol}//${loc.host}${loc.pathname}?join=${this.gameMaster?.getGameId()}`;
+    const url = `${loc.protocol}//${loc.host}${
+      loc.pathname
+    }?join=${this.gameMaster?.getGameId()}`;
 
     const icon = this.add
       .image(0, 0, "invite")
@@ -162,17 +168,41 @@ export default class UI extends Phaser.Scene {
         const txt = this.add
           .text(x, y, "Copied!", {
             color: "#55ff55",
-            fontSize: "18px"
+            fontSize: "18px",
           })
           .setOrigin(0.5);
         this.tweens.add({
           targets: txt,
           alpha: 0,
           duration: 1000,
-          onComplete: () => txt.destroy()
+          onComplete: () => txt.destroy(),
         });
       })
       .on("pointerover", () => icon.setTintFill(0x383838))
       .on("pointerout", () => icon.clearTint());
+  }
+
+  private addControls() {
+    this.add
+      .image(0, 0, "cog")
+      .setOrigin(1, 1)
+      .setPosition(65, this.cameras.main.height - 10)
+      .setScale(0.09)
+      .setInteractive({ useHandCursor: true })
+      .on("pointerdown", () => this.showControls());
+  }
+
+  private showControls() {
+    const h = this.cameras.main.height * 0.8;
+    const w = (h * 1182) / 1222;
+    const x = this.cameras.main.width / 2;
+    const y = this.cameras.main.height / 2;
+    const controls = this.add.sprite(x, y, "controls");
+
+    controls.displayHeight = h;
+    controls.displayWidth = w;
+
+    controls.setInteractive();
+    controls.on("pointerdown", () => controls.destroy());
   }
 }
