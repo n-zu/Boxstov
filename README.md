@@ -8,6 +8,10 @@ Zombies survival co-op game using Phaser and WebRTC.
 
 ## How To Use
 
+### Requirements
+
+This project requires `Node 18`
+
 ### Client
 
 ```bash
