@@ -5,7 +5,7 @@ import { config } from "../config.js";
 import MainScene from "../scenes/mainScene.js";
 
 export class MultiplayerGame extends Phaser.Game {
-  mainScene?: MainScene;
+  mainScene: MainScene;
 
   constructor(gameMaster: GameMaster, onEnd: () => void) {
     super(config);
@@ -16,6 +16,6 @@ export class MultiplayerGame extends Phaser.Game {
   }
 
   public addPlayer(id: string): boolean {
-    return this.mainScene?.addPlayer(id) || false;
+    return this.mainScene.addPlayer(id) || false;
   }
 }
