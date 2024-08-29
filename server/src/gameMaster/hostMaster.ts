@@ -32,6 +32,10 @@ export class HostMaster {
   constructor(server: http.Server) {
     this.io = geckos({
       iceServers: iceServers,
+      portRange: {
+        min: 20000,
+        max: 25000,
+      }
     });
     this.io.addServer(server);
     this.addHandlersCallback();
