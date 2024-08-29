@@ -45,7 +45,7 @@ const prod = {
       ],
     }),
     new DefinePlugin({
-      "process.env.SERVER_URL": JSON.stringify("https://boxstov.delu.ar"),
+      "process.env.SERVER_URL": JSON.stringify("http://149.50.142.55"),
     }),
   ],
 };
