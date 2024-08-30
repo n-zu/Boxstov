@@ -49,10 +49,6 @@ export class Enemy extends Phaser.Physics.Arcade.Sprite {
   }
 
   public async update(players: Player[]) {
-    // This allows random movement and improves performance by not updating
-    // the enemy every frame. We should consider the consequences of using
-    // randomness, because the guest will calculate a different path. Maybe
-    // we should use a seed
     if (!this.body.enable) return;
 
     const canThink = this.brain.think();
