@@ -5,7 +5,7 @@ import { Bullet } from "./bullet.js";
 import { Difficulty, EnemyGroup } from "../groups/enemyGroup.js";
 import { WorldState } from "../../../common/types/state.js";
 import { PlayerUpdate } from "../../../common/types/messages.js";
-import { ENEMY_GROUP_MAX, MS_BETWEEN_SYNCS } from "../../../common/constants.js";
+import { ENEMY_GROUP_MAX } from "../../../common/constants.js";
 import Observer from "../../../common/observer/observer.js";
 import { GameEvents } from "../types/events.js";
 import WorldStats from "./worldStats.js";
