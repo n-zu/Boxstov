@@ -4,7 +4,7 @@ import geckos, {
   ServerChannel,
 } from "@geckos.io/server";
 import http from "http";
-import { ClientMessage, Message } from "../../../common/types/messages.js";
+import { ClientMessage } from "../../../common/types/messages.js";
 import {
   ClientPacket,
   ClientPacketType,
