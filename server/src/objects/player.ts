@@ -1,6 +1,5 @@
 import "@geckos.io/phaser-on-nodejs";
 import Phaser from "phaser";
-import { GameMaster } from "../gameMaster/gameMaster.js";
 import MovementDirection from "../../../common/controls/direction.js";
 import { PlayerRecentEvent, PlayerState } from "../../../common/types/state.js";
 import { PlayerUpdate } from "../../../common/types/messages.js";
@@ -12,7 +11,6 @@ import { GameEvents } from "../types/events.js";
 
 export class Player extends Phaser.Physics.Arcade.Sprite {
   scene: Phaser.Scene;
-  gameMaster: GameMaster;
   observer: Observer<GameEvents>;
   id: string;
   movementDirection: MovementDirection = new MovementDirection();
@@ -27,7 +25,6 @@ export class Player extends Phaser.Physics.Arcade.Sprite {
     scene: Phaser.Scene,
     observer: Observer<GameEvents>,
     id: string,
-    gameMaster: GameMaster,
     x = 0,
     y = 0
   ) {
@@ -41,7 +38,6 @@ export class Player extends Phaser.Physics.Arcade.Sprite {
 
     this.observer = observer;
     this.id = id;
-    this.gameMaster = gameMaster;
     this.subscribeToEvents();
   }
 

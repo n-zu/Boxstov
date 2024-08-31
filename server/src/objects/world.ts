@@ -1,6 +1,5 @@
 import { Player } from "./player.js";
 import { BulletGroup } from "../groups/bulletGroup.js";
-import { GameMaster } from "../gameMaster/gameMaster.js";
 import { Enemy } from "./enemy.js";
 import { Bullet } from "./bullet.js";
 import { Difficulty, EnemyGroup } from "../groups/enemyGroup.js";
@@ -17,23 +16,18 @@ export class World {
   players: Player[];
   enemies: EnemyGroup;
   bulletGroup: BulletGroup;
-  gameMaster: GameMaster;
   scene: Phaser.Scene;
   observer: Observer<GameEvents>;
   stats: WorldStats;
-  onEnd: () => void;
+  onEnd: () => void; 
 
-  lastSyncTimestamp = 0;
-  
-
-  constructor(scene: Phaser.Scene, observer: Observer<GameEvents>, gameMaster: GameMaster, onEnd: () => void) {
+  constructor(scene: Phaser.Scene, observer: Observer<GameEvents>, onEnd: () => void) {
     this.players = [];
     this.observer = observer;
     this.observer.subscribe("tick", () => this.update());
     
     this.bulletGroup = new BulletGroup(scene, observer);
     this.stats = new WorldStats(observer);
-    this.gameMaster = gameMaster;
     this.scene = scene;
     this.onEnd = onEnd;
 
@@ -61,7 +55,6 @@ export class World {
 
     // Enemies repel each other
     this.scene.physics.add.collider(this.enemies, this.enemies);
-    this.setupGameMaster(this.gameMaster);
   }
 
   public update() {
@@ -72,7 +65,6 @@ export class World {
     // if (!this.players.length) this.onEnd();
     this.enemies?.update(this.players);
     this.stats.update();
-    this.sync();
   }
 
   public getState(): WorldState {
@@ -90,11 +82,15 @@ export class World {
     const player = new Player(
       this.scene,
       this.observer,
-      id,
-      this.gameMaster
+      id
     );
     this.players.push(player);
     return true;
+  }
+
+  public updatePlayer(data: PlayerUpdate) {
+    const player = this.getPlayer(data.id);
+    player?.handleMessage(data);
   }
 
   private getSpawnPoints(): { x: number; y: number }[] {
@@ -112,19 +108,5 @@ export class World {
 
   private getPlayer(id: string): Player | undefined {
     return this.players.find((p) => p.id === id);
-  }
-
-  private setupGameMaster(gameMaster: GameMaster) {
-    gameMaster.addAction("player", (data: PlayerUpdate) => {
-      const player = this.getPlayer(data.id);
-      player?.handleMessage(data);
-    });
-  }
-
-  private sync() {
-    if (Date.now() - this.lastSyncTimestamp > MS_BETWEEN_SYNCS) {
-      this.gameMaster.broadcast("sync", this.getState());
-      this.lastSyncTimestamp = Date.now();
-    }
   }
 }
