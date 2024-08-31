@@ -45,7 +45,6 @@ export class World {
       ENEMY_GROUP_MAX,
       Difficulty.Hard,
       spawnPoints,
-      this.gameMaster
     );
 
     this.create();

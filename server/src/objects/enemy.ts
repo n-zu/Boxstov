@@ -1,7 +1,6 @@
 import "@geckos.io/phaser-on-nodejs";
 import Phaser from "phaser";
 import { Player } from "./player.js";
-import { GameMaster } from "../gameMaster/gameMaster.js";
 import { EnemyRecentEvents, EnemyState } from "../../../common/types/state.js";
 import MovementDirection from "../../../common/controls/direction.js";
 import Observer from "../../../common/observer/observer.js";
@@ -16,7 +15,6 @@ export class Enemy extends Phaser.Physics.Arcade.Sprite {
   health = HEALTH;
   strength = 3;
   movementDirection: MovementDirection = new MovementDirection();
-  gameMaster: GameMaster;
   observer: Observer<GameEvents>;
   brain: EnemyBrain;
   action = "walk";
@@ -28,7 +26,6 @@ export class Enemy extends Phaser.Physics.Arcade.Sprite {
     scene: Phaser.Scene,
     x: number,
     y: number,
-    gameMaster: GameMaster,
     id: number,
     observer: Observer<GameEvents>
   ) {
@@ -43,7 +40,6 @@ export class Enemy extends Phaser.Physics.Arcade.Sprite {
     this.speed = isFast ? ZOMBIE_SPEED.FAST : ZOMBIE_SPEED.SLOW;
 
     this.brain = new EnemyBrain();
-    this.gameMaster = gameMaster;
     this.id = id;
     this.observer = observer;
   }

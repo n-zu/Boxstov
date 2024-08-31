@@ -25,14 +25,13 @@ export class EnemyGroup extends Phaser.Physics.Arcade.Group {
     maxEnemies: number,
     difficulty: Difficulty,
     spawnPoints: SpawnPoint[],
-    gameMaster: GameMaster,
   ) {
     super(scene.physics.world, scene);
     this.observer = observer;
 
     const enemies: Enemy[] = [];
     for (let i = 0; i < maxEnemies; i++) {
-      enemies.push(new Enemy(scene, 0, 0, gameMaster, i, observer));
+      enemies.push(new Enemy(scene, 0, 0, i, observer));
     }
 
     this.addMultiple(enemies);
