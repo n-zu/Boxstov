@@ -6,7 +6,7 @@ import { Bullet } from "./bullet.js";
 import { Difficulty, EnemyGroup } from "../groups/enemyGroup.js";
 import { WorldState } from "../../../common/types/state.js";
 import { PlayerUpdate } from "../../../common/types/messages.js";
-import { ENEMY_GROUP_MAX } from "../../../common/constants.js";
+import { ENEMY_GROUP_MAX, MS_BETWEEN_SYNCS } from "../../../common/constants.js";
 import Observer from "../../../common/observer/observer.js";
 import { GameEvents } from "../types/events.js";
 import WorldStats from "./worldStats.js";
@@ -23,9 +23,14 @@ export class World {
   stats: WorldStats;
   onEnd: () => void;
 
+  lastSyncTimestamp = 0;
+  
+
   constructor(scene: Phaser.Scene, observer: Observer<GameEvents>, gameMaster: GameMaster, onEnd: () => void) {
     this.players = [];
     this.observer = observer;
+    this.observer.subscribe("tick", () => this.update());
+    
     this.bulletGroup = new BulletGroup(scene, observer);
     this.stats = new WorldStats(observer);
     this.gameMaster = gameMaster;
@@ -42,6 +47,8 @@ export class World {
       spawnPoints,
       this.gameMaster
     );
+
+    this.create();
   }
 
   public create() {
@@ -62,9 +69,11 @@ export class World {
     const isActive = (p: Player) =>
       Date.now() - INACTIVE_THRESHOLD < p.lastUpdate;
     this.players = this.players.filter(isActive);
-    if (!this.players.length) this.onEnd();
+    // FIXME
+    // if (!this.players.length) this.onEnd();
     this.enemies?.update(this.players);
     this.stats.update();
+    this.sync();
   }
 
   public getState(): WorldState {
@@ -111,5 +120,12 @@ export class World {
       const player = this.getPlayer(data.id);
       player?.handleMessage(data);
     });
+  }
+
+  private sync() {
+    if (Date.now() - this.lastSyncTimestamp > MS_BETWEEN_SYNCS) {
+      this.gameMaster.broadcast("sync", this.getState());
+      this.lastSyncTimestamp = Date.now();
+    }
   }
 }

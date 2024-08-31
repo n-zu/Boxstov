@@ -1,5 +1,4 @@
 import { GunName } from "../../../common/guns";
-import { Events } from "../../../common/observer/observer";
 
 export type BulletInfo = {
   x: number;
@@ -12,4 +11,5 @@ export type BulletInfo = {
 export type GameEvents = {
   enemyKilled: (killerId: string) => void;
   shootBullet: (info: BulletInfo) => void;
+  tick: () => void;
 }
