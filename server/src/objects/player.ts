@@ -41,11 +41,12 @@ export class Player extends Phaser.Physics.Arcade.Sprite {
     this.subscribeToEvents();
   }
 
-  public shoot(playerId: string, gunName: GunName = this.gunName) {
+  public shoot(gunName: GunName = this.gunName) {
     const gun = Guns[gunName];
     const rotation = gun.getGunRotation(this.movementDirection);
     const [xGun, yGun] = gun.getGunOffset(this.movementDirection);
 
+    const playerId = this.id;
     this.observer.notify("shootBullet", {
       x: this.x + xGun,
       y: this.y + yGun,
@@ -90,7 +91,7 @@ export class Player extends Phaser.Physics.Arcade.Sprite {
         this.move(MovementDirection.decode(message.direction));
         break;
       case "shoot":
-        this.shoot(message.id);
+        this.shoot();
         break;
       case "switch_gun":
         this.switchGun(message.gunName as GunName);
