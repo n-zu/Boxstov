@@ -5,6 +5,7 @@ import { Create, Join } from "../../common/types/packet.js";
 import { MultiplayerGame } from "./game/multiplayerGame.js";
 import { HostMaster } from "./gameMaster/hostMaster.js";
 import { SessionMaster } from "./gameMaster/sessionMaster.js";
+import GameObserver from "../../common/observer/gameObserver.js";
 
 type Session = {
   game: MultiplayerGame;
@@ -38,10 +39,12 @@ export default class GameServer {
   private onCreate(channel: ServerChannel, data: Create) {
     const id = this.generateGameId();
     const session = new SessionMaster(id, this.hostMaster);
-    const game = new MultiplayerGame(session, () => {
+    let observer = new GameObserver();
+    observer.subscribe("gameEnd", () => {
       game.destroy(false);
       delete this.games[id];
     });
+    const game = new MultiplayerGame(session, observer);
     this.games[id] = {
       game,
       master: session

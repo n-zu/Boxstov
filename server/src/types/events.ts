@@ -12,4 +12,5 @@ export type GameEvents = {
   enemyKilled: (killerId: string) => void;
   shootBullet: (info: BulletInfo) => void;
   tick: () => void;
+  gameEnd: () => void;
 }

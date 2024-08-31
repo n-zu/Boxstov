@@ -19,9 +19,8 @@ export class World {
   scene: Phaser.Scene;
   observer: Observer<GameEvents>;
   stats: WorldStats;
-  onEnd: () => void; 
 
-  constructor(scene: Phaser.Scene, observer: Observer<GameEvents>, onEnd: () => void) {
+  constructor(scene: Phaser.Scene, observer: Observer<GameEvents>) {
     this.players = [];
     this.observer = observer;
     this.observer.subscribe("tick", () => this.update());
@@ -29,7 +28,6 @@ export class World {
     this.bulletGroup = new BulletGroup(scene, observer);
     this.stats = new WorldStats(observer);
     this.scene = scene;
-    this.onEnd = onEnd;
 
     const spawnPoints = this.getSpawnPoints();
 
@@ -61,8 +59,9 @@ export class World {
     const isActive = (p: Player) =>
       Date.now() - INACTIVE_THRESHOLD < p.lastUpdate;
     this.players = this.players.filter(isActive);
-    // FIXME
-    // if (!this.players.length) this.onEnd();
+    if (!this.players.length) {
+      this.observer.notify("gameEnd");
+    }
     this.enemies?.update(this.players);
     this.stats.update();
   }
