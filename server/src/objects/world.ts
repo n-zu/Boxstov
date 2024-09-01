@@ -1,4 +1,4 @@
-import { Player } from "./player.js";
+import { Player } from "../player/player.js";
 import { BulletGroup } from "../groups/bulletGroup.js";
 import { Enemy } from "./enemy.js";
 import { Bullet } from "./bullet.js";

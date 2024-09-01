@@ -1,5 +1,5 @@
 import { Enemy } from "../objects/enemy.js";
-import { Player } from "../objects/player.js";
+import { Player } from "../player/player.js";
 import { EnemyGroupState, EnemyState, SpawnPoint } from "../../../common/types/state.js";
 import Observer from "../../../common/observer/observer.js";
 import { GameEvents } from "../types/events.js";

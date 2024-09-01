@@ -3,10 +3,11 @@ import Phaser from "phaser";
 import MovementDirection from "../../../common/controls/direction.js";
 import { PlayerRecentEvent, PlayerState } from "../../../common/types/state.js";
 import { PlayerUpdate } from "../../../common/types/messages.js";
-import { KILLS_TO_UNLOCK, PLAYER_SIZE, PLAYER_SPEED } from "../../../common/constants.js";
-import { GunName, Guns } from "../../../common/guns.js";
+import { PLAYER_SIZE, PLAYER_SPEED } from "../../../common/constants.js";
+import { GunName } from "../../../common/guns.js";
 import Observer from "../../../common/observer/observer.js";
 import { GameEvents } from "../types/events.js";
+import PlayerArsenal from "./playerArsenal.js";
 
 
 export class Player extends Phaser.Physics.Arcade.Sprite {
@@ -16,9 +17,8 @@ export class Player extends Phaser.Physics.Arcade.Sprite {
   movementDirection: MovementDirection = new MovementDirection();
   maxHealth = 100;
   health = 100;
-  kills = 0;
   lastUpdate = Date.now();
-  gunName = GunName.Rifle;
+  arsenal: PlayerArsenal;
   recentEvents: PlayerRecentEvent[] = [];
 
   constructor(
@@ -38,29 +38,16 @@ export class Player extends Phaser.Physics.Arcade.Sprite {
 
     this.observer = observer;
     this.id = id;
-    this.subscribeToEvents();
+    this.arsenal = new PlayerArsenal(id, observer);
   }
 
-  public shoot(gunName: GunName = this.gunName) {
-    const gun = Guns[gunName];
-    const rotation = gun.getGunRotation(this.movementDirection);
-    const [xGun, yGun] = gun.getGunOffset(this.movementDirection);
-
-    const playerId = this.id;
-    this.observer.notify("shootBullet", {
-      x: this.x + xGun,
-      y: this.y + yGun,
-      rotation,
-      gunName,
-      playerId
-    });
+  public shoot() {
+    this.arsenal.shoot(this.x, this.y, this.movementDirection);
     this.recentEvents.push("shoot");
   }
 
   public switchGun(gunName: GunName) {
-    if (this.kills >= KILLS_TO_UNLOCK[gunName]) {
-      this.gunName = gunName;
-    }
+    this.arsenal.switchGun(gunName);
   }
 
   public move(direction: MovementDirection) {
@@ -77,8 +64,9 @@ export class Player extends Phaser.Physics.Arcade.Sprite {
       },
       movementDirection: this.movementDirection.encode(),
       health: this.health,
-      gunName: this.gunName,
-      events: this.recentEvents
+      gunName: this.arsenal.currentGun,
+      // FIXME: This is a hack to avoid refactoring the client right now
+      events: this.recentEvents.concat(this.arsenal.recentEvents)
     };
     this.clearEvents();
     return state;
@@ -103,20 +91,6 @@ export class Player extends Phaser.Physics.Arcade.Sprite {
     this.health -= damage;
     this.recentEvents.push("receive_damage");
     if (this.health <= 0) this.health = 0;
-  }
-
-  private subscribeToEvents() {
-    this.observer.subscribe("enemyKilled", (killerId: string) => {
-      if (this.id === killerId) {
-        this.kills++;
-        this.recentEvents.push("kill");
-        for (const gunName of Object.keys(Guns)) {
-          if (this.kills === KILLS_TO_UNLOCK[gunName as GunName]) {
-            this.recentEvents.push("unlocked_gun");
-          }
-        }
-      }
-    });
   }
 
   private clearEvents() {

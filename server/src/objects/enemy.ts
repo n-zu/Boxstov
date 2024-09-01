@@ -1,6 +1,6 @@
 import "@geckos.io/phaser-on-nodejs";
 import Phaser from "phaser";
-import { Player } from "./player.js";
+import { Player } from "../player/player.js";
 import { EnemyRecentEvents, EnemyState } from "../../../common/types/state.js";
 import MovementDirection from "../../../common/controls/direction.js";
 import Observer from "../../../common/observer/observer.js";
