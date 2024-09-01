@@ -14,3 +14,5 @@ nvm alias default 18
 
 # Use node 18
 nvm use 18
+
+echo "Restar the terminal to use Node"
