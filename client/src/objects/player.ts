@@ -7,10 +7,10 @@ import { PlayerRecentEvent, PlayerState } from "../../../common/types/state";
 import { playAnimation } from "../scenes/mainScene";
 import { AnimationSuffix } from "../types/animation";
 import { GunName, Guns } from "../../../common/guns";
-import { PLAYER_SIZE, PLAYER_SPEED } from "../../../common/constants";
 import Observer from "../../../common/observer/observer.js";
 import { GameEvents } from "../types/events";
 import Sprite = Phaser.Physics.Arcade.Sprite;
+import config from "../../../common/config";
 
 const SYNC_DIFF_TOLERANCE = 0.001;
 
@@ -21,8 +21,8 @@ export class Player extends Sprite {
   observer: Observer<GameEvents>;
 
   id: string;
-  maxHealth = 100;
-  health = 100;
+  maxHealth = config.player.health;
+  health = this.maxHealth;
   movementDirection: MovementDirection = new MovementDirection();
   local: boolean;
   gunName = GunName.Rifle;
@@ -43,7 +43,7 @@ export class Player extends Sprite {
 
     scene.physics.add.existing(this);
     scene.add.existing(this);
-    this.setBodySize(...PLAYER_SIZE);
+    this.setBodySize(config.player.size.width, config.player.size.height);
     this.setCollideWorldBounds(true);
     
     this.id = id;
@@ -71,7 +71,7 @@ export class Player extends Sprite {
   }
 
   move() {
-    this.setVelocity(...this.movementDirection.getSpeed(PLAYER_SPEED));
+    this.setVelocity(...this.movementDirection.getSpeed(config.player.speed));
     if (!this.movementDirection.isMoving()) {
       this.doStopMovement();
       return;

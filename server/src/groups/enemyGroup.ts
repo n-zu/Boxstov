@@ -3,6 +3,8 @@ import { Player } from "../player/player.js";
 import { EnemyGroupState, EnemyState, SpawnPoint } from "../../../common/types/state.js";
 import Observer from "../../../common/observer/observer.js";
 import { GameEvents } from "../types/events.js";
+import config from "../../../common/config.js";
+import EnemyPhysique from "../objects/enemy/enemyPhysique.js";
 
 const TIME_BETWEEN_HORDES = 700;
 
@@ -21,7 +23,6 @@ export class EnemyGroup extends Phaser.Physics.Arcade.Group {
   constructor(
     scene: Phaser.Scene,
     observer: Observer<GameEvents>,
-    maxEnemies: number,
     difficulty: Difficulty,
     spawnPoints: SpawnPoint[],
   ) {
@@ -29,8 +30,25 @@ export class EnemyGroup extends Phaser.Physics.Arcade.Group {
     this.observer = observer;
 
     const enemies: Enemy[] = [];
-    for (let i = 0; i < maxEnemies; i++) {
-      enemies.push(new Enemy(scene, 0, 0, i, observer));
+    for (let i = 0; i < config.misc.maxEnemies; i++) {
+      const isFast = Math.random() < config.misc.zombieFastProbability;
+      let physique;
+      if (isFast) {
+        physique = new EnemyPhysique(
+          config.enemies.zombieFast.health,
+          config.enemies.zombieFast.strength,
+          config.enemies.zombieFast.speed,
+          config.enemies.zombieFast.attackRange
+          );
+      } else {
+        physique = new EnemyPhysique(
+          config.enemies.zombieNormal.health,
+          config.enemies.zombieNormal.strength,
+          config.enemies.zombieNormal.speed,
+          config.enemies.zombieNormal.attackRange
+        );
+      }
+      enemies.push(new Enemy(scene, 0, 0, i, observer, physique));
     }
 
     this.addMultiple(enemies);

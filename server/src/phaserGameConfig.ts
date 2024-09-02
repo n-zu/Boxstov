@@ -2,7 +2,7 @@ import "@geckos.io/phaser-on-nodejs";
 import Phaser from "phaser";
 import GameConfig = Phaser.Types.Core.GameConfig;
 
-export const config: GameConfig = {
+export const phaserGameConfig: GameConfig = {
   type: Phaser.HEADLESS,
   parent: "phaser-game",
   width: 896,

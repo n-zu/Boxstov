@@ -10,10 +10,10 @@ export default class EnemyPhysique {
     attackRange: number;
 
     constructor(
-        health: number = 100,
-        strength: number = 3,
-        speed: number = 100,
-        attackRange: number = 150
+        health: number,
+        strength: number,
+        speed: number,
+        attackRange: number
     ) {
         this.maxHealth = health;
         this.health = health;

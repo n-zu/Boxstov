@@ -14,4 +14,6 @@ export default abstract class Gun {
     public abstract getBulledSpeed(): number;
 
     public abstract getDamage(): number;
+
+    public abstract getKillsToUnlock(): number;
 }

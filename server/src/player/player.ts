@@ -1,14 +1,14 @@
 import "@geckos.io/phaser-on-nodejs";
 import Phaser from "phaser";
 import MovementDirection from "../../../common/controls/direction.js";
-import { PlayerRecentEvent, PlayerState } from "../../../common/types/state.js";
+import { PlayerState } from "../../../common/types/state.js";
 import { PlayerUpdate } from "../../../common/types/messages.js";
-import { PLAYER_SIZE, PLAYER_SPEED } from "../../../common/constants.js";
 import { GunName } from "../../../common/guns.js";
 import Observer from "../../../common/observer/observer.js";
 import { GameEvents } from "../types/events.js";
 import PlayerArsenal from "./playerArsenal.js";
 import { BulletGroup } from "../groups/bulletGroup.js";
+import config from "../../../common/config.js";
 
 
 export class Player extends Phaser.Physics.Arcade.Sprite {
@@ -16,8 +16,8 @@ export class Player extends Phaser.Physics.Arcade.Sprite {
   observer: Observer<GameEvents>;
   id: string;
   movementDirection: MovementDirection = new MovementDirection();
-  maxHealth = 100;
-  health = 100;
+  maxHealth: number;
+  health: number;
   lastUpdate = Date.now();
   arsenal: PlayerArsenal;
 
@@ -34,12 +34,14 @@ export class Player extends Phaser.Physics.Arcade.Sprite {
     
     scene.add.existing(this);
     scene.physics.add.existing(this);
-    this.setBodySize(...PLAYER_SIZE);
+    this.setBodySize(config.player.size.width, config.player.size.height);
     this.setCollideWorldBounds(true);
 
     this.observer = observer;
     this.id = id;
     this.arsenal = new PlayerArsenal(id, bullets, observer);
+    this.maxHealth = config.player.health;
+    this.health = this.maxHealth;
   }
 
   public shoot() {
@@ -52,7 +54,7 @@ export class Player extends Phaser.Physics.Arcade.Sprite {
 
   public move(direction: MovementDirection) {
     this.movementDirection = direction;
-    this.setVelocity(...this.movementDirection.getSpeed(PLAYER_SPEED));
+    this.setVelocity(...this.movementDirection.getSpeed(config.player.speed));
   }
 
   public getState(): PlayerState {

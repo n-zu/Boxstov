@@ -1,4 +1,5 @@
 import { GunName } from "../../../common/guns.js";
+import config from "../../../common/config.js";
 import { Bullet } from "../objects/bullet.js";
 import Gun from "./gun.js";
 
@@ -21,12 +22,14 @@ export default class Rpg extends Gun {
     }
 
     public getBulledSpeed(): number {
-        // FIXME: Read from config file
-        return 1000;   
+        return config.guns.rpg.bulletSpeed;
     }
 
     public getDamage(): number {
-        // FIXME: Read from config file
-        return 200;   
+        return config.guns.rpg.damage
+    }
+
+    public getKillsToUnlock(): number {
+        return config.guns.rpg.killsToUnlock;
     }
 }

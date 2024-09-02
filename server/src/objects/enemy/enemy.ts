@@ -1,14 +1,14 @@
 import "@geckos.io/phaser-on-nodejs";
 import Phaser from "phaser";
 import { Player } from "../../player/player.js";
-import { EnemyRecentEvents, EnemyState } from "../../../../common/types/state.js";
+import { EnemyState } from "../../../../common/types/state.js";
 import MovementDirection from "../../../../common/controls/direction.js";
 import Observer from "../../../../common/observer/observer.js";
 import EnemyBrain from "./enemyBrain.js";
 import { GameEvents } from "../../types/events.js";
-import { ZOMBIE_SIZE, ZOMBIE_SPEED } from "../../../../common/constants.js";
 import { UnitVector } from "../../../../common/types/direction.js";
 import EnemyPhysique from "./enemyPhysique.js";
+import config from "../../../../common/config.js";
 
 export class Enemy extends Phaser.Physics.Arcade.Sprite {
   id: number;
@@ -24,7 +24,7 @@ export class Enemy extends Phaser.Physics.Arcade.Sprite {
     y: number,
     id: number,
     observer: Observer<GameEvents>,
-    physique?: EnemyPhysique
+    physique: EnemyPhysique
   ) {
     super(scene, x, y, "zombie");
     this.addToScene();
@@ -32,19 +32,13 @@ export class Enemy extends Phaser.Physics.Arcade.Sprite {
     this.id = id;
     this.observer = observer;
     this.brain = new EnemyBrain(Math.random() * 100);
-
-    if (physique) {
-      this.physique = physique;
-    } else {
-      const isFast = Math.random() > 0.8;
-      this.physique = new EnemyPhysique(undefined, undefined, isFast ? ZOMBIE_SPEED.FAST : ZOMBIE_SPEED.SLOW);
-    }
+    this.physique = physique;
   }
 
   private addToScene() {
     this.scene.add.existing(this);
     this.scene.physics.add.existing(this);
-    this.setBodySize(...ZOMBIE_SIZE);
+    this.setBodySize(config.misc.enemySize.width, config.misc.enemySize.height);
 
     this.visible = false;
     this.active = false;

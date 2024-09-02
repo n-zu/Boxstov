@@ -16,14 +16,16 @@ export default class PlayerArsenal {
     playerId: string;
     kills: number;
     currentGun: Gun;
+    guns: Gun[];
     bullets: BulletGroup;
     observer: Observer<GameEvents>;
 
-    constructor(playerId: string, bullets: BulletGroup, observer: Observer<GameEvents>) {
+    constructor(playerId: string, bullets: BulletGroup, observer: Observer<GameEvents>, availableGuns?: Gun[]) {
         this.playerId = playerId;
         this.kills = 0;
         this.bullets = bullets;
-        this.currentGun = new Rifle(bullets);
+        this.guns = availableGuns || [new Rifle(bullets), new Shotgun(bullets), new Rpg(bullets)];
+        this.currentGun = this.guns[0];
         this.observer = observer;
         this.subscribeToEvents();
     }
@@ -32,8 +34,8 @@ export default class PlayerArsenal {
         this.observer.subscribe("enemyKilled", (killerId: string) => {
             if (this.playerId === killerId) {
               this.kills++;
-              for (const gunName of Object.keys(Guns)) {
-                if (this.kills === KILLS_TO_UNLOCK[gunName as GunName]) {
+              for (let gun of this.guns) {
+                if (gun.getKillsToUnlock() == this.kills) {
                   this.observer.notify("unlockedGun", this.playerId);
                 }
               }
@@ -61,17 +63,12 @@ export default class PlayerArsenal {
     }
 
     public switchGun(gunName: GunName) {
-        if (this.has(gunName)) {
-            switch (gunName) {
-                case GunName.Rifle:
-                    this.currentGun = new Rifle(this.bullets);
-                    break;
-                case GunName.Shotgun:
-                    this.currentGun = new Shotgun(this.bullets);
-                    break;
-                case GunName.Rpg:
-                    this.currentGun = new Rpg(this.bullets);
-                    break;
+        for (const gun of this.guns) {
+            if (gun.getGunName() === gunName) {
+                if (gun.getKillsToUnlock() <= this.kills) {
+                    this.currentGun = gun;
+                }
+                break;
             }
         }
     }

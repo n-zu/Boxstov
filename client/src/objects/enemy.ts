@@ -6,9 +6,10 @@ import Phaser from "phaser";
 import { GameEvents } from "../types/events";
 import Observer from "../../../common/observer/observer";
 import Sprite = Phaser.Physics.Arcade.Sprite;
-import { ZOMBIE_SIZE, ZOMBIE_SPEED } from "../../../common/constants";
+import config from "../../../common/config";
 
-const HEALTH = 100;
+// FIXME: This should not be here 
+const HEALTH = config.enemies.zombieNormal.health;
 
 export class Enemy extends Sprite {
   id: number;
@@ -29,12 +30,12 @@ export class Enemy extends Sprite {
     super(scene, x, y, "zombie");
     scene.physics.add.existing(this);
     scene.add.existing(this);
-    this.setBodySize(...ZOMBIE_SIZE);
+    this.setBodySize(config.misc.enemySize.width, config.misc.enemySize.height);
 
     this.observer = observer;
     this.visible = false;
     this.active = false;
-    this.speed = ZOMBIE_SPEED.SLOW;
+    this.speed = config.enemies.zombieNormal.speed;
     this.id = id;
   }
 
@@ -110,7 +111,7 @@ export class Enemy extends Sprite {
     const action =
       this.action === AnimationSuffix.Attack
         ? AnimationSuffix.Attack
-        : this.speed >= ZOMBIE_SPEED.FAST
+        : this.speed >= config.enemies.zombieNormal.speed
         ? AnimationSuffix.Run
         : AnimationSuffix.Walk;
 

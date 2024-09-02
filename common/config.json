@@ -1,0 +1,53 @@
+{
+    "player": {
+        "health": 100,
+        "speed": 200,
+        "size": {
+            "width": 80,
+            "height": 200
+        }
+    },
+    "guns": {
+        "rifle": {
+            "damage": 10,
+            "bulletSpeed": 2000,
+            "reloadTime": 100,
+            "killsToUnlock": 0
+        },
+        "shotgun": {
+            "damage": 10,
+            "bulletSpeed": 1500,
+            "reloadTime": 800,
+            "killsToUnlock": 5
+        },
+        "rpg": {
+            "damage": 200,
+            "bulletSpeed": 1000,
+            "reloadTime": 1200,
+            "killsToUnlock": 10
+        }
+    },
+    "enemies": {
+        "zombieNormal": {
+            "health": 100,
+            "speed": 100,
+            "strength": 3,
+            "attackRange": 150
+        },
+        "zombieFast": {
+            "health": 100,
+            "speed": 150,
+            "strength": 3,
+            "attackRange": 150
+        }
+    },
+    "misc": {
+        "maxEnemies": 20,
+        "zombieFastProbability": 0.2,
+        "timeBetweenHordes": 700,
+        "enemySize": {
+            "width": 80,
+            "height": 200
+        }
+    }
+}

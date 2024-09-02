@@ -20,6 +20,7 @@ export const numToGunName = (num: number): GunName => {
   }
 };
 
+// FIXME: damage and bulletSpeed are not needed anymore, and should not be read from here
 export abstract class Gun {
   public damage: number;
   public bulletSpeed: number;

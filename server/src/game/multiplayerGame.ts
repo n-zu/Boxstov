@@ -1,7 +1,7 @@
 import "@geckos.io/phaser-on-nodejs";
 import Phaser from "phaser";
 import { GameMaster } from "../gameMaster/gameMaster.js";
-import { config } from "../config.js";
+import { phaserGameConfig } from "../phaserGameConfig.js";
 import MainScene from "../scenes/mainScene.js";
 import { GameEvents } from "../types/events.js";
 import Observer from "../../../common/observer/observer.js";
@@ -18,7 +18,7 @@ export class MultiplayerGame extends Phaser.Game {
   lastSyncTimestamp = 0;
 
   constructor(gameMaster: GameMaster, observer: Observer<GameEvents>) {
-    super(config);
+    super(phaserGameConfig);
     this.gameMaster = gameMaster;
     this.setupGameMaster(gameMaster);
 
