@@ -1,6 +1,6 @@
 import { Player } from "../player/player.js";
 import { BulletGroup } from "../groups/bulletGroup.js";
-import { Enemy } from "./enemy.js";
+import { Enemy } from "./enemy/enemy.js";
 import { Bullet } from "./bullet.js";
 import { Difficulty, EnemyGroup } from "../groups/enemyGroup.js";
 import { WorldState } from "../../../common/types/state.js";

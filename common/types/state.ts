@@ -34,6 +34,14 @@ export type EnemyState = {
   events: EnemyRecentEvents[]
 };
 
+export type EnemyPhysiqueState = {
+  maxHealth: number;
+  health: number;
+  strength: number;
+  speed: number;
+  attackRange: number;
+}
+
 export type EnemyRecentEvents = "receive_damage";
 
 export type EnemyGroupState = {

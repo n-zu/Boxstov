@@ -1,13 +1,15 @@
-import { Player } from "../player/player";
+import { Player } from "../../player/player";
 import { Enemy } from "./enemy";
 
 export default class EnemyBrain {
   cooldown: number;
   cooldownCount: number;
+  action: string;
 
   constructor(cooldown: number) {
     this.cooldown = cooldown;
     this.cooldownCount = cooldown;
+    this.action = "walk";
   }
 
   private canThink(): boolean {
@@ -30,15 +32,16 @@ export default class EnemyBrain {
     const dy = closestPlayer.y - me.y;
 
     const distance = Math.sqrt(dx * dx + dy * dy);
-    const isFar = distance > me.attackRange;
 
     me.turn([dx / distance, dy / distance]);
-
-    me.action = isFar ? "walk" : "atk";
-    if (!isFar) {
+    
+    if (me.physique.canAttack(me, closestPlayer)) {
+      this.action = "atk";
       closestPlayer.receiveDamage(
-        (me.strength * me.scene.game.loop.delta) / 100
+        (me.physique.strength * me.scene.game.loop.delta) / 100
       );
+    } else {
+      this.action = "walk";
     }
   }
 
