@@ -85,7 +85,10 @@ export class World {
     const player = new Player(
       this.scene,
       this.observer,
-      id
+      id,
+      0,
+      0,
+      this.bulletGroup
     );
     this.players.push(player);
     return true;

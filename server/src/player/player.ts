@@ -8,6 +8,7 @@ import { GunName } from "../../../common/guns.js";
 import Observer from "../../../common/observer/observer.js";
 import { GameEvents } from "../types/events.js";
 import PlayerArsenal from "./playerArsenal.js";
+import { BulletGroup } from "../groups/bulletGroup.js";
 
 
 export class Player extends Phaser.Physics.Arcade.Sprite {
@@ -25,7 +26,8 @@ export class Player extends Phaser.Physics.Arcade.Sprite {
     observer: Observer<GameEvents>,
     id: string,
     x = 0,
-    y = 0
+    y = 0,
+    bullets: BulletGroup
   ) {
     super(scene, x, y, "");
     this.scene = scene;
@@ -37,7 +39,7 @@ export class Player extends Phaser.Physics.Arcade.Sprite {
 
     this.observer = observer;
     this.id = id;
-    this.arsenal = new PlayerArsenal(id, observer);
+    this.arsenal = new PlayerArsenal(id, bullets, observer);
   }
 
   public shoot() {
@@ -62,7 +64,7 @@ export class Player extends Phaser.Physics.Arcade.Sprite {
       },
       movementDirection: this.movementDirection.encode(),
       health: this.health,
-      gunName: this.arsenal.currentGun,
+      gunName: this.arsenal.currentGun.getGunName(),
     };
     return state;
   }

@@ -1,21 +1,29 @@
 
-import MovementDirection from "../../../common/controls/direction";
+import MovementDirection from "../../../common/controls/direction.js";
 
 import { GunName, Guns } from "../../../common/guns.js";
 import { KILLS_TO_UNLOCK } from "../../../common/constants.js";
-import Observer from "../../../common/observer/observer";
+import Observer from "../../../common/observer/observer.js";
 import { GameEvents } from "../types/events";
+import Gun from "../guns/gun";
+import Rifle from "../guns/rifle.js";
+import { BulletGroup } from "../groups/bulletGroup";
+import Shotgun from "../guns/shotgun.js";
+import Rpg from "../guns/rpg.js";
+import { GUN_OFFSETS, GUN_ROTATIONS } from "../guns/constants.js";
 
 export default class PlayerArsenal {
     playerId: string;
     kills: number;
-    currentGun: GunName;
+    currentGun: Gun;
+    bullets: BulletGroup;
     observer: Observer<GameEvents>;
 
-    constructor(playerId: string, observer: Observer<GameEvents>) {
+    constructor(playerId: string, bullets: BulletGroup, observer: Observer<GameEvents>) {
         this.playerId = playerId;
         this.kills = 0;
-        this.currentGun = GunName.Rifle;
+        this.bullets = bullets;
+        this.currentGun = new Rifle(bullets);
         this.observer = observer;
         this.subscribeToEvents();
     }
@@ -38,22 +46,41 @@ export default class PlayerArsenal {
     }
 
     public shoot(playerX: number, playerY: number, movementDirection: MovementDirection) {
-      const gun = Guns[this.currentGun];
-      const rotation = gun.getGunRotation(movementDirection);
-      const [xGun, yGun] = gun.getGunOffset(movementDirection);
-  
+      const rotation = GUN_ROTATIONS[movementDirection.getFacingDirection()] as number;
+      const [xGun, yGun] = this.getGunOffset(movementDirection);
+      
+      this.currentGun.shoot(playerX + xGun, playerY + yGun, this.playerId, rotation);
+
       this.observer.notify("shootBullet", {
         x: playerX + xGun,
         y: playerY + yGun,
         rotation,
-        gunName: this.currentGun,
+        gunName: this.currentGun.getGunName(),
         playerId: this.playerId
       });
     }
 
     public switchGun(gunName: GunName) {
         if (this.has(gunName)) {
-            this.currentGun = gunName;
+            switch (gunName) {
+                case GunName.Rifle:
+                    this.currentGun = new Rifle(this.bullets);
+                    break;
+                case GunName.Shotgun:
+                    this.currentGun = new Shotgun(this.bullets);
+                    break;
+                case GunName.Rpg:
+                    this.currentGun = new Rpg(this.bullets);
+                    break;
+            }
+        }
+    }
+
+    private getGunOffset(movementDirection: MovementDirection): [number, number] {
+        if (!movementDirection.isMoving()) {
+            return GUN_OFFSETS.idle[movementDirection.getFacingDirection()] as [number, number];
+        } else {
+            return GUN_OFFSETS.moving[movementDirection.getFacingDirection()] as [number, number];
         }
     }
 }

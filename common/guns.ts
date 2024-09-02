@@ -7,40 +7,6 @@ export enum GunName {
   Rpg = "rpg",
 }
 
-const GUN_OFFSETS = {
-  "moving": {
-    [Direction.Right]: [200, -95],
-    [Direction.Left]: [-170, -110],
-    [Direction.Up]: [10, -230],
-    [Direction.Down]: [-12, 50],
-    [Direction.UpLeft]: [-135, -185],
-    [Direction.UpRight]: [150, -180],
-    [Direction.DownLeft]: [-175, -10],
-    [Direction.DownRight]: [150, -10]
-  },
-  "idle": {
-    [Direction.Right]: [200, -105],
-    [Direction.Left]: [-170, -120],
-    [Direction.Up]: [15, -230],
-    [Direction.Down]: [-20, 40],
-    [Direction.UpLeft]: [-125, -195],
-    [Direction.UpRight]: [150, -180],
-    [Direction.DownLeft]: [-180, -30],
-    [Direction.DownRight]: [150, -20]
-  }
-};
-
-const GUN_ROTATIONS = {
-  [Direction.Right]: 0,
-  [Direction.Left]: Math.PI,
-  [Direction.Up]: -Math.PI / 2,
-  [Direction.Down]: Math.PI / 2,
-  [Direction.UpLeft]: -3 * Math.PI / 4 - 0.3,
-  [Direction.UpRight]: -Math.PI / 4 + 0.3,
-  [Direction.DownLeft]: 3 * Math.PI / 4 + 0.3,
-  [Direction.DownRight]: Math.PI / 4 - 0.3
-};
-
 export const numToGunName = (num: number): GunName => {
   switch (num) {
     case 0:
@@ -70,18 +36,6 @@ export abstract class Gun {
     this.bulletSpeed = bulletSpeed;
     this.bulletTexture = bulletTexture;
     this.reloadTime = reloadTime;
-  }
-
-  public getGunOffset(movementDirection: MovementDirection): [number, number] {
-    if (!movementDirection.isMoving()) {
-      return GUN_OFFSETS.idle[movementDirection.getFacingDirection()] as [number, number];
-    } else {
-      return GUN_OFFSETS.moving[movementDirection.getFacingDirection()] as [number, number];
-    }
-  }
-
-  public getGunRotation(movementDirection: MovementDirection): number {
-    return GUN_ROTATIONS[movementDirection.getFacingDirection()] as number;
   }
 }
 
