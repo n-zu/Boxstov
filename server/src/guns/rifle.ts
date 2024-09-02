@@ -11,12 +11,22 @@ export default class Rifle extends Gun {
                 y,
                 rotation,
                 shooterId,
-                this.getGunName()
+                this
                 );
         }
     }
 
     public getGunName(): GunName {
         return GunName.Rifle;
+    }
+
+    public getBulledSpeed(): number {
+        // FIXME: Read from config file
+        return 2000;   
+    }
+
+    public getDamage(): number {
+        // FIXME: Read from config file
+        return 10;   
     }
 }

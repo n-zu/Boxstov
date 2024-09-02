@@ -11,12 +11,22 @@ export default class Rpg extends Gun {
                 y,
                 rotation,
                 shooterId,
-                this.getGunName()
+                this
                 );
             }
     }
 
     public getGunName(): GunName {
         return GunName.Rpg;
+    }
+
+    public getBulledSpeed(): number {
+        // FIXME: Read from config file
+        return 1000;   
+    }
+
+    public getDamage(): number {
+        // FIXME: Read from config file
+        return 200;   
     }
 }

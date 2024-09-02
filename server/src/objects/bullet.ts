@@ -5,10 +5,12 @@ import { BulletState } from "../../../common/types/state.js";
 import { GunName, Guns } from "../../../common/guns.js";
 import Observer from "../../../common/observer/observer.js";
 import { GameEvents } from "../types/events.js";
+import Gun from "../guns/gun.js";
+import { polarToCartesian } from "../../../common/utils.js";
 
 export class Bullet extends Phaser.Physics.Arcade.Sprite {
   playerId = "none";
-  gunName = GunName.Rifle;
+  origin?: Gun;
   observer: Observer<GameEvents>;
 
   constructor(scene: Phaser.Scene, observer: Observer<GameEvents>) {
@@ -25,9 +27,9 @@ export class Bullet extends Phaser.Physics.Arcade.Sprite {
     y: number,
     rotation: number,
     playerId: string,
-    gunName: GunName
+    origin: Gun
   ) {
-    const [velocityX, velocityY] = this.getVelocityFromRotation(rotation);
+    const velocity = polarToCartesian(rotation, origin.getBulledSpeed());
 
     this.setScale(0.5);
     this.setAlpha(0.3);
@@ -35,12 +37,12 @@ export class Bullet extends Phaser.Physics.Arcade.Sprite {
 
     this.setPosition(x, y);
     this.setRotation(rotation);
-    this.setVelocityX(velocityX);
-    this.setVelocityY(velocityY);
+    this.setVelocityX(velocity[0]);
+    this.setVelocityY(velocity[1]);
     this.setActive(true);
     this.setVisible(true);
 
-    this.gunName = gunName;
+    this.origin = origin;
     this.body.enable = true;
     this.playerId = playerId;
 
@@ -61,9 +63,10 @@ export class Bullet extends Phaser.Physics.Arcade.Sprite {
 
   // We should use an interface for this
   public collideWith(enemy: Enemy) {
-    const gun = Guns[this.gunName];
-    enemy.receiveDamage(gun.damage, this.playerId);
-    this.die();
+    if (this.origin) {
+      enemy.receiveDamage(this.origin.getDamage(), this.playerId);
+      this.die();  
+    }
   }
 
   public getState(): BulletState {
@@ -73,14 +76,7 @@ export class Bullet extends Phaser.Physics.Arcade.Sprite {
       rotation: this.rotation,
       active: this.active,
       visible: this.visible,
-      gunName: this.gunName
+      gunName: this.origin?.getGunName() || GunName.Rifle,
     };
-  }
-
-  private getVelocityFromRotation(rotation: number) {
-    const gun = Guns[this.gunName];
-    const velocityX = gun.bulletSpeed * Math.cos(rotation);
-    const velocityY = gun.bulletSpeed * Math.sin(rotation);
-    return [velocityX, velocityY];
   }
 }

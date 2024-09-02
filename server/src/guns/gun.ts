@@ -10,4 +10,8 @@ export default abstract class Gun {
     public abstract shoot(x: number, y: number, shooterId: string, rotation: number): void;
 
     public abstract getGunName(): GunName;
+
+    public abstract getBulledSpeed(): number;
+
+    public abstract getDamage(): number;
 }
