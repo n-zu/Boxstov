@@ -17,6 +17,6 @@ export default class Rpg extends Gun {
     }
 
     public getGunName(): GunName {
-        return GunName.Shotgun;
+        return GunName.Rpg;
     }
 }
