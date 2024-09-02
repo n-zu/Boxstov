@@ -1,5 +1,8 @@
 #!/bin/bash
 
+export NVM_DIR=~/.nvm
+source ~/.nvm/nvm.sh
+
 session_name=boxstov_server
 command="npm run start_cheap"
 expected_message="Listening on port"
