@@ -7,6 +7,7 @@
   "scripts": {
     "build": "npx --yes tsc -b",
     "start": "node dist/server/src/index.js",
+    "start_cheap": "NODE_OPTIONS=--max_old_space_size=4096 npm run start",
     "dev:tsc": "npx tsc -b --watch",
     "dev:server": "nodemon -q dist/server/src/index.js",
     "dev": "concurrently \"npm run dev:server\" \"npm run dev:tsc\""

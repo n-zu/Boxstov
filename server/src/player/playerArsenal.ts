@@ -61,4 +61,8 @@ export default class PlayerArsenal {
             this.currentGun = gunName;
         }
     }
+
+    public clearEvents() {
+        this.recentEvents = [];
+    }
 }
