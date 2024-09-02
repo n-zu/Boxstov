@@ -95,5 +95,6 @@ export class Player extends Phaser.Physics.Arcade.Sprite {
 
   private clearEvents() {
     this.recentEvents = [];
+    this.arsenal.clearEvents();
   }
 }
