@@ -51,8 +51,8 @@ export class Enemy extends Sprite {
     return Math.sqrt(Math.pow(camera.width, 2) + Math.pow(camera.height, 2));
   }
 
-  public sync(state: EnemyState) {
-    this.syncEvents(state.events);
+  public sync(state: EnemyState, recentEvents: EnemyRecentEvents[]) {
+    this.syncEvents(recentEvents);
 
     if (state.health > 0) {
       this.updateHealth(state.health);

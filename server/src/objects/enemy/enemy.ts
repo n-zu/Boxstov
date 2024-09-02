@@ -17,7 +17,6 @@ export class Enemy extends Phaser.Physics.Arcade.Sprite {
   movementDirection: MovementDirection = new MovementDirection();
   observer: Observer<GameEvents>;
   brain: EnemyBrain;
-  events: EnemyRecentEvents[] = [];
 
   constructor(
     scene: Phaser.Scene,
@@ -76,16 +75,14 @@ export class Enemy extends Phaser.Physics.Arcade.Sprite {
       visible: this.visible,
       bodyEnabled: this.body.enable,
       movementDirection: this.movementDirection.encode(),
-      events: this.events,
     };
-    this.events = [];
     return state;
   }
 
   public receiveDamage(damage: number, damagerId: string) {
     if (this.physique.isDead()) return;
     
-    this.events.push("receive_damage");
+    this.observer.notify("enemyReceivedDamage", this.id);
     this.physique.receiveDamage(damage);
     if (this.physique.isDead()) {
       this.beKilledBy(damagerId);

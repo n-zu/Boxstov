@@ -19,7 +19,6 @@ export class Player extends Phaser.Physics.Arcade.Sprite {
   health = 100;
   lastUpdate = Date.now();
   arsenal: PlayerArsenal;
-  recentEvents: PlayerRecentEvent[] = [];
 
   constructor(
     scene: Phaser.Scene,
@@ -43,7 +42,6 @@ export class Player extends Phaser.Physics.Arcade.Sprite {
 
   public shoot() {
     this.arsenal.shoot(this.x, this.y, this.movementDirection);
-    this.recentEvents.push("shoot");
   }
 
   public switchGun(gunName: GunName) {
@@ -65,10 +63,7 @@ export class Player extends Phaser.Physics.Arcade.Sprite {
       movementDirection: this.movementDirection.encode(),
       health: this.health,
       gunName: this.arsenal.currentGun,
-      // FIXME: This is a hack to avoid refactoring the client right now
-      events: this.recentEvents.concat(this.arsenal.recentEvents)
     };
-    this.clearEvents();
     return state;
   }
 
@@ -88,13 +83,8 @@ export class Player extends Phaser.Physics.Arcade.Sprite {
   }
 
   public receiveDamage(damage: number) {
+    this.observer.notify("playerReceivedDamage", this.id);
     this.health -= damage;
-    this.recentEvents.push("receive_damage");
     if (this.health <= 0) this.health = 0;
-  }
-
-  private clearEvents() {
-    this.recentEvents = [];
-    this.arsenal.clearEvents();
   }
 }

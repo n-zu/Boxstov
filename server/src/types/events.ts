@@ -9,6 +9,10 @@ export type BulletInfo = {
 };
 
 export type GameEvents = {
+  playerReceivedDamage: (playerId: string) => void;
+  unlockedGun: (playerId: string) => void;
+
+  enemyReceivedDamage: (enemyId: number) => void;
   enemyKilled: (killerId: string) => void;
   shootBullet: (info: BulletInfo) => void;
   tick: () => void;

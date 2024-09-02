@@ -85,9 +85,9 @@ export class Player extends Sprite {
     );
   }
 
-  public sync(state: PlayerState) {
+  public sync(state: PlayerState, recentEvents: PlayerRecentEvent[]) {
     this.syncPosition(state.position.x, state.position.y);
-    this.syncEvents(state.events);
+    this.syncEvents(recentEvents);
 
     this.health = state.health;
     if (this.health <= 0) {

@@ -9,6 +9,7 @@ import { ENEMY_GROUP_MAX } from "../../../common/constants.js";
 import Observer from "../../../common/observer/observer.js";
 import { GameEvents } from "../types/events.js";
 import WorldStats from "./worldStats.js";
+import RecentEventsListener from "./recentEventsListener.js";
 
 const INACTIVE_THRESHOLD = 60000; // if 60 seconds pass, the player is considered inactive
 
@@ -19,6 +20,7 @@ export class World {
   scene: Phaser.Scene;
   observer: Observer<GameEvents>;
   stats: WorldStats;
+  recentEvents: RecentEventsListener;
 
   constructor(scene: Phaser.Scene, observer: Observer<GameEvents>) {
     this.players = [];
@@ -40,6 +42,7 @@ export class World {
     );
 
     this.create();
+    this.recentEvents = new RecentEventsListener(this.observer);
   }
 
   public create() {
@@ -71,7 +74,8 @@ export class World {
       players: this.players.map((player) => player.getState()),
       bullets: this.bulletGroup.getState(),
       stats: this.stats.getState(),
-      enemies: this.enemies.getState()
+      enemies: this.enemies.getState(),
+      recentEvents: this.recentEvents.getState(),
     };
   }
 

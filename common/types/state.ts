@@ -8,6 +8,7 @@ export type WorldState = {
   bullets: BulletGroupState;
   enemies: EnemyGroupState;
   stats: WorldStatsState;
+  recentEvents: RecentEventsListenerState;
 };
 
 export type WorldStatsState = {
@@ -31,7 +32,6 @@ export type EnemyState = {
   bodyEnabled: boolean;
   action: string;
   speed: number;
-  events: EnemyRecentEvents[]
 };
 
 export type EnemyPhysiqueState = {
@@ -66,7 +66,6 @@ export type PlayerState = {
   health: number;
   movementDirection: EncodedMovementDirection;
   gunName: GunName;
-  events: PlayerRecentEvent[];
 };
 
 export type PlayerRecentEvent = "shoot" | "receive_damage" | "kill" | "unlocked_gun";
@@ -83,4 +82,11 @@ export type BulletState = {
   active: boolean;
   visible: boolean;
   gunName: GunName;
+};
+
+// Recent events listener
+
+export type RecentEventsListenerState = {
+  playerRecentEvents: { [playerId: string]: PlayerRecentEvent[] };
+  enemyRecentEvents: { [enemyId: number]: EnemyRecentEvents[] };
 };

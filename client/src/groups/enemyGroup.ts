@@ -1,4 +1,4 @@
-import { EnemyGroupState } from "../../../common/types/state";
+import { EnemyGroupState, EnemyRecentEvents } from "../../../common/types/state";
 import { Enemy } from "../objects/enemy";
 import { GameEvents } from "../types/events";
 import Observer from "../../../common/observer/observer";
@@ -15,10 +15,18 @@ export class EnemyGroup extends Phaser.Physics.Arcade.Group {
     this.addMultiple(enemies);
   }
 
-  public sync(enemyGroupState: EnemyGroupState) {
+  public sync(enemyGroupState: EnemyGroupState, enemyRecentEvents: { [enemyId: number]: EnemyRecentEvents[]}) {
     enemyGroupState.enemies.forEach((enemyState, i) => {
       const enemy = this.children.entries[i] as Enemy;
-      enemy.sync(enemyState);
+      enemy.sync(enemyState, this.getRecentEventsOf(i, enemyRecentEvents));
     });
+  }
+
+  private getRecentEventsOf(id: number, enemyRecentEvents: { [enemyId: number]: EnemyRecentEvents[] }) {
+    const recentEvents = enemyRecentEvents[id];
+    if (recentEvents === undefined) {
+      return [];
+    }
+    return recentEvents;
   }
 }

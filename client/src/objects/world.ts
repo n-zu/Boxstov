@@ -39,12 +39,20 @@ export class World {
   public sync(worldState: WorldState) {
     worldState.players.forEach((playerState) => {
       const player = this.getOrCreatePlayer(playerState.id);
-      player.sync(playerState);
+      player.sync(playerState, this.getRecentEventsOfPlayer(playerState.id, worldState));
     });
-    this.enemies.sync(worldState.enemies);
+    this.enemies.sync(worldState.enemies, worldState.recentEvents.enemyRecentEvents);
 
     this.bulletGroup.sync(worldState.bullets);
     this.stats.sync(worldState.stats);
+  }
+
+  private getRecentEventsOfPlayer(id: string, state: WorldState) {
+    const recentEvents = state.recentEvents.playerRecentEvents[id];
+    if (recentEvents === undefined) {
+      return [];
+    }
+    return recentEvents;
   }
 
   private setupFirstPlayer(
