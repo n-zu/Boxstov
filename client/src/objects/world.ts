@@ -5,10 +5,10 @@ import { PlayerControls } from "../controls/playerControls";
 import { EnemyGroup } from "../groups/enemyGroup";
 import { WorldState } from "../../../common/types/state";
 import { SyncUpdate } from "../../../common/types/messages";
-import { ENEMY_GROUP_MAX } from "../../../common/constants";
 import Observer from "../../../common/observer/observer.js";
 import { GameEvents } from "../types/events";
 import WorldStats from "./worldStats.js";
+import config from "../../../common/config";
 
 export class World {
   players!: Player[];
@@ -23,7 +23,7 @@ export class World {
   constructor(scene: Phaser.Scene, observer: Observer<GameEvents>, gameMaster: GameMaster, username: string) {
     this.gameMaster = gameMaster;
     this.scene = scene;
-    this.enemies = new EnemyGroup(scene, observer, ENEMY_GROUP_MAX);
+    this.enemies = new EnemyGroup(scene, observer, config.misc.maxEnemies);
     this.stats = new WorldStats(observer);
     this.observer = observer;
 
