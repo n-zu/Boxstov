@@ -1,5 +1,6 @@
 import BulletGroupInterface from "../bulletGroupInterface.js";
 import config from "../config.js";
+import PlayerModel from "../playerModel.js";
 import Gun from "./gun.js";
 
 export default class Shotgun extends Gun {
@@ -13,9 +14,9 @@ export default class Shotgun extends Gun {
             config.guns.shotgun.killsToUnlock);
     }
 
-    public shoot(x: number, y: number, shooterId: string, rotation: number): void {
+    public shoot(x: number, y: number, shooter: PlayerModel, rotation: number): void {
         for (let i = 0; i < 5; i++) {
-            const bullet = this.bullets.shoot(x, y, rotation + (i - 2) * 0.1, shooterId, this);
+            const bullet = this.bullets.shoot(x, y, rotation + (i - 2) * 0.1, shooter, this);
         }
     }
 }

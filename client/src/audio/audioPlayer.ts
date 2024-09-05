@@ -96,7 +96,7 @@ export default class AudioPlayer {
     const volume = this.calculatePlayerSoundVolume(player);
     if (volume < MIN_VOLUME) return;
 
-    switch (player.currentGun.getGunName()) {
+    switch (player.arsenal.currentGun.getGunName()) {
       case "rifle":
         this.scene.sound.play("rifle", { volume });
         break;

@@ -18,13 +18,13 @@
             "damage": 10,
             "bulletSpeed": 1500,
             "reloadTime": 800,
-            "killsToUnlock": 5
+            "killsToUnlock": 2
         },
         "rpg": {
             "damage": 200,
             "bulletSpeed": 1000,
             "reloadTime": 1200,
-            "killsToUnlock": 10
+            "killsToUnlock": 4
         }
     },
     "enemies": {

@@ -1,30 +1,34 @@
 import Observer from "../../../common/observer/observer.js";
+import PlayerModel from "../../../common/playerModel.js";
+import { GameEvents } from "../../../common/types/events.js";
 import { EnemyRecentEvents, PlayerRecentEvent, RecentEventsListenerState } from "../../../common/types/state.js";
-import { GameEvents } from "../types/events.js";
 
 export default class RecentEventsListener {
     playerRecentEvents: { [playerId: string]: PlayerRecentEvent[] } = {};
     enemyRecentEvents: { [enemyId: number]: EnemyRecentEvents[] } = {};
 
     constructor(obs: Observer<GameEvents>) {
-        obs.subscribe("playerReceivedDamage", (playerId: string) => {
-            this.addPlayerEvent(playerId, "receive_damage");
+        obs.subscribe("playerReceivedDamage", (player: PlayerModel) => {
+            this.addPlayerEvent(player.id, "receive_damage");
         });
 
-        obs.subscribe("unlockedGun", (playerId: string) => {
-            this.addPlayerEvent(playerId, "unlocked_gun");
+        obs.subscribe("playerUnlockedGun", (player: PlayerModel) => {
+            this.addPlayerEvent(player.id, "unlocked_gun");
         });
 
+        /*
+        FIXME: This event is disabled for now
         obs.subscribe("enemyReceivedDamage", (enemyId: number) => {
             this.addEnemyEvent(enemyId, "receive_damage");
         });
+        */
 
-        obs.subscribe("enemyKilled", (killerId: string) => {
-            this.addPlayerEvent(killerId, "kill");
+        obs.subscribe("playerKill", (killer: PlayerModel) => {
+            this.addPlayerEvent(killer.id, "kill");
         });
 
-        obs.subscribe("shootBullet", (info) => {
-            this.addPlayerEvent(info.playerId, "shoot");
+        obs.subscribe("playerShoot", (shooter: PlayerModel) => {
+            this.addPlayerEvent(shooter.id, "shoot");
         });
     }
 

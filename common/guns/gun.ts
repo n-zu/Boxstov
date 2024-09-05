@@ -1,4 +1,5 @@
 import BulletGroupInterface from "../bulletGroupInterface";
+import PlayerModel from "../playerModel";
 
 export type GunName = "rifle" | "rpg" | "shotgun";
 
@@ -26,7 +27,7 @@ export default abstract class Gun {
         this.killsToUnlock = killsToUnlock;
     }
 
-    public abstract shoot(x: number, y: number, shooterId: string, rotation: number): void;
+    public abstract shoot(x: number, y: number, shooter: PlayerModel, rotation: number): void;
 
     public getGunName(): GunName {
         return this.name;

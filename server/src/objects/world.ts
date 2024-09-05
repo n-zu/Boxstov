@@ -6,9 +6,9 @@ import { Difficulty, EnemyGroup } from "../groups/enemyGroup.js";
 import { WorldState } from "../../../common/types/state.js";
 import { PlayerUpdate } from "../../../common/types/messages.js";
 import Observer from "../../../common/observer/observer.js";
-import { GameEvents } from "../types/events.js";
 import WorldStats from "./worldStats.js";
 import RecentEventsListener from "./recentEventsListener.js";
+import { GameEvents } from "../../../common/types/events.js";
 
 const INACTIVE_THRESHOLD = 60000; // if 60 seconds pass, the player is considered inactive
 
@@ -81,11 +81,10 @@ export class World {
   public addPlayer(id: string): boolean {
     if (this.players.some((p) => p.id === id)) return false;
     const player = new Player(
+      id,
       this.scene,
       this.observer,
-      id,
-      0,
-      0,
+      { x: 0, y: 0 },
       this.bulletGroup
     );
     this.players.push(player);

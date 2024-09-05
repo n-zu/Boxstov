@@ -2,9 +2,9 @@ import { Enemy } from "../objects/enemy/enemy.js";
 import { Player } from "../player/player.js";
 import { EnemyGroupState, EnemyState, SpawnPoint } from "../../../common/types/state.js";
 import Observer from "../../../common/observer/observer.js";
-import { GameEvents } from "../types/events.js";
 import config from "../../../common/config.js";
 import EnemyPhysique from "../objects/enemy/enemyPhysique.js";
+import { GameEvents } from "../../../common/types/events.js";
 
 const TIME_BETWEEN_HORDES = 700;
 

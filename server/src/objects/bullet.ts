@@ -3,13 +3,15 @@ import Phaser from "phaser";
 import { Enemy } from "./enemy/enemy.js";
 import { BulletState } from "../../../common/types/state.js";
 import Observer from "../../../common/observer/observer.js";
-import { GameEvents } from "../types/events.js";
 import { polarToCartesian } from "../../../common/utils.js";
 import Gun from "../../../common/guns/gun.js";
+import PlayerModel from "../../../common/playerModel.js";
+import { GameEvents } from "../../../common/types/events.js";
 
 export class Bullet extends Phaser.Physics.Arcade.Sprite {
   playerId = "none";
   origin?: Gun;
+  shooter?: PlayerModel;
   observer: Observer<GameEvents>;
 
   constructor(scene: Phaser.Scene, observer: Observer<GameEvents>) {
@@ -25,7 +27,7 @@ export class Bullet extends Phaser.Physics.Arcade.Sprite {
     x: number,
     y: number,
     rotation: number,
-    playerId: string,
+    shooter: PlayerModel,
     origin: Gun
   ) {
     const velocity = polarToCartesian(rotation, origin.getBulledSpeed());
@@ -43,7 +45,7 @@ export class Bullet extends Phaser.Physics.Arcade.Sprite {
 
     this.origin = origin;
     this.body.enable = true;
-    this.playerId = playerId;
+    this.shooter = shooter;
 
     this.scene.time.addEvent({
       delay: 3000,
@@ -62,8 +64,8 @@ export class Bullet extends Phaser.Physics.Arcade.Sprite {
 
   // We should use an interface for this
   public collideWith(enemy: Enemy) {
-    if (this.origin) {
-      enemy.receiveDamage(this.origin.getDamage(), this.playerId);
+    if (this.origin && this.shooter) {
+      enemy.receiveDamage(this.origin.getDamage(), this.shooter);
       this.die();  
     }
   }

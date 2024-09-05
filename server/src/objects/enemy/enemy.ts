@@ -5,10 +5,11 @@ import { EnemyState } from "../../../../common/types/state.js";
 import MovementDirection from "../../../../common/controls/direction.js";
 import Observer from "../../../../common/observer/observer.js";
 import EnemyBrain from "./enemyBrain.js";
-import { GameEvents } from "../../types/events.js";
 import { UnitVector } from "../../../../common/types/direction.js";
 import EnemyPhysique from "./enemyPhysique.js";
 import config from "../../../../common/config.js";
+import { GameEvents } from "../../../../common/types/events.js";
+import PlayerModel from "../../../../common/playerModel.js";
 
 export class Enemy extends Phaser.Physics.Arcade.Sprite {
   id: number;
@@ -73,13 +74,14 @@ export class Enemy extends Phaser.Physics.Arcade.Sprite {
     return state;
   }
 
-  public receiveDamage(damage: number, damagerId: string) {
+  public receiveDamage(damage: number, damager: PlayerModel) {
     if (this.physique.isDead()) return;
     
-    this.observer.notify("enemyReceivedDamage", this.id);
+    // FIXME: This event is disabled for now
+    // this.observer.notify("enemyReceivedDamage", this.id);
     this.physique.receiveDamage(damage);
     if (this.physique.isDead()) {
-      this.beKilledBy(damagerId);
+      this.beKilledBy(damager);
     }
   }
 
@@ -91,11 +93,11 @@ export class Enemy extends Phaser.Physics.Arcade.Sprite {
     this.body.enable = true;
   }
 
-  private beKilledBy(killerId: string) {
+  private beKilledBy(killer: PlayerModel) {
     this.setVelocity(0, 0);
     this.movementDirection.update([0, 0]);
     this.body.enable = false;
-    this.observer.notify("enemyKilled", killerId);
+    this.observer.notify("playerKill", killer);
 
     this.setRotation(Math.random() * 0.4 - 0.2);
 

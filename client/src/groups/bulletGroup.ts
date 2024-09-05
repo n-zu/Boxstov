@@ -1,5 +1,6 @@
 import BulletGroupInterface from "../../../common/bulletGroupInterface";
 import Gun from "../../../common/guns/gun";
+import PlayerModel from "../../../common/playerModel";
 import { BulletGroupState } from "../../../common/types/state";
 import { Bullet } from "../objects/bullet";
 
@@ -23,7 +24,7 @@ export class BulletGroup extends Phaser.GameObjects.Group implements BulletGroup
     });
   }
   
-  public shoot(x: number, y: number, rotation: number, shooterId: string, origin: Gun): void {
+  public shoot(x: number, y: number, rotation: number, shooter: PlayerModel, origin: Gun): void {
     const bullet = this.getFirstDead(false) as Bullet;
     if (bullet) {
       bullet.fire(x, y, rotation, origin);

@@ -1,5 +1,5 @@
 import Observer from "../../../common/observer/observer.js";
-import { GameEvents } from "../types/events.js";
+import { GameEvents } from "../../../common/types/events.js";
 import { WorldStatsState } from "../../../common/types/state.js";
 
 export default class WorldStats {
@@ -14,7 +14,7 @@ export default class WorldStats {
     this.rage = 0;
     this.observer = observer;
 
-    this.observer.subscribe("enemyKilled", (playerId) => this.addKill(playerId));
+    this.observer.subscribe("playerKill", (killer) => this.addKill(killer.id));
   }
 
   public update() {

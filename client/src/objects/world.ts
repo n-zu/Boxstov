@@ -63,9 +63,10 @@ export class World {
     this.bulletGroup = new BulletGroup(scene);
 
     const player = new Player(
+      username,
       scene,
       this.observer,
-      username,
+      { x: 0, y: 0 },
       gameMaster,
       this.bulletGroup,
       true
@@ -86,9 +87,10 @@ export class World {
     let player = this.players.find((p) => p.id === id);
     if (player === undefined) {
       player = new Player(
+        id,
         this.scene,
         this.observer,
-        id,
+        { x: 0, y: 0 },
         this.gameMaster,
         this.bulletGroup
       );
