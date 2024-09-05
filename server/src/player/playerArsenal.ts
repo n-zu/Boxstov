@@ -1,16 +1,14 @@
 
 import MovementDirection from "../../../common/controls/direction.js";
 
-import { GunName, Guns } from "../../../common/guns.js";
-import { KILLS_TO_UNLOCK } from "../../../common/constants.js";
 import Observer from "../../../common/observer/observer.js";
 import { GameEvents } from "../types/events";
-import Gun from "../guns/gun";
-import Rifle from "../guns/rifle.js";
 import { BulletGroup } from "../groups/bulletGroup";
-import Shotgun from "../guns/shotgun.js";
-import Rpg from "../guns/rpg.js";
-import { GUN_OFFSETS, GUN_ROTATIONS } from "../guns/constants.js";
+import { GUN_OFFSETS, GUN_ROTATIONS } from "../../../common/guns/constants.js";
+import Gun, { GunName } from "../../../common/guns/gun.js";
+import Rifle from "../../../common/guns/rifle.js";
+import Shotgun from "../../../common/guns/shotgun.js";
+import Rpg from "../../../common/guns/rpg.js";
 
 export default class PlayerArsenal {
     playerId: string;
@@ -41,10 +39,6 @@ export default class PlayerArsenal {
               }
             }
           });
-    }
-
-    private has(gunName: GunName): boolean {
-        return this.kills >= KILLS_TO_UNLOCK[gunName];
     }
 
     public shoot(playerX: number, playerY: number, movementDirection: MovementDirection) {

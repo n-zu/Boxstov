@@ -3,12 +3,12 @@ import Phaser from "phaser";
 import MovementDirection from "../../../common/controls/direction.js";
 import { PlayerState } from "../../../common/types/state.js";
 import { PlayerUpdate } from "../../../common/types/messages.js";
-import { GunName } from "../../../common/guns.js";
 import Observer from "../../../common/observer/observer.js";
 import { GameEvents } from "../types/events.js";
 import PlayerArsenal from "./playerArsenal.js";
 import { BulletGroup } from "../groups/bulletGroup.js";
 import config from "../../../common/config.js";
+import { GunName } from "../../../common/guns/gun.js";
 
 
 export class Player extends Phaser.Physics.Arcade.Sprite {

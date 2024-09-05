@@ -1,7 +1,7 @@
-import { GunName } from "../../../common/guns";
 import { UnitVector } from "../../../common/types/direction";
 import { Player } from "../objects/player";
 import { Enemy } from "../objects/enemy";
+import { GunName } from "../../../common/guns/gun";
 
 export type GameEvents = {
   /// Local player wants to change gun

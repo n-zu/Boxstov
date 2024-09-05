@@ -1,9 +1,9 @@
-import MovementDirection from "../../../common/controls/direction";
-import { GunName } from "../../../common/guns";
+import BulletGroupInterface from "../../../common/bulletGroupInterface";
+import Gun from "../../../common/guns/gun";
 import { BulletGroupState } from "../../../common/types/state";
 import { Bullet } from "../objects/bullet";
 
-export class BulletGroup extends Phaser.GameObjects.Group {
+export class BulletGroup extends Phaser.GameObjects.Group implements BulletGroupInterface {
   constructor(scene: Phaser.Scene) {
     super(scene);
 
@@ -16,22 +16,17 @@ export class BulletGroup extends Phaser.GameObjects.Group {
     });
   }
 
-  public shootBullet(
-    x: number,
-    y: number,
-    direction: MovementDirection,
-    gunName: GunName
-  ) {
-    const bullet = this.getFirstDead(false) as Bullet;
-    if (bullet) {
-      bullet.fire(x, y, direction, gunName);
-    }
-  }
-
   public sync(bulletGroupState: BulletGroupState) {
     bulletGroupState.forEach((bulletState, i) => {
       const bullet = this.children.entries[i] as Bullet;
       bullet.sync(bulletState);
     });
+  }
+  
+  public shoot(x: number, y: number, rotation: number, shooterId: string, origin: Gun): void {
+    const bullet = this.getFirstDead(false) as Bullet;
+    if (bullet) {
+      bullet.fire(x, y, rotation, origin);
+    }
   }
 }

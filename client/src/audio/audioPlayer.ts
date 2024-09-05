@@ -1,6 +1,5 @@
 import { GameEvents } from "../types/events";
 import Observer from "../../../common/observer/observer.js";
-import { GunName } from "../../../common/guns.js";
 import { Player } from "../objects/player";
 import { Enemy } from "../objects/enemy";
 
@@ -97,14 +96,14 @@ export default class AudioPlayer {
     const volume = this.calculatePlayerSoundVolume(player);
     if (volume < MIN_VOLUME) return;
 
-    switch (player.gunName) {
-      case GunName.Rifle:
+    switch (player.currentGun.getGunName()) {
+      case "rifle":
         this.scene.sound.play("rifle", { volume });
         break;
-      case GunName.Shotgun:
+      case "shotgun":
         this.scene.sound.play("shotgun", { volume });
         break;
-      case GunName.Rpg:
+      case "rpg":
         this.scene.sound.play("rpg", { volume });
         break;
     }

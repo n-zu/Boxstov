@@ -1,10 +1,10 @@
 import CursorKeys = Phaser.Types.Input.Keyboard.CursorKeys;
 import InputPlugin = Phaser.Input.InputPlugin;
 import { UnitVector } from "../../../common/types/direction";
-import { numToGunName } from "../../../common/guns";
 import Observer from "../../../common/observer/observer.js";
 import { GameEvents } from "../types/events";
 import { Player } from "../objects/player.js";
+import { GunName } from "../../../common/guns/gun";
 
 const diagonalFactor = Math.sqrt(2) / 2;
 
@@ -18,6 +18,8 @@ interface LetterKeys {
   S: Phaser.Input.Keyboard.Key;
   D: Phaser.Input.Keyboard.Key;
 }
+
+const GUN_NAMES = ["rifle", "shotgun", "rpg"] as GunName[];
 
 export class PlayerControls {
   cursorKeys: CursorKeys;
@@ -36,7 +38,7 @@ export class PlayerControls {
     scene.input.keyboard.on("keydown", (event: any) => {
       if (event.keyCode >= 49 && event.keyCode <= 57) {
         const num = event.keyCode - 49;
-        const name = numToGunName(num);
+        const name = GUN_NAMES[num];
         this.observer.notify("triggerChangeGun", name);
       }
     });

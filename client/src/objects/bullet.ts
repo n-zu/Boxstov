@@ -1,31 +1,41 @@
 import Sprite = Phaser.GameObjects.Sprite;
 import { BulletState } from "../../../common/types/state";
-import MovementDirection from "../../../common/controls/direction";
-import { GunName, Guns } from "../../../common/guns";
+import Gun, { GunName } from "../../../common/guns/gun";
+import { polarToCartesian } from "../../../common/utils";
 
 export class Bullet extends Sprite {
-  gunName = GunName.Rifle;
+  origin: GunName;
 
-  constructor(scene: Phaser.Scene, x: number, y: number) {
+  constructor(scene: Phaser.Scene, x: number, y: number, origin?: Gun) {
     super(scene, x, y, "bullet");
+    this.origin = "rifle";
   }
 
   public fire(
     x: number,
     y: number,
-    direction: MovementDirection,
-    gunName: GunName
+    rotation: number,
+    origin: Gun
   ) {
-    const gun = Guns[gunName];
-    const [velocityX, velocityY] = direction.getFacingSpeed(gun.bulletSpeed);
-    const rotation = Math.atan2(velocityY, velocityX);
-
+    const velocity = polarToCartesian(rotation, origin.getBulledSpeed());
+    
     this.setBase();
     this.setPosition(x, y);
     this.setRotation(rotation);
     this.setActive(true);
     this.setVisible(true);
-    this.setTexture(Guns[gunName].bulletTexture);
+    // FIXME: This is not very good
+    switch (origin.getGunName()) {
+      case "rifle":
+        this.setTexture("bullet");
+        break;
+      case "shotgun":
+        this.setTexture("shell");
+        break;
+      case "rpg":
+        this.setTexture("rocket");
+        break;
+    }
 
     this.scene.time.addEvent({
       delay: 3000,
@@ -46,9 +56,20 @@ export class Bullet extends Sprite {
   }
 
   public setGunName(gunName: GunName) {
-    if (this.gunName !== gunName) {
-      this.gunName = gunName;
-      this.setTexture(Guns[gunName].bulletTexture);
+    if (this.origin !== gunName) {
+      this.origin = gunName;
+      // FIXME
+      switch (gunName) {
+        case "rifle":
+          this.setTexture("bullet");
+          break;
+        case "shotgun":
+          this.setTexture("shell");
+          break;
+        case "rpg":
+          this.setTexture("rocket");
+          break;
+      }
     }
   }
 

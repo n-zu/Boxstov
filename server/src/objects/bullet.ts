@@ -2,11 +2,10 @@ import "@geckos.io/phaser-on-nodejs";
 import Phaser from "phaser";
 import { Enemy } from "./enemy/enemy.js";
 import { BulletState } from "../../../common/types/state.js";
-import { GunName, Guns } from "../../../common/guns.js";
 import Observer from "../../../common/observer/observer.js";
 import { GameEvents } from "../types/events.js";
-import Gun from "../guns/gun.js";
 import { polarToCartesian } from "../../../common/utils.js";
+import Gun from "../../../common/guns/gun.js";
 
 export class Bullet extends Phaser.Physics.Arcade.Sprite {
   playerId = "none";
@@ -76,7 +75,7 @@ export class Bullet extends Phaser.Physics.Arcade.Sprite {
       rotation: this.rotation,
       active: this.active,
       visible: this.visible,
-      gunName: this.origin?.getGunName() || GunName.Rifle,
+      gunName: this.origin?.getGunName() || "rifle",
     };
   }
 }

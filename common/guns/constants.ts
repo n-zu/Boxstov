@@ -1,4 +1,4 @@
-import { Direction } from "../../../common/types/direction.js";
+import { Direction } from "../types/direction.js";
 
 export const GUN_OFFSETS = {
     "moving": {

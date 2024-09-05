@@ -6,11 +6,14 @@ import MovementDirection from "../../../common/controls/direction";
 import { PlayerRecentEvent, PlayerState } from "../../../common/types/state";
 import { playAnimation } from "../scenes/mainScene";
 import { AnimationSuffix } from "../types/animation";
-import { GunName, Guns } from "../../../common/guns";
 import Observer from "../../../common/observer/observer.js";
 import { GameEvents } from "../types/events";
 import Sprite = Phaser.Physics.Arcade.Sprite;
 import config from "../../../common/config";
+import Rifle from "../../../common/guns/rifle";
+import Gun, { GunName } from "../../../common/guns/gun";
+import Shotgun from "../../../common/guns/shotgun";
+import Rpg from "../../../common/guns/rpg";
 
 const SYNC_DIFF_TOLERANCE = 0.001;
 
@@ -25,7 +28,7 @@ export class Player extends Sprite {
   health = this.maxHealth;
   movementDirection: MovementDirection = new MovementDirection();
   local: boolean;
-  gunName = GunName.Rifle;
+  currentGun: Gun;
   lastShootTime = 0;
 
   constructor(
@@ -38,8 +41,12 @@ export class Player extends Sprite {
     x = 0,
     y = 0
   ) {
-    super(scene, x, y, GunName.Rifle);
+    const currentGun = new Rifle(bulletGroup);
+    super(scene, x, y, currentGun.getGunName());
     this.scene = scene;
+
+    this.bulletGroup = bulletGroup;
+    this.currentGun = currentGun;
 
     scene.physics.add.existing(this);
     scene.add.existing(this);
@@ -48,12 +55,11 @@ export class Player extends Sprite {
     
     this.id = id;
     this.gameMaster = gameMaster;
-    this.bulletGroup = bulletGroup;
     this.local = local;
     this.observer = observer;
     this.observer.notify("newPlayer", this);
 
-    playAnimation(this, this.gunName, Direction.Down, AnimationSuffix.Idle);
+    playAnimation(this, this.currentGun.getGunName(), Direction.Down, AnimationSuffix.Idle);
     this.subscribeToEvents();
   }
 
@@ -79,7 +85,7 @@ export class Player extends Sprite {
 
     playAnimation(
       this,
-      this.gunName,
+      this.currentGun.getGunName(),
       this.movementDirection.getFacingDirection(),
       AnimationSuffix.Run
     );
@@ -102,15 +108,20 @@ export class Player extends Sprite {
       );
       this.move();
     }
-    if (this.gunName !== state.gunName) {
-      this.gunName = state.gunName;
+    if (this.currentGun.getGunName() !== state.gunName) {
+      switch (state.gunName) {
+        case "rifle":
+          this.currentGun = new Rifle(this.bulletGroup);
+          break;
+        case "shotgun":
+          this.currentGun = new Shotgun(this.bulletGroup);
+          break;
+        case "rpg":
+          this.currentGun = new Rpg(this.bulletGroup);
+          break;
+      }
       this.observer.notify("playerSwitchedGun", this);
     }
-  }
-
-  public getShootReloadTime(): number {
-    const gun = Guns[this.gunName];
-    return gun.reloadTime;
   }
 
   public getDistanceToCamera(): number {
@@ -127,7 +138,7 @@ export class Player extends Sprite {
   }
 
   private isReloading(): boolean {
-    return this.lastShootTime + this.getShootReloadTime() > Date.now();
+    return this.lastShootTime + this.currentGun.getReloadTime() > Date.now();
   }
 
   private shoot() {
@@ -137,7 +148,7 @@ export class Player extends Sprite {
     this.gameMaster.send("player", {
       id: this.id,
       type: "shoot",
-      gunName: this.gunName
+      gunName: this.currentGun.getGunName()
     });
   }
 
@@ -204,7 +215,7 @@ export class Player extends Sprite {
 
   private playIdleAnimation() {
     const animationName = `${
-      this.gunName
+      this.currentGun.getGunName()
     }-${this.movementDirection?.getFacingDirection()}-${AnimationSuffix.Idle}`;
     this.anims.play(animationName, true);
   }

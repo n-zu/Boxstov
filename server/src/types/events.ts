@@ -1,4 +1,4 @@
-import { GunName } from "../../../common/guns";
+import { GunName } from "../../../common/guns/gun";
 
 export type BulletInfo = {
   x: number;

@@ -1,7 +1,7 @@
 // World
 
 import { EncodedMovementDirection } from "../controls/direction";
-import { GunName } from "../guns";
+import { GunName } from "../guns/gun";
 
 export type WorldState = {
   players: PlayerState[];
