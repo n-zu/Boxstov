@@ -1,7 +1,7 @@
 {
     "player": {
-        "health": 10000000000,
-        "speed": 500,
+        "health": 100,
+        "speed": 300,
         "size": {
             "width": 80,
             "height": 200
@@ -30,13 +30,13 @@
     "enemies": {
         "zombieNormal": {
             "health": 100,
-            "speed": 0,
+            "speed": 100,
             "strength": 3,
             "attackRange": 150
         },
         "zombieFast": {
             "health": 100,
-            "speed": 0,
+            "speed": 150,
             "strength": 3,
             "attackRange": 150
         }
