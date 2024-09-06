@@ -5,12 +5,25 @@ import MovementDirection from "../../../common/controls/direction";
 import Phaser from "phaser";
 import config from "../../../common/config";
 import { EnemyModel } from "../../../common/enemy/enemyModel.js";
+import EnemyPhysique from "../../../common/enemy/enemyPhysique";
+import { GameEvents } from "../types/events";
+import Observer from "../../../common/observer/observer";
 
 // FIXME: This should not be here 
 const HEALTH = config.enemies.zombieNormal.health;
 
 export class Enemy extends EnemyModel {
   action: string = "";
+
+  constructor(
+    id: number,
+    scene: Phaser.Scene,
+    position: { x: number; y: number },
+    observer: Observer<GameEvents>,
+    physique: EnemyPhysique
+  ) {
+    super(id, scene, position, observer, physique, "zombie");
+  }
 
   public getDistanceToCamera(): number {
     const camera = this.scene.cameras.main;
