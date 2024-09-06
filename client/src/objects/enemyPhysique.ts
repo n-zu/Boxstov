@@ -5,7 +5,7 @@ import { Enemy } from "./enemy";
 export default class EnemyPhysique extends EnemyPhysiqueModel {
     public sync(enemy: Enemy, state: EnemyPhysiqueState) {
         if (state.health > 0) {
-            this.updateHealth(state.health);
+            this.updateHealth(enemy, state.health);
         }
         if (!this.isDead() && state.health <= 0) {
             enemy.die();
@@ -18,7 +18,9 @@ export default class EnemyPhysique extends EnemyPhysiqueModel {
         this.speed = state.speed;
     }
 
-    private updateHealth(newHealth: number) {
-        if (newHealth < this.health) this.receiveDamage(this.health - newHealth);
+    private updateHealth(enemy: Enemy, newHealth: number) {
+        if (newHealth < this.health) {
+            enemy.receiveDamage(this.health - newHealth);
+        }
     }
 }

@@ -52,7 +52,6 @@ export class Enemy extends EnemyModel {
   }
 
   private syncEvents(events: EnemyRecentEvents[]) {
-    /*
     events.forEach((event) => {
       switch (event) {
         case "receive_damage":
@@ -61,7 +60,6 @@ export class Enemy extends EnemyModel {
           break;
       }
     });
-    */
   }
 
   private changeColor() {
