@@ -9,6 +9,8 @@ import Observer from "../../../common/observer/observer.js";
 import { GameEvents } from "../types/events";
 import WorldStats from "./worldStats.js";
 import config from "../../../common/config";
+import { Difficulty } from "../../../common/enemyGroupModel";
+import { Enemy } from "./enemy";
 
 export class World {
   players!: Player[];
@@ -23,7 +25,9 @@ export class World {
   constructor(scene: Phaser.Scene, observer: Observer<GameEvents>, gameMaster: GameMaster, username: string) {
     this.gameMaster = gameMaster;
     this.scene = scene;
-    this.enemies = new EnemyGroup(scene, observer, config.misc.maxEnemies);
+    this.enemies = new EnemyGroup(scene, observer, Difficulty.Hard, this.getSpawnPoints(),
+      (id, scene, position, observer, physique) => new Enemy(id, scene, position, observer, physique)
+    );
     this.stats = new WorldStats(observer);
     this.observer = observer;
 
@@ -34,6 +38,7 @@ export class World {
   public update() {
     this.playerControls.update();
     this.players?.forEach((player) => player.update());
+    this.enemies.update(this.players);
   }
 
   public sync(worldState: WorldState) {
@@ -103,5 +108,19 @@ export class World {
     gameMaster.addAction("sync", (data: SyncUpdate) => {
       this.sync(data);
     });
+  }
+
+  // FIXME: This should be in a WorldModel class
+  private getSpawnPoints(): { x: number; y: number }[] {
+    const center = { x: 0, y: 0 };
+    const radius = 1000;
+    const spawnPoints = [];
+    for (let i = 0; i < 30; i++) {
+      const angle = Math.random() * 2 * Math.PI;
+      const x = center.x + radius * Math.cos(angle);
+      const y = center.y + radius * Math.sin(angle);
+      spawnPoints.push({ x, y });
+    }
+    return spawnPoints;
   }
 }

@@ -1,7 +1,7 @@
 import { Player } from "../player/player.js";
 import { BulletGroup } from "../groups/bulletGroup.js";
 import { Bullet } from "./bullet.js";
-import { Difficulty, EnemyGroup } from "../groups/enemyGroup.js";
+import { EnemyGroup } from "../groups/enemyGroup.js";
 import { WorldState } from "../../../common/types/state.js";
 import { PlayerUpdate } from "../../../common/types/messages.js";
 import Observer from "../../../common/observer/observer.js";
@@ -9,6 +9,8 @@ import WorldStats from "./worldStats.js";
 import RecentEventsListener from "./recentEventsListener.js";
 import { GameEvents } from "../../../common/types/events.js";
 import { EnemyModel } from "../../../common/enemy/enemyModel.js";
+import Enemy from "./enemy.js";
+import { Difficulty } from "../../../common/enemyGroupModel.js";
 
 const INACTIVE_THRESHOLD = 60000; // if 60 seconds pass, the player is considered inactive
 
@@ -37,6 +39,8 @@ export class World {
       this.observer,
       Difficulty.Hard,
       spawnPoints,
+      (id, scene, position, observer, physique) =>
+        new Enemy(id, scene, position, observer, physique)
     );
 
     this.create();
