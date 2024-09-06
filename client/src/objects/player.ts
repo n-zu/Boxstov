@@ -141,8 +141,9 @@ export class Player extends PlayerModel {
     }
 
     private syncEvents(events: PlayerRecentEvent[]) {
-        // TODO: Remove these events, as they are probably not needed anymore
-        /*
+        if (this.local) {
+            return;
+        }
         events.forEach(event => {
             switch (event) {
                 case "shoot":
@@ -159,7 +160,6 @@ export class Player extends PlayerModel {
                     break;
             }
         });
-        */
     }
 
     private doStopMovement() {
