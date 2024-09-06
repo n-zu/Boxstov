@@ -40,8 +40,6 @@ export type EnemyPhysiqueState = {
   attackRange: number;
 }
 
-export type EnemyRecentEvents = "receive_damage";
-
 export type EnemyGroupState = {
   enemies: EnemyState[];
   timeUntilNextHorde: number;
@@ -91,5 +89,4 @@ export type BulletState = {
 
 export type RecentEventsListenerState = {
   playerRecentEvents: { [playerId: string]: PlayerRecentEvent[] };
-  enemyRecentEvents: { [enemyId: number]: EnemyRecentEvents[] };
 };

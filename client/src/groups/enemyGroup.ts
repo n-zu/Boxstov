@@ -1,4 +1,4 @@
-import { EnemyGroupState, EnemyRecentEvents } from "../../../common/types/state";
+import { EnemyGroupState } from "../../../common/types/state";
 import { Enemy } from "../objects/enemy";
 import { Difficulty, EnemyGroupModel } from "../../../common/enemyGroupModel";
 import Observer from "../../../common/observer/observer";
@@ -24,18 +24,10 @@ export class EnemyGroup extends EnemyGroupModel {
   }
 
 
-  public sync(enemyGroupState: EnemyGroupState, enemyRecentEvents: { [enemyId: number]: EnemyRecentEvents[] }) {
+  public sync(enemyGroupState: EnemyGroupState) {
     enemyGroupState.enemies.forEach((enemyState, i) => {
       const enemy = this.children.entries[i] as Enemy;
-      enemy.sync(enemyState, this.getRecentEventsOf(i, enemyRecentEvents));
+      enemy.sync(enemyState);
     });
-  }
-
-  private getRecentEventsOf(id: number, enemyRecentEvents: { [enemyId: number]: EnemyRecentEvents[] }) {
-    const recentEvents = enemyRecentEvents[id];
-    if (recentEvents === undefined) {
-      return [];
-    }
-    return recentEvents;
   }
 }

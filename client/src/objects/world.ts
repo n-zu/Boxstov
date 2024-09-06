@@ -51,7 +51,7 @@ export class World extends WorldModel {
       const player = this.getOrCreatePlayer(playerState.id) as Player;
       player.sync(playerState, this.getRecentEventsOfPlayer(playerState.id, worldState));
     });
-    (this.enemies as EnemyGroup).sync(worldState.enemies, worldState.recentEvents.enemyRecentEvents);
+    (this.enemies as EnemyGroup).sync(worldState.enemies);
 
     (this.bullets as BulletGroup).sync(worldState.bullets);
     this.stats.sync(worldState.stats);

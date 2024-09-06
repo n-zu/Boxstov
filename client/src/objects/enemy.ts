@@ -1,5 +1,5 @@
 import { playAnimation } from "../scenes/mainScene";
-import { EnemyRecentEvents, EnemyState } from "../../../common/types/state";
+import { EnemyState } from "../../../common/types/state";
 import { AnimationActor, AnimationSuffix } from "../types/animation";
 import MovementDirection from "../../../common/controls/direction";
 import Phaser from "phaser";
@@ -40,8 +40,7 @@ export class Enemy extends EnemyModel {
     return Math.sqrt(Math.pow(camera.width, 2) + Math.pow(camera.height, 2));
   }
 
-  public sync(state: EnemyState, recentEvents: EnemyRecentEvents[]) {
-    this.syncEvents(recentEvents);
+  public sync(state: EnemyState) {
     this.action = state.action;
     this.move(state);
     (this.physique as EnemyPhysique).sync(this, state.physique);
@@ -49,17 +48,6 @@ export class Enemy extends EnemyModel {
     this.setVisible(state.visible);
     this.active = state.active;
     this.action = state.action;
-  }
-
-  private syncEvents(events: EnemyRecentEvents[]) {
-    events.forEach((event) => {
-      switch (event) {
-        case "receive_damage":
-          this.observer.notify("enemyReceivedDamage", this);
-          this.changeColor();
-          break;
-      }
-    });
   }
 
   private changeColor() {
