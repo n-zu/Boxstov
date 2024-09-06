@@ -16,6 +16,8 @@ export class BulletModel extends Phaser.Physics.Arcade.Sprite {
         this.setActive(false);
         this.setVisible(false);
         this.setPosition(0, 0);
+        scene.add.existing(this);
+        scene.physics.add.existing(this);
 
         this.observer = observer;
     }

@@ -1,4 +1,4 @@
-import BulletGroupInterface from "./bulletGroupInterface";
+import { BulletGroupModel } from "./bulletGroupModel.js";
 import config from "./config.js";
 import MovementDirection from "./controls/direction.js";
 import { GunName } from "./guns/gun";
@@ -19,7 +19,7 @@ export default class PlayerModel extends Phaser.Physics.Arcade.Sprite {
         scene: Phaser.Scene,
         observer: Observer<GameEvents>,
         position: { x: number, y: number },
-        bullets: BulletGroupInterface,
+        bullets: BulletGroupModel,
         sprite: string = "") {
         super(scene, position.x, position.y, sprite)
         this.id = id;

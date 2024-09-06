@@ -1,10 +1,10 @@
-import BulletGroupInterface from "../bulletGroupInterface.js";
+import { BulletGroupModel } from "../bulletGroupModel.js";
 import config from "../config.js";
 import PlayerModel from "../playerModel.js";
 import Gun from "./gun.js";
 
 export default class Rpg extends Gun {
-    constructor(bullets: BulletGroupInterface) {
+    constructor(bullets: BulletGroupModel) {
         super(
             bullets,
             "rpg",

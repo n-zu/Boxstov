@@ -1,4 +1,4 @@
-import BulletGroupInterface from "./bulletGroupInterface";
+import { BulletGroupModel } from "./bulletGroupModel";
 import MovementDirection from "./controls/direction";
 import { GUN_OFFSETS, GUN_ROTATIONS } from "./guns/constants.js";
 import Gun, { GunName } from "./guns/gun.js";
@@ -14,12 +14,12 @@ export default class PlayerArsenalModel {
     kills: number;
     currentGun: Gun;
     guns: Gun[];
-    bullets: BulletGroupInterface;
+    bullets: BulletGroupModel;
     observer: Observer<GameEvents>;
 
     lastTimeShoot: number = 0;
 
-    constructor(playerId: string, bullets: BulletGroupInterface, observer: Observer<GameEvents>, availableGuns?: Gun[]) {
+    constructor(playerId: string, bullets: BulletGroupModel, observer: Observer<GameEvents>, availableGuns?: Gun[]) {
         this.playerId = playerId;
         this.kills = 0;
         this.bullets = bullets;

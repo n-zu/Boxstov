@@ -6,13 +6,6 @@ import { GameEvents } from "../types/events";
 import PlayerModel from "../../../common/playerModel";
 
 export class Bullet extends BulletModel {
-  constructor(scene: Phaser.Scene, observer: Observer<GameEvents>, origin?: Gun) {
-    super(scene, observer, "bullet");
-    // FIXME: This should be in a BulletGroupModel class
-    scene.add.existing(this);
-    scene.physics.add.existing(this);
-  }
-
   public fire(x: number, y: number, rotation: number, shooter: PlayerModel, origin: Gun): void {
     super.fire(x, y, rotation, shooter, origin);
     this.setBase();

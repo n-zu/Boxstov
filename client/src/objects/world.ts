@@ -10,6 +10,7 @@ import { GameEvents } from "../types/events";
 import WorldStats from "./worldStats.js";
 import { Difficulty } from "../../../common/enemyGroupModel";
 import { Enemy } from "./enemy";
+import { Bullet } from "./bullet";
 
 export class World {
   players!: Player[];

@@ -1,4 +1,4 @@
-import BulletGroupInterface from "../../../common/bulletGroupInterface";
+import { BulletGroupModel } from "../../../common/bulletGroupModel";
 import Gun from "../../../common/guns/gun";
 import Observer from "../../../common/observer/observer";
 import PlayerModel from "../../../common/playerModel";
@@ -6,23 +6,11 @@ import { BulletGroupState } from "../../../common/types/state";
 import { Bullet } from "../objects/bullet";
 import { GameEvents } from "../types/events";
 
-export class BulletGroup extends Phaser.GameObjects.Group implements BulletGroupInterface {
+export class BulletGroup extends BulletGroupModel {
   constructor(scene: Phaser.Scene, observer: Observer<GameEvents>) {
-    super(scene);
-
-    function factory() {
-      return new Bullet(scene, observer);
-    }
-
-    this.createMultiple({
-      frameQuantity: 30,
-      key: "bullet",
-      active: false,
-      visible: false,
-      classType: factory,
-    });
+    super(scene, observer, (scene, observer) => new Bullet(scene, observer));
   }
-
+  
   public sync(bulletGroupState: BulletGroupState) {
     bulletGroupState.forEach((bulletState, i) => {
       const bullet = this.children.entries[i] as Bullet;

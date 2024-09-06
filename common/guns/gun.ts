@@ -1,10 +1,10 @@
-import BulletGroupInterface from "../bulletGroupInterface";
+import { BulletGroupModel } from "../bulletGroupModel";
 import PlayerModel from "../playerModel";
 
 export type GunName = "rifle" | "rpg" | "shotgun";
 
 export default abstract class Gun {
-    bullets: BulletGroupInterface;
+    bullets: BulletGroupModel;
     name: GunName;
     bulletSpeed: number;
     damage: number;
@@ -12,7 +12,7 @@ export default abstract class Gun {
     killsToUnlock: number;
 
     constructor(
-        bullets: BulletGroupInterface,
+        bullets: BulletGroupModel,
         name: GunName,
         bulletSpeed: number,
         damage: number,

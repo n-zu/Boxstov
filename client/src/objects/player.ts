@@ -9,7 +9,7 @@ import Observer from "../../../common/observer/observer.js";
 import { GameEvents } from "../types/events";
 import { GunName } from "../../../common/guns/gun";
 import PlayerModel from "../../../common/playerModel";
-import BulletGroupInterface from "../../../common/bulletGroupInterface";
+import { BulletGroupModel } from "../../../common/bulletGroupModel";
 
 const SYNC_DIFF_TOLERANCE = 0.001;
 
@@ -24,7 +24,7 @@ export class Player extends PlayerModel {
         observer: Observer<GameEvents>,
         position: { x: number; y: number },
         gameMaster: GameMaster,
-        bullets: BulletGroupInterface,
+        bullets: BulletGroupModel,
         local = false,
     ) {
         super(id, scene, observer, position, bullets);
