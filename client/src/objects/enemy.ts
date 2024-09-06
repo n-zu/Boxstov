@@ -8,6 +8,7 @@ import { EnemyModel } from "../../../common/enemy/enemyModel.js";
 import EnemyPhysique from "../../../common/enemy/enemyPhysique";
 import { GameEvents } from "../types/events";
 import Observer from "../../../common/observer/observer";
+import PlayerModel from "../../../common/playerModel";
 
 // FIXME: This should not be here 
 const HEALTH = config.enemies.zombieNormal.health;
@@ -75,6 +76,12 @@ export class Enemy extends EnemyModel {
     this.scene.time.delayedCall(100, () => this.setTint(0xff5555));
     this.scene.time.delayedCall(200, () => this.setTint(0xffaaaa));
     this.scene.time.delayedCall(300, () => this.setTint(0xffffff));
+  }
+
+  public receiveDamage(damage: number, damager?: PlayerModel): void {
+    super.receiveDamage(damage, damager);
+    this.changeColor();
+    this.observer.notify("enemyReceivedDamage", this);
   }
 
   private updateHealth(newHealth: number) {

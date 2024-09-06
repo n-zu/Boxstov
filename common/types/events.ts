@@ -1,3 +1,4 @@
+import { EnemyModel } from "../enemy/enemyModel";
 import { GunName } from "../guns/gun";
 import PlayerModel from "../playerModel";
 import { UnitVector } from "./direction";
@@ -39,8 +40,7 @@ export type GameEvents = {
   playerStoppedMoving: (player: PlayerModel) => void;
 
   /// Some enemy has received damage
-  // FIXME: This event is disabled for now
-  // enemyReceivedDamage: (enemy: Enemy) => void;
+  enemyReceivedDamage: (enemy: EnemyModel) => void;
 
   tick: () => void;
 
