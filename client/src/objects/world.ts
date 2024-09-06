@@ -9,46 +9,51 @@ import Observer from "../../../common/observer/observer.js";
 import { GameEvents } from "../types/events";
 import WorldStats from "./worldStats.js";
 import { Difficulty } from "../../../common/enemyGroupModel";
-import { Enemy } from "./enemy";
-import { Bullet } from "./bullet";
+import { WorldModel } from "../../../common/worldModel";
+import PlayerModel from "../../../common/playerModel";
 
-export class World {
-  players!: Player[];
-  enemies: EnemyGroup;
-  observer: Observer<GameEvents>;
+export class World extends WorldModel {
   stats: WorldStats;
-  playerControls!: PlayerControls;
-  bulletGroup!: BulletGroup;
+  playerControls?: PlayerControls;
   gameMaster: GameMaster;
-  scene: Phaser.Scene;
 
   constructor(scene: Phaser.Scene, observer: Observer<GameEvents>, gameMaster: GameMaster, username: string) {
+    super(scene, observer);
     this.gameMaster = gameMaster;
-    this.scene = scene;
-    this.enemies = new EnemyGroup(scene, observer, Difficulty.Hard, this.getSpawnPoints(),
-      (id, scene, position, observer, physique) => new Enemy(id, scene, position, observer, physique)
-    );
     this.stats = new WorldStats(observer);
-    this.observer = observer;
-
+    
     this.setupGameMaster(gameMaster);
-    this.setupFirstPlayer(scene, gameMaster, username, observer);
+    this.setupFirstPlayer(scene, gameMaster, username);
   }
 
   public update() {
-    this.playerControls.update();
-    this.players?.forEach((player) => player.update());
-    this.enemies.update(this.players);
+    if (this.playerControls) {
+      this.playerControls.update();
+    }
+    super.update();
+  }
+
+  protected newBulletGroup(scene: Phaser.Scene, observer: Observer<GameEvents>) {
+    return new BulletGroup(scene, observer);
+  }
+
+  protected newEnemyGroup(scene: Phaser.Scene, observer: Observer<GameEvents>, difficulty: Difficulty, spawnPoints: { x: number; y: number }[]) {
+    return new EnemyGroup(scene, observer, difficulty, spawnPoints);
+  }
+
+  protected newPlayer(id: string, scene: Phaser.Scene, observer: Observer<GameEvents>, position: { x: number; y: number }, bullets: BulletGroup) {
+    const local = this.players.length === 0;
+    return new Player(id, scene, observer, position, this.gameMaster, bullets, local);
   }
 
   public sync(worldState: WorldState) {
     worldState.players.forEach((playerState) => {
-      const player = this.getOrCreatePlayer(playerState.id);
+      const player = this.getOrCreatePlayer(playerState.id) as Player;
       player.sync(playerState, this.getRecentEventsOfPlayer(playerState.id, worldState));
     });
-    this.enemies.sync(worldState.enemies, worldState.recentEvents.enemyRecentEvents);
+    (this.enemies as EnemyGroup).sync(worldState.enemies, worldState.recentEvents.enemyRecentEvents);
 
-    this.bulletGroup.sync(worldState.bullets);
+    (this.bullets as BulletGroup).sync(worldState.bullets);
     this.stats.sync(worldState.stats);
   }
 
@@ -63,18 +68,15 @@ export class World {
   private setupFirstPlayer(
     scene: Phaser.Scene,
     gameMaster: GameMaster,
-    username: string,
-    observer: Observer<GameEvents>
+    username: string
   ) {
-    this.bulletGroup = new BulletGroup(scene, observer);
-
     const player = new Player(
       username,
       scene,
       this.observer,
       { x: 0, y: 0 },
       gameMaster,
-      this.bulletGroup,
+      this.bullets,
       true
     );
     this.playerControls = new PlayerControls(this.scene, player, this.observer);
@@ -89,17 +91,10 @@ export class World {
     this.players = [player];
   }
 
-  private getOrCreatePlayer(id: string): Player {
+  public getOrCreatePlayer(id: string): PlayerModel {
     let player = this.players.find((p) => p.id === id);
     if (player === undefined) {
-      player = new Player(
-        id,
-        this.scene,
-        this.observer,
-        { x: 0, y: 0 },
-        this.gameMaster,
-        this.bulletGroup
-      );
+      player = this.newPlayer(id, this.scene, this.observer, { x: 0, y: 0 }, this.bullets as BulletGroup);
       this.players.push(player);
     }
     return player;
@@ -109,19 +104,5 @@ export class World {
     gameMaster.addAction("sync", (data: SyncUpdate) => {
       this.sync(data);
     });
-  }
-
-  // FIXME: This should be in a WorldModel class
-  private getSpawnPoints(): { x: number; y: number }[] {
-    const center = { x: 0, y: 0 };
-    const radius = 1000;
-    const spawnPoints = [];
-    for (let i = 0; i < 30; i++) {
-      const angle = Math.random() * 2 * Math.PI;
-      const x = center.x + radius * Math.cos(angle);
-      const y = center.y + radius * Math.sin(angle);
-      spawnPoints.push({ x, y });
-    }
-    return spawnPoints;
   }
 }

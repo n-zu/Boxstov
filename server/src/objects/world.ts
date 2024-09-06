@@ -2,53 +2,34 @@ import { Player } from "../player/player.js";
 import { BulletGroup } from "../groups/bulletGroup.js";
 import { Bullet } from "./bullet.js";
 import { EnemyGroup } from "../groups/enemyGroup.js";
-import { WorldState } from "../../../common/types/state.js";
+import { SpawnPoint, WorldState } from "../../../common/types/state.js";
 import { PlayerUpdate } from "../../../common/types/messages.js";
 import Observer from "../../../common/observer/observer.js";
 import WorldStats from "./worldStats.js";
 import RecentEventsListener from "./recentEventsListener.js";
 import { GameEvents } from "../../../common/types/events.js";
 import { EnemyModel } from "../../../common/enemy/enemyModel.js";
-import Enemy from "./enemy.js";
-import { Difficulty } from "../../../common/enemyGroupModel.js";
+import { WorldModel } from "../../../common/worldModel.js";
+import { Difficulty, EnemyGroupModel } from "../../../common/enemyGroupModel.js";
 
 const INACTIVE_THRESHOLD = 60000; // if 60 seconds pass, the player is considered inactive
 
-export class World {
-  players: Player[];
-  enemies: EnemyGroup;
-  bulletGroup: BulletGroup;
-  scene: Phaser.Scene;
-  observer: Observer<GameEvents>;
+export class World extends WorldModel {
   stats: WorldStats;
   recentEvents: RecentEventsListener;
 
   constructor(scene: Phaser.Scene, observer: Observer<GameEvents>) {
-    this.players = [];
-    this.observer = observer;
+    super(scene, observer);
     this.observer.subscribe("tick", () => this.update());
     
-    this.bulletGroup = new BulletGroup(scene, observer);
     this.stats = new WorldStats(observer);
-    this.scene = scene;
 
-    const spawnPoints = this.getSpawnPoints();
-
-    this.enemies = new EnemyGroup(
-      this.scene,
-      this.observer,
-      Difficulty.Hard,
-      spawnPoints,
-      (id, scene, position, observer, physique) =>
-        new Enemy(id, scene, position, observer, physique)
-    );
-
-    this.create();
+    this.setupCollisions();
     this.recentEvents = new RecentEventsListener(this.observer);
   }
 
-  public create() {
-    this.scene.physics.add.overlap(this.enemies, this.bulletGroup, (e, b) => {
+  public setupCollisions() {
+    this.scene.physics.add.overlap(this.enemies, this.bullets, (e, b) => {
       const bullet = b as Bullet;
       const enemy = e as EnemyModel;
       if (bullet.active && enemy.active) {
@@ -60,23 +41,36 @@ export class World {
     this.scene.physics.add.collider(this.enemies, this.enemies);
   }
 
+  protected newBulletGroup(scene: Phaser.Scene, observer: Observer<GameEvents>) {
+    return new BulletGroup(scene, observer);
+  }
+
+  protected newEnemyGroup(scene: Phaser.Scene, observer: Observer<GameEvents>, difficulty: Difficulty, spawnPoints: SpawnPoint[]): EnemyGroupModel {
+    return new EnemyGroup(scene, observer, difficulty, spawnPoints);
+  }
+
+  protected newPlayer(id: string, scene: Phaser.Scene, observer: Observer<GameEvents>, position: { x: number; y: number }, bullets: BulletGroup) {
+    return new Player(id, scene, observer, position, bullets);
+  }
+
   public update() {
     const isActive = (p: Player) =>
       Date.now() - INACTIVE_THRESHOLD < p.lastUpdate;
-    this.players = this.players.filter(isActive);
+    this.players = (this.players as Player[]).filter(isActive);
+
     if (!this.players.length) {
       this.observer.notify("gameEnd");
     }
-    this.enemies?.update(this.players);
     this.stats.update();
+    super.update();
   }
 
   public getState(): WorldState {
     return {
-      players: this.players.map((player) => player.getState()),
-      bullets: this.bulletGroup.getState(),
+      players: (this.players as Player[]).map((player) => player.getState()),
+      bullets: (this.bullets as BulletGroup).getState(),
       stats: this.stats.getState(),
-      enemies: this.enemies.getState(),
+      enemies: (this.enemies as EnemyGroup).getState(),
       recentEvents: this.recentEvents.getState(),
     };
   }
@@ -89,7 +83,7 @@ export class World {
       this.scene,
       this.observer,
       { x: 0, y: 0 },
-      this.bulletGroup
+      this.bullets
     );
     this.players.push(player);
     return true;
@@ -100,20 +94,12 @@ export class World {
     player?.handleMessage(data);
   }
 
-  private getSpawnPoints(): { x: number; y: number }[] {
-    const center = { x: 0, y: 0 };
-    const radius = 1000;
-    const spawnPoints = [];
-    for (let i = 0; i < 30; i++) {
-      const angle = Math.random() * 2 * Math.PI;
-      const x = center.x + radius * Math.cos(angle);
-      const y = center.y + radius * Math.sin(angle);
-      spawnPoints.push({ x, y });
-    }
-    return spawnPoints;
-  }
-
   private getPlayer(id: string): Player | undefined {
-    return this.players.find((p) => p.id === id);
+    const player = this.players.find((p) => p.id === id);
+    if (player) {
+      return player as Player;
+    } else {
+      return undefined;
+    }
   }
 }
