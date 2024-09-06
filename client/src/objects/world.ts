@@ -6,11 +6,11 @@ import { EnemyGroup } from "../groups/enemyGroup";
 import { WorldState } from "../../../common/types/state";
 import { SyncUpdate } from "../../../common/types/messages";
 import Observer from "../../../common/observer/observer.js";
-import { GameEvents } from "../types/events";
 import WorldStats from "./worldStats.js";
 import { Difficulty } from "../../../common/enemyGroupModel";
 import { WorldModel } from "../../../common/worldModel";
 import PlayerModel from "../../../common/playerModel";
+import { GameEvents } from "../../../common/types/events";
 
 export class World extends WorldModel {
   stats: WorldStats;

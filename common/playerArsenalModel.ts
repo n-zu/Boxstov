@@ -57,11 +57,12 @@ export default class PlayerArsenalModel {
         return true;
     }
 
-    public switchGun(gunName: GunName, force: boolean = false) {
+    public switchGun(player: PlayerModel, gunName: GunName, force: boolean = false) {
         for (const gun of this.guns) {
             if (gun.getGunName() === gunName) {
                 if (gun.getKillsToUnlock() <= this.kills || force) {
                     this.currentGun = gun;
+                    this.observer.notify("playerSwitchedGun", player);
                 }
                 break;
             }

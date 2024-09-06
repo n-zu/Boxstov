@@ -1,7 +1,7 @@
-import { GameEvents } from "../types/events";
 import Observer from "../../../common/observer/observer.js";
 import { Player } from "../objects/player";
 import { Enemy } from "../objects/enemy";
+import { GameEvents } from "../../../common/types/events.js";
 
 const MAX_ATTACK_SOUND_AMOUNT = 3;
 const MAX_DMG_SOUND_AMOUNT = 5;
@@ -21,11 +21,11 @@ export default class AudioPlayer {
   }
 
   private subscribeToEvents() {
-    this.observer.subscribe("playerShoot", (player) => this.playShootSound(player));
-    this.observer.subscribe("playerSwitchedGun", (player) => this.playSwitchGunSound(player));
-    this.observer.subscribe("playerUnlockedGun", (player) => this.playUnlockGunSound(player));
-    this.observer.subscribe("playerReceivedDamage", (player) => this.playPlayerReceivedDamageSound(player));
-    this.observer.subscribe("enemyReceivedDamage", (enemy) => this.playEnemyReceivedDamageSound(enemy));
+    this.observer.subscribe("playerShoot", (player) => this.playShootSound(player as Player));
+    this.observer.subscribe("playerSwitchedGun", (player) => this.playSwitchGunSound(player as Player));
+    this.observer.subscribe("playerUnlockedGun", (player) => this.playUnlockGunSound(player as Player));
+    this.observer.subscribe("playerReceivedDamage", (player) => this.playPlayerReceivedDamageSound(player as Player));
+    this.observer.subscribe("enemyReceivedDamage", (enemy) => this.playEnemyReceivedDamageSound(enemy as Enemy));
   }
 
   private playEnemyReceivedDamageSound(enemy: Enemy) {

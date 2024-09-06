@@ -1,6 +1,5 @@
 import { Player } from "../player/player.js";
 import { BulletGroup } from "../groups/bulletGroup.js";
-import { Bullet } from "./bullet.js";
 import { EnemyGroup } from "../groups/enemyGroup.js";
 import { SpawnPoint, WorldState } from "../../../common/types/state.js";
 import { PlayerUpdate } from "../../../common/types/messages.js";
@@ -8,7 +7,6 @@ import Observer from "../../../common/observer/observer.js";
 import WorldStats from "./worldStats.js";
 import RecentEventsListener from "./recentEventsListener.js";
 import { GameEvents } from "../../../common/types/events.js";
-import { EnemyModel } from "../../../common/enemy/enemyModel.js";
 import { WorldModel } from "../../../common/worldModel.js";
 import { Difficulty, EnemyGroupModel } from "../../../common/enemyGroupModel.js";
 
@@ -24,21 +22,7 @@ export class World extends WorldModel {
     
     this.stats = new WorldStats(observer);
 
-    this.setupCollisions();
     this.recentEvents = new RecentEventsListener(this.observer);
-  }
-
-  public setupCollisions() {
-    this.scene.physics.add.overlap(this.enemies, this.bullets, (e, b) => {
-      const bullet = b as Bullet;
-      const enemy = e as EnemyModel;
-      if (bullet.active && enemy.active) {
-        bullet.collideWith(enemy);
-      }
-    });
-
-    // Enemies repel each other
-    this.scene.physics.add.collider(this.enemies, this.enemies);
   }
 
   protected newBulletGroup(scene: Phaser.Scene, observer: Observer<GameEvents>) {

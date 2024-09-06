@@ -6,10 +6,10 @@ import { PlayerRecentEvent, PlayerState } from "../../../common/types/state";
 import { playAnimation } from "../scenes/mainScene";
 import { AnimationSuffix } from "../types/animation";
 import Observer from "../../../common/observer/observer.js";
-import { GameEvents } from "../types/events";
 import { GunName } from "../../../common/guns/gun";
 import PlayerModel from "../../../common/playerModel";
 import { BulletGroupModel } from "../../../common/bulletGroupModel";
+import { GameEvents } from "../../../common/types/events";
 
 const SYNC_DIFF_TOLERANCE = 0.001;
 
@@ -104,7 +104,7 @@ export class Player extends PlayerModel {
             this.move(this.movementDirection);
         }
         if (this.arsenal.currentGun.getGunName() !== state.gunName) {
-            this.arsenal.switchGun(state.gunName, true);
+            this.arsenal.switchGun(this, state.gunName, true);
             this.observer.notify("playerSwitchedGun", this);
             playAnimation(this, this.arsenal.currentGun.getGunName(), this.movementDirection.getFacingDirection(), AnimationSuffix.Idle);
         }
@@ -125,9 +125,6 @@ export class Player extends PlayerModel {
 
     private subscribeToEvents() {
         if (this.local) {
-            this.observer.subscribe("triggerChangeGun", (gunName: GunName) => {
-                this.switchGun(gunName);
-            });
             this.observer.subscribe("triggerMove", (direction) => {
                 this.moveTo(direction);
             });

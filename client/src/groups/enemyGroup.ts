@@ -2,7 +2,7 @@ import { EnemyGroupState, EnemyRecentEvents } from "../../../common/types/state"
 import { Enemy } from "../objects/enemy";
 import { Difficulty, EnemyGroupModel } from "../../../common/enemyGroupModel";
 import Observer from "../../../common/observer/observer";
-import { GameEvents } from "../types/events";
+import { GameEvents } from "../../../common/types/events";
 
 export class EnemyGroup extends EnemyGroupModel {
   constructor(scene: Phaser.Scene, observer: Observer<GameEvents>, difficulty: Difficulty, spawnPoints: { x: number; y: number }[]) {
@@ -13,8 +13,8 @@ export class EnemyGroup extends EnemyGroupModel {
       spawnPoints,
       (id, scene, position, observer, physique) => new Enemy(id, scene, position, observer, physique));
   }
-  
-  public sync(enemyGroupState: EnemyGroupState, enemyRecentEvents: { [enemyId: number]: EnemyRecentEvents[]}) {
+
+  public sync(enemyGroupState: EnemyGroupState, enemyRecentEvents: { [enemyId: number]: EnemyRecentEvents[] }) {
     enemyGroupState.enemies.forEach((enemyState, i) => {
       const enemy = this.children.entries[i] as Enemy;
       enemy.sync(enemyState, this.getRecentEventsOf(i, enemyRecentEvents));

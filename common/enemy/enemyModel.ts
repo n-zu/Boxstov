@@ -56,7 +56,7 @@ export class EnemyModel extends Phaser.Physics.Arcade.Sprite {
     
     this.physique.receiveDamage(damage);
     if (this.physique.isDead() && damager) {
-      this.beKilledBy(damager);
+      this.die(damager);
     }
   }
 
@@ -68,14 +68,16 @@ export class EnemyModel extends Phaser.Physics.Arcade.Sprite {
     this.body.enable = true;
   }
 
-  private beKilledBy(killer: PlayerModel) {
+  protected die(killer?: PlayerModel) {
     this.setVelocity(0, 0);
     this.movementDirection.update([0, 0]);
     this.body.enable = false;
-    this.observer.notify("playerKill", killer);
+    if (killer) {
+      this.observer.notify("playerKill", killer);
+    }
 
     this.setRotation(Math.random() * 0.4 - 0.2);
-
+    this.setDepth(this.y - 100);
     this.scene.time.delayedCall(10000, () => {
       this.setVisible(false);
       this.setActive(false);

@@ -50,7 +50,7 @@ export default class PlayerModel extends Phaser.Physics.Arcade.Sprite {
     }
 
     public switchGun(gunName: GunName) {
-        this.arsenal.switchGun(gunName);
+        this.arsenal.switchGun(this, gunName);
     }
 
     public move(direction: MovementDirection) {

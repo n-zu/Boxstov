@@ -112,10 +112,10 @@ export class Enemy extends EnemyModel {
     }
   }
 
-  private die() {
+  protected die(killer?: PlayerModel) {
+    super.die(killer);
     this.setTint(0xff5555);
     setTimeout(() => this.setTint(0xffdddd), 1000);
-    this.setDepth(this.y - 100);
 
     playAnimation(
       this,
@@ -123,11 +123,5 @@ export class Enemy extends EnemyModel {
       this.movementDirection.getFacingDirection(),
       AnimationSuffix.Die
     );
-    this.setRotation(Math.random() * 0.4 - 0.2);
-
-    this.scene.time.delayedCall(10000, () => {
-      this.setVisible(false);
-      this.setActive(false);
-    });
   }
 }

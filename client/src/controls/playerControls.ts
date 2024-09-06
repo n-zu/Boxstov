@@ -2,9 +2,9 @@ import CursorKeys = Phaser.Types.Input.Keyboard.CursorKeys;
 import InputPlugin = Phaser.Input.InputPlugin;
 import { UnitVector } from "../../../common/types/direction";
 import Observer from "../../../common/observer/observer.js";
-import { GameEvents } from "../types/events";
 import { Player } from "../objects/player.js";
 import { GunName } from "../../../common/guns/gun";
+import { GameEvents } from "../../../common/types/events";
 
 const diagonalFactor = Math.sqrt(2) / 2;
 
@@ -39,7 +39,7 @@ export class PlayerControls {
       if (event.keyCode >= 49 && event.keyCode <= 57) {
         const num = event.keyCode - 49;
         const name = GUN_NAMES[num];
-        this.observer.notify("triggerChangeGun", name);
+        localPlayer.switchGun(name);
       }
     });
 

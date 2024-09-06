@@ -1,4 +1,6 @@
 import { BulletGroupModel } from "./bulletGroupModel";
+import { BulletModel } from "./bulletModel";
+import { EnemyModel } from "./enemy/enemyModel";
 import { Difficulty, EnemyGroupModel } from "./enemyGroupModel.js";
 import Observer from "./observer/observer";
 import PlayerModel from "./playerModel";
@@ -18,6 +20,21 @@ export abstract class WorldModel {
         this.observer = observer;
         this.bullets = this.newBulletGroup(scene, observer);
         this.players = [];
+
+        this.setupCollisions();
+    }
+
+    public setupCollisions() {
+        this.scene.physics.add.overlap(this.enemies, this.bullets, (e, b) => {
+            const bullet = b as BulletModel;
+            const enemy = e as EnemyModel;
+            if (bullet.active && enemy.active) {
+                bullet.collideWith(enemy);
+            }
+        });
+
+        // Enemies repel each other
+        this.scene.physics.add.collider(this.enemies, this.enemies);
     }
 
     protected abstract newBulletGroup(scene: Phaser.Scene, observer: Observer<GameEvents>): BulletGroupModel;

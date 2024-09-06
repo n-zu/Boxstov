@@ -12,8 +12,6 @@ export type BulletInfo = {
 };
 
 export type GameEvents = {
-  /// Local player wants to change gun
-  triggerChangeGun: (name: GunName) => void;
   /// Local player wants to move in a direction
   triggerMove: (direction: UnitVector) => void;
   /// Local player wants to shoot
