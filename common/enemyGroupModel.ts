@@ -1,6 +1,6 @@
 import config from "./config.js";
 import { EnemyModel } from "./enemy/enemyModel.js";
-import EnemyPhysique from "./enemy/enemyPhysique.js";
+import EnemyPhysiqueModel from "./enemy/enemyPhysiqueModel.js";
 import Observer from "./observer/observer.js";
 import PlayerModel from "./playerModel.js";
 import { GameEvents } from "./types/events.js";
@@ -16,7 +16,7 @@ export enum Difficulty {
   Hard = "hard",
 }
 
-export class EnemyGroupModel extends Phaser.Physics.Arcade.Group {
+export abstract class EnemyGroupModel extends Phaser.Physics.Arcade.Group {
   difficulty: Difficulty;
   timeUntilNextHorde = 0;
   spawnPoints: SpawnPoint[];
@@ -27,7 +27,7 @@ export class EnemyGroupModel extends Phaser.Physics.Arcade.Group {
     observer: Observer<GameEvents>,
     difficulty: Difficulty,
     spawnPoints: SpawnPoint[],
-    enemyFactory: (id: number, scene: Phaser.Scene, position: { x: number, y: number }, observer: Observer<GameEvents>, physique: EnemyPhysique) => EnemyModel
+    enemyFactory: (id: number, scene: Phaser.Scene, position: { x: number, y: number }, observer: Observer<GameEvents>, physique: EnemyPhysiqueModel) => EnemyModel
   ) {
     super(scene.physics.world, scene);
     this.observer = observer;
@@ -37,14 +37,14 @@ export class EnemyGroupModel extends Phaser.Physics.Arcade.Group {
       const isFast = prng() < config.misc.zombieFastProbability;
       let physique;
       if (isFast) {
-        physique = new EnemyPhysique(
+        physique = this.newFastEnemyPhysique(
           config.enemies.zombieFast.health,
           config.enemies.zombieFast.strength,
           config.enemies.zombieFast.speed,
           config.enemies.zombieFast.attackRange
         );
       } else {
-        physique = new EnemyPhysique(
+        physique = this.newNormalEnemyPhysique(
           config.enemies.zombieNormal.health,
           config.enemies.zombieNormal.strength,
           config.enemies.zombieNormal.speed,
@@ -59,6 +59,10 @@ export class EnemyGroupModel extends Phaser.Physics.Arcade.Group {
     this.difficulty = difficulty;
     this.spawnPoints = spawnPoints;
   }
+
+  protected abstract newNormalEnemyPhysique(health: number, strength: number, speed: number, attackRange: number): EnemyPhysiqueModel;
+
+  protected abstract newFastEnemyPhysique(health: number, strength: number, speed: number, attackRange: number): EnemyPhysiqueModel;
 
   public update(players: PlayerModel[]) {
     const enemies = this.getMatching("active", true) as EnemyModel[];

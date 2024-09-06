@@ -2,7 +2,7 @@ import MovementDirection from "../controls/direction.js";
 import Observer from "../observer/observer.js";
 import EnemyBrain from "./enemyBrain.js";
 import { UnitVector } from "../types/direction.js";
-import EnemyPhysique from "./enemyPhysique.js";
+import EnemyPhysiqueModel from "./enemyPhysiqueModel.js";
 import config from "../config.js";
 import { GameEvents } from "../types/events.js";
 import PlayerModel from "../playerModel.js";
@@ -12,7 +12,7 @@ const prng = getPrng(42);
 
 export class EnemyModel extends Phaser.Physics.Arcade.Sprite {
   id: number;
-  physique: EnemyPhysique;
+  physique: EnemyPhysiqueModel;
 
   movementDirection: MovementDirection = new MovementDirection();
   observer: Observer<GameEvents>;
@@ -23,7 +23,7 @@ export class EnemyModel extends Phaser.Physics.Arcade.Sprite {
     scene: Phaser.Scene,
     position: { x: number; y: number },
     observer: Observer<GameEvents>,
-    physique: EnemyPhysique,
+    physique: EnemyPhysiqueModel,
     sprite: string = ""
   ) {
     super(scene, position.x, position.y, sprite);

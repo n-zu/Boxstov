@@ -25,13 +25,11 @@ export type EnemyState = {
     y: number;
   };
   movementDirection: EncodedMovementDirection;
-  dead: boolean;
-  health: number;
+  physique: EnemyPhysiqueState;
   active: boolean;
   visible: boolean;
   bodyEnabled: boolean;
   action: string;
-  speed: number;
 };
 
 export type EnemyPhysiqueState = {

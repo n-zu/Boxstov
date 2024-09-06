@@ -2,7 +2,7 @@ import { EnemyPhysiqueState } from "../types/state.js";
 import { EnemyModel } from "./enemyModel.js";
 import PlayerModel from "../playerModel.js";
 
-export default class EnemyPhysique {
+export default class EnemyPhysiqueModel {
     maxHealth: number;
     health: number;
     strength: number;
@@ -39,16 +39,6 @@ export default class EnemyPhysique {
 
     public setVelocityOf(enemy: EnemyModel) {
         enemy.setVelocity(...enemy.movementDirection.getSpeed(this.speed));
-    }
-
-    public getState(): EnemyPhysiqueState {
-        return {
-            maxHealth: this.maxHealth,
-            health: this.health,
-            strength: this.strength,
-            speed: this.speed,
-            attackRange: this.attackRange,
-        };
     }
 
     public canAttack(me: EnemyModel, player: PlayerModel): boolean {
