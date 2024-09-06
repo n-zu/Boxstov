@@ -152,12 +152,6 @@ export class Player extends PlayerModel {
                 case "receive_damage":
                     this.observer.notify("playerReceivedDamage", this);
                     break;
-                case "kill":
-                    this.observer.notify("playerKill", this);
-                    break;
-                case "unlocked_gun":
-                    this.observer.notify("playerUnlockedGun", this);
-                    break;
             }
         });
     }

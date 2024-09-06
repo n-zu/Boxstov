@@ -13,16 +13,8 @@ export default class RecentEventsListener {
             this.addPlayerEvent(player.id, "receive_damage");
         });
 
-        obs.subscribe("playerUnlockedGun", (player: PlayerModel) => {
-            this.addPlayerEvent(player.id, "unlocked_gun");
-        });
-
         obs.subscribe("enemyReceivedDamage", (enemy: EnemyModel) => {
             this.addEnemyEvent(enemy.id, "receive_damage");
-        });
-
-        obs.subscribe("playerKill", (killer: PlayerModel) => {
-            this.addPlayerEvent(killer.id, "kill");
         });
 
         obs.subscribe("playerShoot", (shooter: PlayerModel) => {

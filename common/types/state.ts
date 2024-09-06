@@ -68,7 +68,7 @@ export type PlayerState = {
   gunName: GunName;
 };
 
-export type PlayerRecentEvent = "shoot" | "receive_damage" | "kill" | "unlocked_gun";
+export type PlayerRecentEvent = "shoot" | "receive_damage";
 
 
 // Bullet
