@@ -28,6 +28,5 @@ export default class PlayerArsenal extends PlayerArsenalModel {
             }
         }
         this.kills = state.kills;
-        this.lastTimeShoot = state.lastTimeShoot
     }
 }

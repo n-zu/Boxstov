@@ -6,7 +6,6 @@ export default class PlayerArsenal extends PlayerArsenalModel {
         return {
             currentGun: this.currentGun.getGunName(),
             kills: this.kills,
-            lastTimeShoot: this.lastTimeShoot,
         };
     }
 }
