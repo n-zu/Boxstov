@@ -1,12 +1,12 @@
 import "@geckos.io/phaser-on-nodejs";
 import Phaser from "phaser";
-import { Enemy } from "./enemy/enemy.js";
 import { BulletState } from "../../../common/types/state.js";
 import Observer from "../../../common/observer/observer.js";
 import { polarToCartesian } from "../../../common/utils.js";
 import Gun from "../../../common/guns/gun.js";
 import PlayerModel from "../../../common/playerModel.js";
 import { GameEvents } from "../../../common/types/events.js";
+import { EnemyModel } from "../../../common/enemy/enemyModel.js";
 
 export class Bullet extends Phaser.Physics.Arcade.Sprite {
   playerId = "none";
@@ -63,7 +63,7 @@ export class Bullet extends Phaser.Physics.Arcade.Sprite {
   }
 
   // We should use an interface for this
-  public collideWith(enemy: Enemy) {
+  public collideWith(enemy: EnemyModel) {
     if (this.origin && this.shooter) {
       enemy.receiveDamage(this.origin.getDamage(), this.shooter);
       this.die();  

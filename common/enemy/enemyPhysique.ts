@@ -1,6 +1,6 @@
-import { EnemyPhysiqueState } from "../../../../common/types/state.js";
-import { Player } from "../../player/player";
-import { Enemy } from "./enemy";
+import { EnemyPhysiqueState } from "../types/state.js";
+import { EnemyModel } from "./enemyModel.js";
+import PlayerModel from "../playerModel.js";
 
 export default class EnemyPhysique {
     maxHealth: number;
@@ -37,7 +37,7 @@ export default class EnemyPhysique {
         return this.health == 0;
     }
 
-    public setVelocityOf(enemy: Enemy) {
+    public setVelocityOf(enemy: EnemyModel) {
         enemy.setVelocity(...enemy.movementDirection.getSpeed(this.speed));
     }
 
@@ -51,7 +51,7 @@ export default class EnemyPhysique {
         };
     }
 
-    public canAttack(me: Enemy, player: Player): boolean {
+    public canAttack(me: EnemyModel, player: PlayerModel): boolean {
         const dx = player.x - me.x;
         const dy = player.y - me.y;
         const distance = Math.sqrt(dx * dx + dy * dy);

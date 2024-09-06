@@ -1,10 +1,10 @@
-import { Enemy } from "../objects/enemy/enemy.js";
 import { Player } from "../player/player.js";
 import { EnemyGroupState, EnemyState, SpawnPoint } from "../../../common/types/state.js";
 import Observer from "../../../common/observer/observer.js";
 import config from "../../../common/config.js";
-import EnemyPhysique from "../objects/enemy/enemyPhysique.js";
 import { GameEvents } from "../../../common/types/events.js";
+import { EnemyModel } from "../../../common/enemy/enemyModel.js";
+import EnemyPhysique from "../../../common/enemy/enemyPhysique.js";
 
 const TIME_BETWEEN_HORDES = 700;
 
@@ -29,7 +29,7 @@ export class EnemyGroup extends Phaser.Physics.Arcade.Group {
     super(scene.physics.world, scene);
     this.observer = observer;
 
-    const enemies: Enemy[] = [];
+    const enemies: EnemyModel[] = [];
     for (let i = 0; i < config.misc.maxEnemies; i++) {
       const isFast = Math.random() < config.misc.zombieFastProbability;
       let physique;
@@ -48,7 +48,7 @@ export class EnemyGroup extends Phaser.Physics.Arcade.Group {
           config.enemies.zombieNormal.attackRange
         );
       }
-      enemies.push(new Enemy(scene, 0, 0, i, observer, physique));
+      enemies.push(new EnemyModel(i, scene, {x: 0, y: 0}, observer, physique));
     }
 
     this.addMultiple(enemies);
@@ -58,7 +58,7 @@ export class EnemyGroup extends Phaser.Physics.Arcade.Group {
   }
 
   public update(players: Player[]) {
-    const enemies = this.getMatching("active", true) as Enemy[];
+    const enemies = this.getMatching("active", true) as EnemyModel[];
     enemies.forEach((e) => {
       e.update(players);
     });
@@ -71,7 +71,7 @@ export class EnemyGroup extends Phaser.Physics.Arcade.Group {
 
   public getState(): EnemyGroupState {
     const enemyInfo: EnemyState[] = this.children.entries.map((enemy) => {
-      const e = enemy as Enemy;
+      const e = enemy as EnemyModel;
       return e.getState();
     });
     return {
@@ -96,7 +96,7 @@ export class EnemyGroup extends Phaser.Physics.Arcade.Group {
   private spawnHorde() {
     const enemiesToSpawn = this.getEnemiesToSpawn();
     for (let i = 0; i < enemiesToSpawn; i++) {
-      const enemy = this.getFirstDead(false) as Enemy;
+      const enemy = this.getFirstDead(false) as EnemyModel;
       if (enemy) {
         const spawnPoint =
           this.spawnPoints[Math.floor(Math.random() * this.spawnPoints.length)];

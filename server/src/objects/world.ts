@@ -1,6 +1,5 @@
 import { Player } from "../player/player.js";
 import { BulletGroup } from "../groups/bulletGroup.js";
-import { Enemy } from "./enemy/enemy.js";
 import { Bullet } from "./bullet.js";
 import { Difficulty, EnemyGroup } from "../groups/enemyGroup.js";
 import { WorldState } from "../../../common/types/state.js";
@@ -9,6 +8,7 @@ import Observer from "../../../common/observer/observer.js";
 import WorldStats from "./worldStats.js";
 import RecentEventsListener from "./recentEventsListener.js";
 import { GameEvents } from "../../../common/types/events.js";
+import { EnemyModel } from "../../../common/enemy/enemyModel.js";
 
 const INACTIVE_THRESHOLD = 60000; // if 60 seconds pass, the player is considered inactive
 
@@ -46,7 +46,7 @@ export class World {
   public create() {
     this.scene.physics.add.overlap(this.enemies, this.bulletGroup, (e, b) => {
       const bullet = b as Bullet;
-      const enemy = e as Enemy;
+      const enemy = e as EnemyModel;
       if (bullet.active && enemy.active) {
         bullet.collideWith(enemy);
       }

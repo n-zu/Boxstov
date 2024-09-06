@@ -2,6 +2,7 @@ import { EnemyGroupState, EnemyRecentEvents } from "../../../common/types/state"
 import { Enemy } from "../objects/enemy";
 import { GameEvents } from "../types/events";
 import Observer from "../../../common/observer/observer";
+import EnemyPhysique from "../../../common/enemy/enemyPhysique";
 
 export class EnemyGroup extends Phaser.Physics.Arcade.Group {
   constructor(scene: Phaser.Scene, observer: Observer<GameEvents>, maxEnemies: number) {
@@ -9,7 +10,8 @@ export class EnemyGroup extends Phaser.Physics.Arcade.Group {
 
     const enemies: Enemy[] = [];
     for (let i = 0; i < maxEnemies; i++) {
-      enemies.push(new Enemy(scene, observer, 0, 0, i));
+      // TODO: Fix the enemy physique
+      enemies.push(new Enemy(i, scene, {x: 0, y: 0}, observer, new EnemyPhysique(1, 1, 1, 1)));
     }
 
     this.addMultiple(enemies);

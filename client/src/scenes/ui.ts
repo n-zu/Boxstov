@@ -102,7 +102,7 @@ class MiniMap {
     this.enemies.fillStyle(0xff5555, 1);
     world.enemies.getChildren().forEach((enemy) => {
       const e = enemy as Enemy;
-      if (!e.active || e.dead) return;
+      if (!e.active || e.physique.isDead()) return;
       const ex = (e.x * 110) / GAME_WIDTH;
       const ey = (e.y * 110) / GAME_HEIGHT;
       this.enemies.fillRect(10 + 55 + ex, 100 + 55 + ey, 2, 2);

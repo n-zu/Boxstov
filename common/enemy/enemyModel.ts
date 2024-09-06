@@ -1,17 +1,14 @@
-import "@geckos.io/phaser-on-nodejs";
-import Phaser from "phaser";
-import { Player } from "../../player/player.js";
-import { EnemyState } from "../../../../common/types/state.js";
-import MovementDirection from "../../../../common/controls/direction.js";
-import Observer from "../../../../common/observer/observer.js";
+import { EnemyState } from "../types/state.js";
+import MovementDirection from "../controls/direction.js";
+import Observer from "../observer/observer.js";
 import EnemyBrain from "./enemyBrain.js";
-import { UnitVector } from "../../../../common/types/direction.js";
+import { UnitVector } from "../types/direction.js";
 import EnemyPhysique from "./enemyPhysique.js";
-import config from "../../../../common/config.js";
-import { GameEvents } from "../../../../common/types/events.js";
-import PlayerModel from "../../../../common/playerModel.js";
+import config from "../config.js";
+import { GameEvents } from "../types/events.js";
+import PlayerModel from "../playerModel.js";
 
-export class Enemy extends Phaser.Physics.Arcade.Sprite {
+export class EnemyModel extends Phaser.Physics.Arcade.Sprite {
   id: number;
   physique: EnemyPhysique;
 
@@ -20,14 +17,14 @@ export class Enemy extends Phaser.Physics.Arcade.Sprite {
   brain: EnemyBrain;
 
   constructor(
-    scene: Phaser.Scene,
-    x: number,
-    y: number,
     id: number,
+    scene: Phaser.Scene,
+    position: { x: number; y: number },
     observer: Observer<GameEvents>,
-    physique: EnemyPhysique
+    physique: EnemyPhysique,
+    sprite: string = ""
   ) {
-    super(scene, x, y, "zombie");
+    super(scene, position.x, position.y, sprite);
     this.addToScene();
 
     this.id = id;
@@ -45,7 +42,7 @@ export class Enemy extends Phaser.Physics.Arcade.Sprite {
     this.active = false;
   }
 
-  public async update(players: Player[]) {
+  public async update(players: PlayerModel[]) {
     this.brain.update(this, players);
   }
 
@@ -74,13 +71,13 @@ export class Enemy extends Phaser.Physics.Arcade.Sprite {
     return state;
   }
 
-  public receiveDamage(damage: number, damager: PlayerModel) {
+  public receiveDamage(damage: number, damager?: PlayerModel) {
     if (this.physique.isDead()) return;
     
     // FIXME: This event is disabled for now
     // this.observer.notify("enemyReceivedDamage", this.id);
     this.physique.receiveDamage(damage);
-    if (this.physique.isDead()) {
+    if (this.physique.isDead() && damager) {
       this.beKilledBy(damager);
     }
   }

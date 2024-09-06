@@ -3,41 +3,14 @@ import { EnemyRecentEvents, EnemyState } from "../../../common/types/state";
 import { AnimationActor, AnimationSuffix } from "../types/animation";
 import MovementDirection from "../../../common/controls/direction";
 import Phaser from "phaser";
-import { GameEvents } from "../types/events";
-import Observer from "../../../common/observer/observer";
-import Sprite = Phaser.Physics.Arcade.Sprite;
 import config from "../../../common/config";
+import { EnemyModel } from "../../../common/enemy/enemyModel.js";
 
 // FIXME: This should not be here 
 const HEALTH = config.enemies.zombieNormal.health;
 
-export class Enemy extends Sprite {
-  id: number;
-  health = HEALTH;
-  movementDirection: MovementDirection = new MovementDirection();
-  action = "";
-  dead = true;
-  speed: number;
-  observer: Observer<GameEvents>;
-
-  constructor(
-    scene: Phaser.Scene,
-    observer: Observer<GameEvents>,
-    x: number,
-    y: number,
-    id: number
-  ) {
-    super(scene, x, y, "zombie");
-    scene.physics.add.existing(this);
-    scene.add.existing(this);
-    this.setBodySize(config.misc.enemySize.width, config.misc.enemySize.height);
-
-    this.observer = observer;
-    this.visible = false;
-    this.active = false;
-    this.speed = config.enemies.zombieNormal.speed;
-    this.id = id;
-  }
+export class Enemy extends EnemyModel {
+  action: string = "";
 
   public getDistanceToCamera(): number {
     const camera = this.scene.cameras.main;
@@ -59,27 +32,20 @@ export class Enemy extends Sprite {
       this.updateHealth(state.health);
     }
     this.move(state);
-    if (!this.dead && state.dead) {
+    if (!this.physique.isDead() && state.dead) {
       this.die();
     }
-    this.dead = state.dead;
     this.setActive(state.active);
     this.setVisible(state.visible);
     this.active = state.active;
     this.action = state.action;
-    this.speed = state.speed;
-  }
-
-  public receiveDamage(damage: number) {
-    if (this.health <= 0) return;
-
-    this.health -= damage;
-    if (this.health <= 0) {
-      this.die();
-    }
+    // TODO: Check if there is anything else that needs to be synced
+    this.physique.health = state.health;
+    this.physique.speed = state.speed;
   }
 
   private syncEvents(events: EnemyRecentEvents[]) {
+    /*
     events.forEach((event) => {
       switch (event) {
         case "receive_damage":
@@ -88,6 +54,7 @@ export class Enemy extends Sprite {
           break;
       }
     });
+    */
   }
 
   private changeColor() {
@@ -98,7 +65,7 @@ export class Enemy extends Sprite {
   }
 
   private updateHealth(newHealth: number) {
-    if (newHealth < this.health) this.receiveDamage(this.health - newHealth);
+    if (newHealth < this.physique.health) this.receiveDamage(this.physique.health - newHealth);
   }
 
   private move(state: EnemyState) {
@@ -106,15 +73,15 @@ export class Enemy extends Sprite {
     this.setDepth(state.position.y);
 
     this.movementDirection = MovementDirection.decode(state.movementDirection);
-    this.setVelocity(...this.movementDirection.getSpeed(this.speed));
-
+    this.setVelocity(...this.movementDirection.getSpeed(this.physique.speed));
+    
     const action =
       this.action === AnimationSuffix.Attack
         ? AnimationSuffix.Attack
-        : this.speed >= config.enemies.zombieNormal.speed
+        : this.physique.speed >= config.enemies.zombieNormal.speed
         ? AnimationSuffix.Run
         : AnimationSuffix.Walk;
-
+    
     if (this.movementDirection.isMoving()) {
       playAnimation(
         this,
@@ -126,7 +93,6 @@ export class Enemy extends Sprite {
   }
 
   private die() {
-    this.health = 0;
     this.setTint(0xff5555);
     setTimeout(() => this.setTint(0xffdddd), 1000);
     this.setDepth(this.y - 100);

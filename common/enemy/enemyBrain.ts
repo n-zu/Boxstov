@@ -1,5 +1,5 @@
-import { Player } from "../../player/player";
-import { Enemy } from "./enemy";
+import PlayerModel from "../playerModel";
+import { EnemyModel } from "./enemyModel";
 
 export default class EnemyBrain {
   cooldown: number;
@@ -21,7 +21,7 @@ export default class EnemyBrain {
     return false;
   }
 
-  public update(me: Enemy, players: Player[]) {
+  public update(me: EnemyModel, players: PlayerModel[]) {
     if (!me.body.enable) return;
 
     if (!this.canThink()) return;
@@ -45,8 +45,8 @@ export default class EnemyBrain {
     }
   }
 
-  private getClosestPlayer(me: Enemy, players: Player[]): Player {
-    let closestPlayer: Player = players[0];
+  private getClosestPlayer(me: EnemyModel, players: PlayerModel[]): PlayerModel {
+    let closestPlayer: PlayerModel = players[0];
     let distanceToClosestPlayer: number | null = null;
     for (const player of players) {
       const distance = Phaser.Math.Distance.Between(
