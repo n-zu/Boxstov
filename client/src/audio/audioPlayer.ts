@@ -53,6 +53,7 @@ export default class AudioPlayer {
   }
 
   private playPlayerReceivedDamageSound(player: Player) {
+    console.log("play player dmg sound");
     const volume = this.calculatePlayerSoundVolume(player);
     if (volume < MIN_VOLUME) return;
 

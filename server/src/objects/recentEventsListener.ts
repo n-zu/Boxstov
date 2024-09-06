@@ -1,3 +1,4 @@
+import { EnemyModel } from "../../../common/enemy/enemyModel.js";
 import Observer from "../../../common/observer/observer.js";
 import PlayerModel from "../../../common/playerModel.js";
 import { GameEvents } from "../../../common/types/events.js";
@@ -16,12 +17,9 @@ export default class RecentEventsListener {
             this.addPlayerEvent(player.id, "unlocked_gun");
         });
 
-        /*
-        FIXME: This event is disabled for now
-        obs.subscribe("enemyReceivedDamage", (enemyId: number) => {
-            this.addEnemyEvent(enemyId, "receive_damage");
+        obs.subscribe("enemyReceivedDamage", (enemy: EnemyModel) => {
+            this.addEnemyEvent(enemy.id, "receive_damage");
         });
-        */
 
         obs.subscribe("playerKill", (killer: PlayerModel) => {
             this.addPlayerEvent(killer.id, "kill");

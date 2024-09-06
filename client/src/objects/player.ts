@@ -76,11 +76,13 @@ export class Player extends PlayerModel {
 
     public switchGun(gunName: GunName): void {
         super.switchGun(gunName);
-        this.gameMaster.send("player", {
-            id: this.id,
-            type: "switch_gun",
-            gunName
-          });
+        if (this.local) {
+            this.gameMaster.send("player", {
+                id: this.id,
+                type: "switch_gun",
+                gunName
+              });
+        }
     }
 
     public sync(state: PlayerState, recentEvents: PlayerRecentEvent[]) {
@@ -104,6 +106,7 @@ export class Player extends PlayerModel {
         if (this.arsenal.currentGun.getGunName() !== state.gunName) {
             this.arsenal.switchGun(state.gunName, true);
             this.observer.notify("playerSwitchedGun", this);
+            playAnimation(this, this.arsenal.currentGun.getGunName(), this.movementDirection.getFacingDirection(), AnimationSuffix.Idle);
         }
     }
 
