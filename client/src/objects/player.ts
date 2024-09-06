@@ -10,6 +10,7 @@ import { GunName } from "../../../common/guns/gun";
 import PlayerModel from "../../../common/playerModel";
 import { BulletGroupModel } from "../../../common/bulletGroupModel";
 import { GameEvents } from "../../../common/types/events";
+import PlayerArsenal from "./playerArsenal";
 
 const SYNC_DIFF_TOLERANCE = 0.001;
 
@@ -27,14 +28,22 @@ export class Player extends PlayerModel {
         bullets: BulletGroupModel,
         local = false,
     ) {
-        super(id, scene, observer, position, bullets);
+        super(id, scene, observer, position, new PlayerArsenal(bullets, observer));
 
         this.gameMaster = gameMaster;
         this.local = local;
 
-        // TODO: Move this to the view, tie it to the 'newPlayer' event
+        // TODO: Move this to the view
         playAnimation(this, this.arsenal.currentGun.getGunName(), Direction.Down, AnimationSuffix.Idle);
-        this.subscribeToEvents();
+
+        if (this.local) {
+            this.observer.subscribe("triggerMove", (direction) => {
+                this.moveTo(direction);
+            });
+            this.observer.subscribe("triggerShoot", () => {
+                this.shoot();
+            });
+        }
     }
 
     public update() {
@@ -103,11 +112,7 @@ export class Player extends PlayerModel {
             );
             this.move(this.movementDirection);
         }
-        if (this.arsenal.currentGun.getGunName() !== state.gunName) {
-            this.arsenal.switchGun(this, state.gunName, true);
-            this.observer.notify("playerSwitchedGun", this);
-            playAnimation(this, this.arsenal.currentGun.getGunName(), this.movementDirection.getFacingDirection(), AnimationSuffix.Idle);
-        }
+        (this.arsenal as PlayerArsenal).sync(this, state.playerArsenal);
     }
 
     public getDistanceToCamera(): number {
@@ -121,17 +126,6 @@ export class Player extends PlayerModel {
     public getMaxDistanceToCamera(): number {
         const camera = this.scene.cameras.main;
         return Math.sqrt(Math.pow(camera.width, 2) + Math.pow(camera.height, 2));
-    }
-
-    private subscribeToEvents() {
-        if (this.local) {
-            this.observer.subscribe("triggerMove", (direction) => {
-                this.moveTo(direction);
-            });
-            this.observer.subscribe("triggerShoot", () => {
-                this.shoot();
-            });
-        }
     }
 
     private notifyInconsistencies(state: PlayerState) {

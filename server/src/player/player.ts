@@ -4,6 +4,7 @@ import { PlayerState } from "../../../common/types/state.js";
 import { PlayerUpdate } from "../../../common/types/messages.js";
 import { GunName } from "../../../common/guns/gun.js";
 import PlayerModel from "../../../common/playerModel.js";
+import PlayerArsenal from "./playerArsenal.js";
 
 export class Player extends PlayerModel {
     lastUpdate = Date.now();
@@ -17,7 +18,7 @@ export class Player extends PlayerModel {
             },
             movementDirection: this.movementDirection.encode(),
             health: this.health,
-            gunName: this.arsenal.currentGun.getGunName(),
+            playerArsenal: (this.arsenal as PlayerArsenal).getState(),
         };
         return state;
     }

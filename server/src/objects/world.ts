@@ -9,6 +9,7 @@ import RecentEventsListener from "./recentEventsListener.js";
 import { GameEvents } from "../../../common/types/events.js";
 import { WorldModel } from "../../../common/worldModel.js";
 import { Difficulty, EnemyGroupModel } from "../../../common/enemyGroupModel.js";
+import PlayerArsenal from "../player/playerArsenal.js";
 
 const INACTIVE_THRESHOLD = 60000; // if 60 seconds pass, the player is considered inactive
 
@@ -34,7 +35,7 @@ export class World extends WorldModel {
   }
 
   protected newPlayer(id: string, scene: Phaser.Scene, observer: Observer<GameEvents>, position: { x: number; y: number }, bullets: BulletGroup) {
-    return new Player(id, scene, observer, position, bullets);
+    return new Player(id, scene, observer, position, new PlayerArsenal(bullets, observer));
   }
 
   public update() {
@@ -67,7 +68,7 @@ export class World extends WorldModel {
       this.scene,
       this.observer,
       { x: 0, y: 0 },
-      this.bullets
+      new PlayerArsenal(this.bullets, this.observer)
     );
     this.players.push(player);
     return true;

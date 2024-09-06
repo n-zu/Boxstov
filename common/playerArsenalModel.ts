@@ -10,7 +10,6 @@ import PlayerModel from "./playerModel.js";
 import { GameEvents } from "./types/events.js";
 
 export default class PlayerArsenalModel {
-    playerId: string;
     kills: number;
     currentGun: Gun;
     guns: Gun[];
@@ -19,27 +18,21 @@ export default class PlayerArsenalModel {
 
     lastTimeShoot: number = 0;
 
-    constructor(playerId: string, bullets: BulletGroupModel, observer: Observer<GameEvents>, availableGuns?: Gun[]) {
-        this.playerId = playerId;
+    constructor(bullets: BulletGroupModel, observer: Observer<GameEvents>, availableGuns?: Gun[]) {
         this.kills = 0;
         this.bullets = bullets;
         this.guns = availableGuns || [new Rifle(bullets), new Shotgun(bullets), new Rpg(bullets)];
         this.currentGun = this.guns[0];
         this.observer = observer;
-        this.subscribeToEvents();
     }
 
-    private subscribeToEvents() {
-        this.observer.subscribe("playerKill", (killer: PlayerModel) => {
-            if (this.playerId === killer.id) {
-                this.kills++;
-                for (let gun of this.guns) {
-                    if (gun.getKillsToUnlock() == this.kills) {
-                        this.observer.notify("playerUnlockedGun", killer);
-                    }
-                }
+    public addKill(player: PlayerModel) {
+        this.kills++;
+        for (let gun of this.guns) {
+            if (gun.getKillsToUnlock() == this.kills) {
+                this.observer.notify("playerUnlockedGun", player);
             }
-        });
+        }
     }
 
     public shoot(player: PlayerModel): boolean {

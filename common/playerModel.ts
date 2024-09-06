@@ -19,7 +19,7 @@ export default class PlayerModel extends Phaser.Physics.Arcade.Sprite {
         scene: Phaser.Scene,
         observer: Observer<GameEvents>,
         position: { x: number, y: number },
-        bullets: BulletGroupModel,
+        arsenal: PlayerArsenalModel,
         sprite: string = "") {
         super(scene, position.x, position.y, sprite)
         this.id = id;
@@ -27,11 +27,12 @@ export default class PlayerModel extends Phaser.Physics.Arcade.Sprite {
         this.addToScene();
 
         this.observer = observer;
-        this.arsenal = new PlayerArsenalModel(id, bullets, observer);
+        this.arsenal = arsenal;
         this.maxHealth = config.player.health;
         this.health = this.maxHealth;
 
         this.observer.notify("newPlayer", this);
+        this.subscribeToEvents();
     }
 
     private addToScene() {
@@ -65,5 +66,14 @@ export default class PlayerModel extends Phaser.Physics.Arcade.Sprite {
             this.health = 0;
             this.observer.notify("playerDied", this);
         }
+    }
+
+    private subscribeToEvents() {
+        this.observer.subscribe("playerKill", (killer: PlayerModel) => {
+            console.log(`Player ${this.id} killed a zombie`);
+            if (this.id === killer.id) {
+                this.arsenal.addKill(this);
+            }
+        });
     }
 }

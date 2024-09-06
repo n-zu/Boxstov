@@ -65,8 +65,14 @@ export type PlayerState = {
   };
   health: number;
   movementDirection: EncodedMovementDirection;
-  gunName: GunName;
+  playerArsenal: PlayerArsenalState;
 };
+
+export type PlayerArsenalState = {
+  kills: number;
+  currentGun: GunName;
+  lastTimeShoot: number;
+}
 
 export type PlayerRecentEvent = "shoot" | "receive_damage";
 
