@@ -74,8 +74,6 @@ export class EnemyModel extends Phaser.Physics.Arcade.Sprite {
   public receiveDamage(damage: number, damager?: PlayerModel) {
     if (this.physique.isDead()) return;
     
-    // FIXME: This event is disabled for now
-    // this.observer.notify("enemyReceivedDamage", this.id);
     this.physique.receiveDamage(damage);
     if (this.physique.isDead() && damager) {
       this.beKilledBy(damager);
