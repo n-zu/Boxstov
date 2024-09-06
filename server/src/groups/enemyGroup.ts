@@ -5,6 +5,7 @@ import config from "../../../common/config.js";
 import { GameEvents } from "../../../common/types/events.js";
 import { EnemyModel } from "../../../common/enemy/enemyModel.js";
 import EnemyPhysique from "../../../common/enemy/enemyPhysique.js";
+import Enemy from "../objects/enemy.js";
 
 const TIME_BETWEEN_HORDES = 700;
 
@@ -48,7 +49,7 @@ export class EnemyGroup extends Phaser.Physics.Arcade.Group {
           config.enemies.zombieNormal.attackRange
         );
       }
-      enemies.push(new EnemyModel(i, scene, {x: 0, y: 0}, observer, physique));
+      enemies.push(new Enemy(i, scene, {x: 0, y: 0}, observer, physique));
     }
 
     this.addMultiple(enemies);
@@ -71,7 +72,7 @@ export class EnemyGroup extends Phaser.Physics.Arcade.Group {
 
   public getState(): EnemyGroupState {
     const enemyInfo: EnemyState[] = this.children.entries.map((enemy) => {
-      const e = enemy as EnemyModel;
+      const e = enemy as Enemy;
       return e.getState();
     });
     return {

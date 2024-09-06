@@ -51,26 +51,6 @@ export class EnemyModel extends Phaser.Physics.Arcade.Sprite {
     this.physique.setVelocityOf(this);
   }
 
-  public getState(): EnemyState {
-    const physiqueState = this.physique.getState();
-    const state = {
-      position: {
-        x: this.x,
-        y: this.y,
-      },
-      // FIXME: This is a hack to avoid refactoring the client right now
-      dead: this.physique.isDead(),
-      health: physiqueState.health,
-      speed: physiqueState.speed,
-      action: this.brain.action,
-      active: this.active,
-      visible: this.visible,
-      bodyEnabled: this.body.enable,
-      movementDirection: this.movementDirection.encode(),
-    };
-    return state;
-  }
-
   public receiveDamage(damage: number, damager?: PlayerModel) {
     if (this.physique.isDead()) return;
     
