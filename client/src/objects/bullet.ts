@@ -1,29 +1,21 @@
-import Sprite = Phaser.GameObjects.Sprite;
 import { BulletState } from "../../../common/types/state";
 import Gun, { GunName } from "../../../common/guns/gun";
-import { polarToCartesian } from "../../../common/utils";
+import { BulletModel } from "../../../common/bulletModel";
+import Observer from "../../../common/observer/observer";
+import { GameEvents } from "../types/events";
+import PlayerModel from "../../../common/playerModel";
 
-export class Bullet extends Sprite {
-  origin: GunName;
-
-  constructor(scene: Phaser.Scene, x: number, y: number, origin?: Gun) {
-    super(scene, x, y, "bullet");
-    this.origin = "rifle";
+export class Bullet extends BulletModel {
+  constructor(scene: Phaser.Scene, observer: Observer<GameEvents>, origin?: Gun) {
+    super(scene, observer, "bullet");
+    // FIXME: This should be in a BulletGroupModel class
+    scene.add.existing(this);
+    scene.physics.add.existing(this);
   }
 
-  public fire(
-    x: number,
-    y: number,
-    rotation: number,
-    origin: Gun
-  ) {
-    const velocity = polarToCartesian(rotation, origin.getBulledSpeed());
-    
+  public fire(x: number, y: number, rotation: number, shooter: PlayerModel, origin: Gun): void {
+    super.fire(x, y, rotation, shooter, origin);
     this.setBase();
-    this.setPosition(x, y);
-    this.setRotation(rotation);
-    this.setActive(true);
-    this.setVisible(true);
     // FIXME: This is not very good
     switch (origin.getGunName()) {
       case "rifle":
@@ -36,13 +28,6 @@ export class Bullet extends Sprite {
         this.setTexture("rocket");
         break;
     }
-
-    this.scene.time.addEvent({
-      delay: 3000,
-      callback: () => {
-        this.die();
-      }
-    });
   }
 
   setBase() {
@@ -55,9 +40,8 @@ export class Bullet extends Sprite {
     this.setVisible(false);
   }
 
-  public setGunName(gunName: GunName) {
-    if (this.origin !== gunName) {
-      this.origin = gunName;
+  private setGunName(gunName: GunName) {
+    if (!this.origin || this.origin.getGunName() !== gunName) {
       // FIXME
       switch (gunName) {
         case "rifle":

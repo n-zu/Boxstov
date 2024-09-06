@@ -8,7 +8,6 @@ import { SyncUpdate } from "../../../common/types/messages";
 import Observer from "../../../common/observer/observer.js";
 import { GameEvents } from "../types/events";
 import WorldStats from "./worldStats.js";
-import config from "../../../common/config";
 import { Difficulty } from "../../../common/enemyGroupModel";
 import { Enemy } from "./enemy";
 
@@ -32,7 +31,7 @@ export class World {
     this.observer = observer;
 
     this.setupGameMaster(gameMaster);
-    this.setupFirstPlayer(scene, gameMaster, username);
+    this.setupFirstPlayer(scene, gameMaster, username, observer);
   }
 
   public update() {
@@ -63,9 +62,10 @@ export class World {
   private setupFirstPlayer(
     scene: Phaser.Scene,
     gameMaster: GameMaster,
-    username: string
+    username: string,
+    observer: Observer<GameEvents>
   ) {
-    this.bulletGroup = new BulletGroup(scene);
+    this.bulletGroup = new BulletGroup(scene, observer);
 
     const player = new Player(
       username,

@@ -1,19 +1,25 @@
 import BulletGroupInterface from "../../../common/bulletGroupInterface";
 import Gun from "../../../common/guns/gun";
+import Observer from "../../../common/observer/observer";
 import PlayerModel from "../../../common/playerModel";
 import { BulletGroupState } from "../../../common/types/state";
 import { Bullet } from "../objects/bullet";
+import { GameEvents } from "../types/events";
 
 export class BulletGroup extends Phaser.GameObjects.Group implements BulletGroupInterface {
-  constructor(scene: Phaser.Scene) {
+  constructor(scene: Phaser.Scene, observer: Observer<GameEvents>) {
     super(scene);
+
+    function factory() {
+      return new Bullet(scene, observer);
+    }
 
     this.createMultiple({
       frameQuantity: 30,
       key: "bullet",
       active: false,
       visible: false,
-      classType: Bullet,
+      classType: factory,
     });
   }
 
@@ -27,7 +33,7 @@ export class BulletGroup extends Phaser.GameObjects.Group implements BulletGroup
   public shoot(x: number, y: number, rotation: number, shooter: PlayerModel, origin: Gun): void {
     const bullet = this.getFirstDead(false) as Bullet;
     if (bullet) {
-      bullet.fire(x, y, rotation, origin);
+      bullet.fire(x, y, rotation, shooter, origin);
     }
   }
 }
