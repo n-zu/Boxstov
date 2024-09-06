@@ -1,4 +1,3 @@
-import { EnemyState } from "../types/state.js";
 import MovementDirection from "../controls/direction.js";
 import Observer from "../observer/observer.js";
 import EnemyBrain from "./enemyBrain.js";
@@ -7,6 +6,9 @@ import EnemyPhysique from "./enemyPhysique.js";
 import config from "../config.js";
 import { GameEvents } from "../types/events.js";
 import PlayerModel from "../playerModel.js";
+import { getPrng } from "../utils.js";
+
+const prng = getPrng(42);
 
 export class EnemyModel extends Phaser.Physics.Arcade.Sprite {
   id: number;
@@ -29,7 +31,7 @@ export class EnemyModel extends Phaser.Physics.Arcade.Sprite {
 
     this.id = id;
     this.observer = observer;
-    this.brain = new EnemyBrain(Math.random() * 100);
+    this.brain = new EnemyBrain(prng() * 100);
     this.physique = physique;
   }
 
@@ -76,7 +78,7 @@ export class EnemyModel extends Phaser.Physics.Arcade.Sprite {
       this.observer.notify("playerKill", killer);
     }
 
-    this.setRotation(Math.random() * 0.4 - 0.2);
+    this.setRotation(prng() * 0.4 - 0.2);
     this.setDepth(this.y - 100);
     this.scene.time.delayedCall(10000, () => {
       this.setVisible(false);

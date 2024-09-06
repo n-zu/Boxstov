@@ -6,6 +6,9 @@ import Observer from "./observer/observer";
 import PlayerModel from "./playerModel";
 import { GameEvents } from "./types/events";
 import { SpawnPoint } from "./types/state";
+import { getPrng } from "./utils.js";
+
+const prng = getPrng(42);
 
 export abstract class WorldModel {
     players: PlayerModel[];
@@ -57,7 +60,7 @@ export abstract class WorldModel {
         const radius = 1000;
         const spawnPoints = [];
         for (let i = 0; i < 30; i++) {
-            const angle = Math.random() * 2 * Math.PI;
+            const angle = prng() * 2 * Math.PI;
             const x = center.x + radius * Math.cos(angle);
             const y = center.y + radius * Math.sin(angle);
             spawnPoints.push({ x, y });

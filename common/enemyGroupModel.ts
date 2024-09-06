@@ -5,8 +5,10 @@ import Observer from "./observer/observer.js";
 import PlayerModel from "./playerModel.js";
 import { GameEvents } from "./types/events.js";
 import { SpawnPoint } from "./types/state.js";
+import { getPrng } from "./utils.js";
 
 const TIME_BETWEEN_HORDES = 700;
+const prng = getPrng(42);
 
 export enum Difficulty {
   Easy = "easy",
@@ -25,14 +27,14 @@ export class EnemyGroupModel extends Phaser.Physics.Arcade.Group {
     observer: Observer<GameEvents>,
     difficulty: Difficulty,
     spawnPoints: SpawnPoint[],
-    enemyFactory: (id: number, scene: Phaser.Scene, position: {x: number, y: number}, observer: Observer<GameEvents>, physique: EnemyPhysique) => EnemyModel
+    enemyFactory: (id: number, scene: Phaser.Scene, position: { x: number, y: number }, observer: Observer<GameEvents>, physique: EnemyPhysique) => EnemyModel
   ) {
     super(scene.physics.world, scene);
     this.observer = observer;
 
     const enemies: EnemyModel[] = [];
     for (let i = 0; i < config.misc.maxEnemies; i++) {
-      const isFast = Math.random() < config.misc.zombieFastProbability;
+      const isFast = prng() < config.misc.zombieFastProbability;
       let physique;
       if (isFast) {
         physique = new EnemyPhysique(
@@ -40,7 +42,7 @@ export class EnemyGroupModel extends Phaser.Physics.Arcade.Group {
           config.enemies.zombieFast.strength,
           config.enemies.zombieFast.speed,
           config.enemies.zombieFast.attackRange
-          );
+        );
       } else {
         physique = new EnemyPhysique(
           config.enemies.zombieNormal.health,
@@ -49,7 +51,7 @@ export class EnemyGroupModel extends Phaser.Physics.Arcade.Group {
           config.enemies.zombieNormal.attackRange
         );
       }
-      enemies.push(enemyFactory(i, scene, {x: 0, y: 0}, observer, physique));
+      enemies.push(enemyFactory(i, scene, { x: 0, y: 0 }, observer, physique));
     }
 
     this.addMultiple(enemies);
@@ -88,9 +90,9 @@ export class EnemyGroupModel extends Phaser.Physics.Arcade.Group {
       const enemy = this.getFirstDead(false) as EnemyModel;
       if (enemy) {
         const spawnPoint =
-          this.spawnPoints[Math.floor(Math.random() * this.spawnPoints.length)];
-        const xPosition = spawnPoint.x + Math.floor(Math.random() * 100) - 50;
-        const yPosition = spawnPoint.y + Math.floor(Math.random() * 100) - 50;
+          this.spawnPoints[Math.floor(prng() * this.spawnPoints.length)];
+        const xPosition = spawnPoint.x + Math.floor(prng() * 100) - 50;
+        const yPosition = spawnPoint.y + Math.floor(prng() * 100) - 50;
 
         enemy.spawn(xPosition, yPosition);
       } else {
