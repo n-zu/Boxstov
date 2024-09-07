@@ -1,15 +1,7 @@
-import { UnitVector } from "../../../common/types/direction";
 import { Player } from "../objects/player";
 import { Enemy } from "../objects/enemy";
-import { GunName } from "../../../common/guns/gun";
 
 export type GameEvents = {
-  /// Local player wants to change gun
-  triggerChangeGun: (name: GunName) => void;
-  /// Local player wants to move in a direction
-  triggerMove: (direction: UnitVector) => void;
-  /// Local player wants to shoot
-  triggerShoot: () => void;
   /// Some player has shot
   playerShoot: (player: Player) => void;
   /// Some player has joined the game

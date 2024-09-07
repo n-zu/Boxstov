@@ -62,12 +62,12 @@ export class PlayerControls {
     return this.cursorKeys.right.isDown || this.letterKeys.D.isDown;
   }
 
-  update() {
+  update(player: Player) {
     const direction = this.getKeysDirection();
-    this.observer.notify("triggerMove", direction);
+    player.moveTo(direction);
 
     if (this.wantsToShoot()) {
-      this.observer.notify("triggerShoot");
+      player.shoot();
     }
   }
 

@@ -1,7 +1,6 @@
 import { EnemyModel } from "../enemy/enemyModel";
 import { GunName } from "../guns/gun";
 import PlayerModel from "../playerModel";
-import { UnitVector } from "./direction";
 
 export type BulletInfo = {
   x: number;
@@ -12,8 +11,6 @@ export type BulletInfo = {
 };
 
 export type GameEvents = {
-  /// Local player wants to move in a direction
-  triggerMove: (direction: UnitVector) => void;
   /// Local player wants to shoot
   triggerShoot: () => void;
   /// Some player has shot

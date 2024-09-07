@@ -27,8 +27,8 @@ export class World extends WorldModel {
   }
 
   public update() {
-    if (this.playerControls) {
-      this.playerControls.update();
+    if (this.playerControls && this.players.length > 0) {
+      this.playerControls.update(this.players[0] as Player);
     }
     super.update();
   }

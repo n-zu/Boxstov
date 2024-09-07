@@ -35,15 +35,6 @@ export class Player extends PlayerModel {
 
         // TODO: Move this to the view
         playAnimation(this, this.arsenal.currentGun.getGunName(), Direction.Down, AnimationSuffix.Idle);
-
-        if (this.local) {
-            this.observer.subscribe("triggerMove", (direction) => {
-                this.moveTo(direction);
-            });
-            this.observer.subscribe("triggerShoot", () => {
-                this.shoot();
-            });
-        }
     }
 
     public update() {
