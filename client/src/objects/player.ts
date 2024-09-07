@@ -33,10 +33,6 @@ export class Player extends PlayerModel {
         this.local = local;
     }
 
-    public update() {
-        this.observer.notify("playerUpdate", this);
-    }
-
     public sendMovementMessageIfNecessary(direction?: Direction) {
         if (this.idle) {
             if (direction) {
