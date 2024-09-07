@@ -1,8 +1,7 @@
-import config from "../config.js";
-import { Bullet } from "../../server/src/objects/bullet.js";
-import Gun from "./gun.js";
-import PlayerModel from "../playerModel.js";
 import { BulletGroupModel } from "../bulletGroupModel.js";
+import config from "../config.js";
+import PlayerModel from "../playerModel.js";
+import Gun from "./gun.js";
 
 export default class Rifle extends Gun {
     constructor(bullets: BulletGroupModel) {

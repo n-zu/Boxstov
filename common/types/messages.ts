@@ -19,10 +19,10 @@ export type ServerMessage = Message<ServerMessageType>;
 export type UpdateFor<T extends MessageType> = T extends "sync"
   ? SyncUpdate
   : T extends "player"
-    ? PlayerUpdate
-    : T extends "enemy"
-      ? EnemyUpdate
-      : undefined;
+  ? PlayerUpdate
+  : T extends "enemy"
+  ? EnemyUpdate
+  : undefined;
 
 // Player
 
@@ -48,10 +48,10 @@ export type PlayerUpdateShoot = {
 export type PlayerUpdateFor<T extends PlayerUpdateType> = T extends "move"
   ? PlayerUpdateMove
   : T extends "switch_gun"
-    ? PlayerUpdateSwitchGun
-    : T extends "shoot"
-      ? PlayerUpdateShoot
-      : PlayerUpdateBase<T>;
+  ? PlayerUpdateSwitchGun
+  : T extends "shoot"
+  ? PlayerUpdateShoot
+  : PlayerUpdateBase<T>;
 
 export type PlayerUpdate = PlayerUpdateFor<PlayerUpdateType>;
 

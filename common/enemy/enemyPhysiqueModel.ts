@@ -1,7 +1,6 @@
-import { EnemyPhysiqueState } from "../types/state.js";
-import { EnemyModel } from "./enemyModel.js";
 import PlayerModel from "../playerModel.js";
 import { polarToCartesian } from "../utils.js";
+import { EnemyModel } from "./enemyModel.js";
 
 export default class EnemyPhysiqueModel {
     maxHealth: number;
@@ -30,7 +29,7 @@ export default class EnemyPhysiqueModel {
     public receiveDamage(damage: number) {
         this.health -= damage;
         if (this.health < 0) {
-            this.health = 0;    
+            this.health = 0;
         }
     }
 

@@ -1,15 +1,10 @@
-import { playAnimation } from "../scenes/mainScene";
 import { EnemyState } from "../../../common/types/state";
-import { AnimationActor, AnimationSuffix } from "../types/animation";
 import Phaser from "phaser";
-import config from "../../../common/config";
 import { EnemyModel } from "../../../common/enemy/enemyModel.js";
 import EnemyPhysiqueModel from "../../../common/enemy/enemyPhysiqueModel";
 import Observer from "../../../common/observer/observer";
-import PlayerModel from "../../../common/playerModel";
 import EnemyPhysique from "./enemyPhysique";
 import { polarToCartesian } from "../../../common/utils";
-import { roundAngleToDirection } from "../../../common/types/direction";
 import { GameEvents } from "../../../common/types/events";
 
 export class Enemy extends EnemyModel {

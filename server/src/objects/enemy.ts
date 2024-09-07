@@ -17,6 +17,6 @@ export default class Enemy extends EnemyModel {
             bodyEnabled: this.body.enable,
             angle: this.angle
         };
-        return state; 
+        return state;
     }
 }

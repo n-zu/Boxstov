@@ -1,8 +1,8 @@
-import { Bullet } from "../objects/bullet.js";
-import { BulletGroupState } from "../../../common/types/state.js";
+import { BulletGroupModel } from "../../../common/bulletGroupModel.js";
 import Observer from "../../../common/observer/observer.js";
 import { GameEvents } from "../../../common/types/events.js";
-import { BulletGroupModel } from "../../../common/bulletGroupModel.js";
+import { BulletGroupState } from "../../../common/types/state.js";
+import { Bullet } from "../objects/bullet.js";
 
 export class BulletGroup extends BulletGroupModel {
   constructor(scene: Phaser.Scene, observer: Observer<GameEvents>) {

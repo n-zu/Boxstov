@@ -30,7 +30,7 @@ export default class EnemyBrain {
     const closestPlayer = this.getClosestPlayer(me, players);
     const angle = this.calculateAngleWithPlayer(me, closestPlayer);
     me.turn(angle);
-    
+
     if (me.physique.canAttack(me, closestPlayer)) {
       this.action = "atk";
       closestPlayer.receiveDamage(

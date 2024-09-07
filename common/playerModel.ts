@@ -2,8 +2,8 @@ import config from "./config.js";
 import { GunName } from "./guns/gun";
 import Observer from "./observer/observer";
 import PlayerArsenalModel from "./playerArsenalModel.js";
-import { GameEvents } from "./types/events";
 import { Direction, directionToRadians } from "./types/direction.js";
+import { GameEvents } from "./types/events";
 import { polarToCartesian } from "./utils.js";
 
 export default class PlayerModel extends Phaser.Physics.Arcade.Sprite {

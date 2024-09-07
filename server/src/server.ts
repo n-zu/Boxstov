@@ -1,11 +1,11 @@
 import "@geckos.io/phaser-on-nodejs";
 import { ServerChannel } from "@geckos.io/server";
 import http from "http";
+import GameObserver from "../../common/observer/gameObserver.js";
 import { Create, Join } from "../../common/types/packet.js";
 import { MultiplayerGame } from "./game/multiplayerGame.js";
 import { HostMaster } from "./gameMaster/hostMaster.js";
 import { SessionMaster } from "./gameMaster/sessionMaster.js";
-import GameObserver from "../../common/observer/gameObserver.js";
 
 type Session = {
   game: MultiplayerGame;

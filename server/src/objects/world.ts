@@ -1,15 +1,15 @@
-import { Player } from "../player/player.js";
+import { Difficulty, EnemyGroupModel } from "../../../common/enemyGroupModel.js";
+import Observer from "../../../common/observer/observer.js";
+import { GameEvents } from "../../../common/types/events.js";
+import { PlayerUpdate } from "../../../common/types/messages.js";
+import { SpawnPoint, WorldState } from "../../../common/types/state.js";
+import { WorldModel } from "../../../common/worldModel.js";
 import { BulletGroup } from "../groups/bulletGroup.js";
 import { EnemyGroup } from "../groups/enemyGroup.js";
-import { SpawnPoint, WorldState } from "../../../common/types/state.js";
-import { PlayerUpdate } from "../../../common/types/messages.js";
-import Observer from "../../../common/observer/observer.js";
-import WorldStats from "./worldStats.js";
-import RecentEventsListener from "./recentEventsListener.js";
-import { GameEvents } from "../../../common/types/events.js";
-import { WorldModel } from "../../../common/worldModel.js";
-import { Difficulty, EnemyGroupModel } from "../../../common/enemyGroupModel.js";
+import { Player } from "../player/player.js";
 import PlayerArsenal from "../player/playerArsenal.js";
+import RecentEventsListener from "./recentEventsListener.js";
+import WorldStats from "./worldStats.js";
 
 const INACTIVE_THRESHOLD = 60000; // if 60 seconds pass, the player is considered inactive
 
@@ -20,7 +20,7 @@ export class World extends WorldModel {
   constructor(scene: Phaser.Scene, observer: Observer<GameEvents>) {
     super(scene, observer);
     this.observer.subscribe("tick", () => this.update());
-    
+
     this.stats = new WorldStats(observer);
 
     this.recentEvents = new RecentEventsListener(this.observer);

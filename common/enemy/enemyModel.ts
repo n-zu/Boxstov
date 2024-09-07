@@ -1,10 +1,10 @@
+import config from "../config.js";
 import Observer from "../observer/observer.js";
+import PlayerModel from "../playerModel.js";
+import { GameEvents } from "../types/events.js";
+import { getPrng } from "../utils.js";
 import EnemyBrain from "./enemyBrain.js";
 import EnemyPhysiqueModel from "./enemyPhysiqueModel.js";
-import config from "../config.js";
-import { GameEvents } from "../types/events.js";
-import PlayerModel from "../playerModel.js";
-import { getPrng } from "../utils.js";
 
 const prng = getPrng(42);
 
@@ -54,7 +54,7 @@ export class EnemyModel extends Phaser.Physics.Arcade.Sprite {
 
   public receiveDamage(damage: number, damager?: PlayerModel) {
     if (this.physique.isDead()) return;
-    
+
     this.physique.receiveDamage(damage);
     this.observer.notify("enemyReceivedDamage", this);
     if (this.physique.isDead() && damager) {

@@ -1,8 +1,8 @@
 import "@geckos.io/phaser-on-nodejs";
-import { PlayerState } from "../../../common/types/state.js";
-import { PlayerUpdate } from "../../../common/types/messages.js";
 import { GunName } from "../../../common/guns/gun.js";
 import PlayerModel from "../../../common/playerModel.js";
+import { PlayerUpdate } from "../../../common/types/messages.js";
+import { PlayerState } from "../../../common/types/state.js";
 import PlayerArsenal from "./playerArsenal.js";
 
 export class Player extends PlayerModel {

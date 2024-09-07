@@ -16,7 +16,7 @@ export default class Shotgun extends Gun {
 
     public shoot(x: number, y: number, shooter: PlayerModel, rotation: number): void {
         for (let i = 0; i < 5; i++) {
-            const bullet = this.bullets.shoot(x, y, rotation + (i - 2) * 0.1, shooter, this);
+            this.bullets.shoot(x, y, rotation + (i - 2) * 0.1, shooter, this);
         }
     }
 }

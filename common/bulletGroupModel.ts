@@ -4,8 +4,6 @@ import Observer from "./observer/observer";
 import PlayerModel from "./playerModel";
 import { GameEvents } from "./types/events";
 
-const MAX_BULLETS = 30;
-
 export class BulletGroupModel extends Phaser.Physics.Arcade.Group {
     observer: Observer<GameEvents>;
 

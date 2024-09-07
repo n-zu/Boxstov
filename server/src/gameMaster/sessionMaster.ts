@@ -1,4 +1,3 @@
-import { GameMaster } from "./gameMaster.js";
 import { ServerChannel } from "@geckos.io/server";
 import {
   Action,
@@ -7,8 +6,9 @@ import {
   ServerMessageType,
   UpdateFor
 } from "../../../common/types/messages.js";
-import { HostMaster } from "./hostMaster.js";
 import { Packet } from "../../../common/types/packet.js";
+import { GameMaster } from "./gameMaster.js";
+import { HostMaster } from "./hostMaster.js";
 
 export class SessionMaster implements GameMaster {
   id: string;

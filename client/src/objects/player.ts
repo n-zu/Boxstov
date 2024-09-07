@@ -1,14 +1,12 @@
-import { GameMaster } from "../gameMaster/gameMaster";
 import * as Phaser from "phaser";
-import { Direction } from "../../../common/types/direction";
-import { PlayerRecentEvent, PlayerState } from "../../../common/types/state";
-import { playAnimation } from "../scenes/mainScene";
-import { AnimationSuffix } from "../types/animation";
-import Observer from "../../../common/observer/observer.js";
-import { GunName } from "../../../common/guns/gun";
-import PlayerModel from "../../../common/playerModel";
 import { BulletGroupModel } from "../../../common/bulletGroupModel";
+import { GunName } from "../../../common/guns/gun";
+import Observer from "../../../common/observer/observer.js";
+import PlayerModel from "../../../common/playerModel";
+import { Direction } from "../../../common/types/direction";
 import { GameEvents } from "../../../common/types/events";
+import { PlayerRecentEvent, PlayerState } from "../../../common/types/state";
+import { GameMaster } from "../gameMaster/gameMaster";
 import PlayerArsenal from "./playerArsenal";
 
 const SYNC_DIFF_TOLERANCE = 0.001;
