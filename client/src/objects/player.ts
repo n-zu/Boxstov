@@ -40,21 +40,23 @@ export class Player extends PlayerModel {
         this.observer.notify("playerUpdate", this);
     }
 
-    move(direction?: Direction) {
-        if (this.local) {
-            if (this.idle) {
-                if (direction) {
-                    this.sendMovementMessage(direction);
-                }
-            } else {
-                if (!direction) {
-                    this.sendMovementMessage();
-                } else if (this.facing !== direction) {
-                    this.sendMovementMessage(direction);
-                }
+    public sendMovementMessageIfNecessary(direction?: Direction) {
+        if (this.idle) {
+            if (direction) {
+                this.sendMovementMessage(direction);
+            }
+        } else {
+            if (!direction) {
+                this.sendMovementMessage();
+            } else if (this.facing !== direction) {
+                this.sendMovementMessage(direction);
             }
         }
+    }
+
+    public move(direction?: Direction) {
         super.move(direction);
+        // TODO: Move this to the view
         playAnimation(
             this,
             this.arsenal.currentGun.getGunName(),

@@ -64,6 +64,7 @@ export class PlayerControls {
 
   update(player: Player) {
     const direction = this.getKeysDirection();
+    player.sendMovementMessageIfNecessary(direction);
     player.move(direction);
 
     if (this.wantsToShoot()) {
