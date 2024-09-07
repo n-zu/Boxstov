@@ -12,9 +12,6 @@ import { polarToCartesian } from "../../../common/utils";
 import { roundAngleToDirection } from "../../../common/types/direction";
 import { GameEvents } from "../../../common/types/events";
 
-// FIXME: This should not be here 
-const HEALTH = config.enemies.zombieNormal.health;
-
 export class Enemy extends EnemyModel {
   action: string = "";
 
