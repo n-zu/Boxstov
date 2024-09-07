@@ -1,6 +1,6 @@
 import { GameMaster } from "../gameMaster/gameMaster";
 import * as Phaser from "phaser";
-import { Direction, UnitVector } from "../../../common/types/direction";
+import { Direction } from "../../../common/types/direction";
 import { PlayerRecentEvent, PlayerState } from "../../../common/types/state";
 import { playAnimation } from "../scenes/mainScene";
 import { AnimationSuffix } from "../types/animation";

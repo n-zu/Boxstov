@@ -8,11 +8,11 @@ import UI from "./ui";
 import { GAME_HEIGHT, GAME_WIDTH, WORLD_BOUNDS } from "../../../common/constants";
 import GameObserver from "../../../common/observer/gameObserver.js";
 import GameUI from "../controls/gameUi";
-import { GameEvents } from "../types/events";
 import Observer from "../../../common/observer/observer";
 import AudioPlayer from "../audio/audioPlayer";
 import Sprite = Phaser.GameObjects.Sprite;
 import { GunName } from "../../../common/guns/gun";
+import { GameEvents } from "../../../common/types/events";
 
 
 export function playAnimation(

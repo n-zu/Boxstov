@@ -1,5 +1,5 @@
 import Observer from "../../../common/observer/observer.js";
-import { GameEvents } from "../types/events";
+import { GameEvents } from "../../../common/types/events.js";
 import { WorldStatsState } from "../../../common/types/state.js";
 
 export default class WorldStats {

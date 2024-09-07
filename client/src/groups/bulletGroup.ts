@@ -2,9 +2,9 @@ import { BulletGroupModel } from "../../../common/bulletGroupModel";
 import Gun from "../../../common/guns/gun";
 import Observer from "../../../common/observer/observer";
 import PlayerModel from "../../../common/playerModel";
+import { GameEvents } from "../../../common/types/events";
 import { BulletGroupState } from "../../../common/types/state";
 import { Bullet } from "../objects/bullet";
-import { GameEvents } from "../types/events";
 
 export class BulletGroup extends BulletGroupModel {
   constructor(scene: Phaser.Scene, observer: Observer<GameEvents>) {

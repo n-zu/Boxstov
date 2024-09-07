@@ -1,8 +1,6 @@
 import { BulletState } from "../../../common/types/state";
 import Gun, { GunName } from "../../../common/guns/gun";
 import { BulletModel } from "../../../common/bulletModel";
-import Observer from "../../../common/observer/observer";
-import { GameEvents } from "../types/events";
 import PlayerModel from "../../../common/playerModel";
 
 export class Bullet extends BulletModel {
