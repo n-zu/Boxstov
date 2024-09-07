@@ -11,8 +11,6 @@ export type BulletInfo = {
 };
 
 export type GameEvents = {
-  /// Local player wants to shoot
-  triggerShoot: () => void;
   /// Some player has shot
   playerShoot: (player: PlayerModel) => void;
   /// Some player has joined the game
