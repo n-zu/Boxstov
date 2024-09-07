@@ -77,12 +77,14 @@ export class Enemy extends EnemyModel {
           ? AnimationSuffix.Run
           : AnimationSuffix.Walk;
 
-    playAnimation(
-      this,
-      AnimationActor.Zombie,
-      roundAngleToDirection(state.angle),
-      action
-    );
+    if (!this.physique.isDead()) {
+      playAnimation(
+        this,
+        AnimationActor.Zombie,
+        roundAngleToDirection(state.angle),
+        action
+      );
+    }
   }
 
   public die(killer?: PlayerModel) {
