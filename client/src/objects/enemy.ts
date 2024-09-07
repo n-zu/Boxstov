@@ -1,7 +1,6 @@
 import { playAnimation } from "../scenes/mainScene";
 import { EnemyState } from "../../../common/types/state";
 import { AnimationActor, AnimationSuffix } from "../types/animation";
-import MovementDirection from "../../../common/controls/direction";
 import Phaser from "phaser";
 import config from "../../../common/config";
 import { EnemyModel } from "../../../common/enemy/enemyModel.js";
@@ -10,6 +9,8 @@ import { GameEvents } from "../types/events";
 import Observer from "../../../common/observer/observer";
 import PlayerModel from "../../../common/playerModel";
 import EnemyPhysique from "./enemyPhysique";
+import { polarToCartesian } from "../../../common/utils";
+import { roundAngleToDirection } from "../../../common/types/direction";
 
 // FIXME: This should not be here 
 const HEALTH = config.enemies.zombieNormal.health;
@@ -67,8 +68,7 @@ export class Enemy extends EnemyModel {
     this.setPosition(state.position.x, state.position.y);
     this.setDepth(state.position.y);
 
-    this.movementDirection = MovementDirection.decode(state.movementDirection);
-    this.setVelocity(...this.movementDirection.getSpeed(this.physique.speed));
+    this.setVelocity(...polarToCartesian(state.angle, this.physique.speed));
 
     const action =
       this.action === AnimationSuffix.Attack
@@ -77,14 +77,12 @@ export class Enemy extends EnemyModel {
           ? AnimationSuffix.Run
           : AnimationSuffix.Walk;
 
-    if (this.movementDirection.isMoving()) {
-      playAnimation(
-        this,
-        AnimationActor.Zombie,
-        this.movementDirection.getFacingDirection(),
-        action
-      );
-    }
+    playAnimation(
+      this,
+      AnimationActor.Zombie,
+      roundAngleToDirection(state.angle),
+      action
+    );
   }
 
   public die(killer?: PlayerModel) {
@@ -95,7 +93,7 @@ export class Enemy extends EnemyModel {
     playAnimation(
       this,
       AnimationActor.Zombie,
-      this.movementDirection.getFacingDirection(),
+      roundAngleToDirection(this.angle),
       AnimationSuffix.Die
     );
   }

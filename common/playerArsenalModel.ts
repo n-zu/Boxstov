@@ -1,5 +1,4 @@
 import { BulletGroupModel } from "./bulletGroupModel";
-import MovementDirection from "./controls/direction";
 import { GUN_OFFSETS, GUN_ROTATIONS } from "./guns/constants.js";
 import Gun, { GunName } from "./guns/gun.js";
 import Rifle from "./guns/rifle.js";
@@ -7,6 +6,7 @@ import Rpg from "./guns/rpg.js";
 import Shotgun from "./guns/shotgun.js";
 import Observer from "./observer/observer.js";
 import PlayerModel from "./playerModel.js";
+import { Direction } from "./types/direction";
 import { GameEvents } from "./types/events.js";
 
 export default class PlayerArsenalModel {
@@ -40,8 +40,8 @@ export default class PlayerArsenalModel {
             return false;
         }
 
-        const rotation = GUN_ROTATIONS[player.movementDirection.getFacingDirection()] as number;
-        const [xGun, yGun] = this.getGunOffset(player.movementDirection);
+        const rotation = GUN_ROTATIONS[player.facing] as number;
+        const [xGun, yGun] = this.getGunOffset(player.facing, player.idle);
 
         this.currentGun.shoot(player.x + xGun, player.y + yGun, player, rotation);
 
@@ -62,11 +62,11 @@ export default class PlayerArsenalModel {
         }
     }
 
-    private getGunOffset(movementDirection: MovementDirection): [number, number] {
-        if (!movementDirection.isMoving()) {
-            return GUN_OFFSETS.idle[movementDirection.getFacingDirection()] as [number, number];
+    private getGunOffset(direction: Direction, idle: boolean): [number, number] {
+        if (idle) {
+            return GUN_OFFSETS.idle[direction] as [number, number];
         } else {
-            return GUN_OFFSETS.moving[movementDirection.getFacingDirection()] as [number, number];
+            return GUN_OFFSETS.moving[direction] as [number, number];
         }
     }
 

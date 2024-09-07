@@ -1,6 +1,7 @@
 import { EnemyPhysiqueState } from "../types/state.js";
 import { EnemyModel } from "./enemyModel.js";
 import PlayerModel from "../playerModel.js";
+import { polarToCartesian } from "../utils.js";
 
 export default class EnemyPhysiqueModel {
     maxHealth: number;
@@ -29,7 +30,7 @@ export default class EnemyPhysiqueModel {
     public receiveDamage(damage: number) {
         this.health -= damage;
         if (this.health < 0) {
-            this.health = 0;
+            this.health = 0;    
         }
     }
 
@@ -38,7 +39,9 @@ export default class EnemyPhysiqueModel {
     }
 
     public setVelocityOf(enemy: EnemyModel) {
-        enemy.setVelocity(...enemy.movementDirection.getSpeed(this.speed));
+        const v = polarToCartesian(enemy.angle, this.speed);
+        // We need to invert the y component because in the canvas, the y axis is inverted
+        enemy.setVelocity(v[0], -v[1]);
     }
 
     public canAttack(me: EnemyModel, player: PlayerModel): boolean {

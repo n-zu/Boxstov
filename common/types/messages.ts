@@ -1,4 +1,4 @@
-import { EncodedMovementDirection } from "../controls/direction.js";
+import { Direction } from "./direction.js";
 import { WorldState } from "./state.js";
 
 // Messages
@@ -34,7 +34,7 @@ export type PlayerUpdateBase<T extends PlayerUpdateType> = {
 };
 
 export type PlayerUpdateMove = {
-  direction: EncodedMovementDirection;
+  direction?: Direction;
 } & PlayerUpdateBase<"move">;
 
 export type PlayerUpdateSwitchGun = {

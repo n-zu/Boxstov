@@ -1,5 +1,4 @@
 import "@geckos.io/phaser-on-nodejs";
-import MovementDirection from "../../../common/controls/direction.js";
 import { PlayerState } from "../../../common/types/state.js";
 import { PlayerUpdate } from "../../../common/types/messages.js";
 import { GunName } from "../../../common/guns/gun.js";
@@ -16,7 +15,8 @@ export class Player extends PlayerModel {
                 x: this.x,
                 y: this.y
             },
-            movementDirection: this.movementDirection.encode(),
+            facing: this.facing,
+            idle: this.idle,
             health: this.health,
             playerArsenal: (this.arsenal as PlayerArsenal).getState(),
         };
@@ -27,7 +27,7 @@ export class Player extends PlayerModel {
         this.lastUpdate = Date.now();
         switch (message.type) {
             case "move":
-                this.move(MovementDirection.decode(message.direction));
+                this.move(message.direction);
                 break;
             case "shoot":
                 this.shoot();

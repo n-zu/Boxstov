@@ -1,7 +1,5 @@
-import MovementDirection from "../controls/direction.js";
 import Observer from "../observer/observer.js";
 import EnemyBrain from "./enemyBrain.js";
-import { UnitVector } from "../types/direction.js";
 import EnemyPhysiqueModel from "./enemyPhysiqueModel.js";
 import config from "../config.js";
 import { GameEvents } from "../types/events.js";
@@ -14,7 +12,7 @@ export class EnemyModel extends Phaser.Physics.Arcade.Sprite {
   id: number;
   physique: EnemyPhysiqueModel;
 
-  movementDirection: MovementDirection = new MovementDirection();
+  angle: number = 0;
   observer: Observer<GameEvents>;
   brain: EnemyBrain;
 
@@ -48,8 +46,8 @@ export class EnemyModel extends Phaser.Physics.Arcade.Sprite {
     this.brain.update(this, players);
   }
 
-  public turn(v: UnitVector) {
-    this.movementDirection.update(v);
+  public turn(angle: number) {
+    this.angle = angle;
     this.physique.setVelocityOf(this);
   }
 
@@ -72,7 +70,6 @@ export class EnemyModel extends Phaser.Physics.Arcade.Sprite {
 
   protected die(killer?: PlayerModel) {
     this.setVelocity(0, 0);
-    this.movementDirection.update([0, 0]);
     this.body.enable = false;
     if (killer) {
       this.observer.notify("playerKill", killer);

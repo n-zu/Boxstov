@@ -1,6 +1,6 @@
 import CursorKeys = Phaser.Types.Input.Keyboard.CursorKeys;
 import InputPlugin = Phaser.Input.InputPlugin;
-import { UnitVector } from "../../../common/types/direction";
+import { Direction, UnitVector } from "../../../common/types/direction";
 import Observer from "../../../common/observer/observer.js";
 import { Player } from "../objects/player.js";
 import { GunName } from "../../../common/guns/gun";
@@ -64,7 +64,7 @@ export class PlayerControls {
 
   update(player: Player) {
     const direction = this.getKeysDirection();
-    player.moveTo(direction);
+    player.move(direction);
 
     if (this.wantsToShoot()) {
       player.shoot();
@@ -86,15 +86,31 @@ export class PlayerControls {
     return this.cursorKeys.space.isDown || this.input.activePointer.isDown;
   }
 
-  private getKeysDirection(): UnitVector {
-    if (!document.hasFocus()) return [0, 0];
+  private getKeysDirection(): Direction | undefined {
+    if (!document.hasFocus()) return undefined;
 
     let horizontal = +this.right() - +this.left();
     let vertical = +this.down() - +this.up();
-    if (horizontal && vertical) {
-      horizontal *= diagonalFactor;
-      vertical *= diagonalFactor;
+    if (horizontal === 0 && vertical === 0) return undefined;
+
+    if (horizontal === 1 && vertical === 1) {
+      return Direction.DownRight;
+    } else if (horizontal === 1 && vertical === -1) {
+      return Direction.UpRight;
+    } else if (horizontal === -1 && vertical === 1) {
+      return Direction.DownLeft;
+    } else if (horizontal === -1 && vertical === -1) {
+      return Direction.UpLeft;
+    } else if (horizontal === 1) {
+      return Direction.Right;
+    } else if (horizontal === -1) {
+      return Direction.Left;
+    } else if (vertical === 1) {
+      return Direction.Down;
+    } else if (vertical === -1) {
+      return Direction.Up;
+    } else {
+      return undefined;
     }
-    return [horizontal, vertical];
   }
 }

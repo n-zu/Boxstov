@@ -28,12 +28,8 @@ export default class EnemyBrain {
     if (players.length === 0) return;
 
     const closestPlayer = this.getClosestPlayer(me, players);
-    const dx = closestPlayer.x - me.x;
-    const dy = closestPlayer.y - me.y;
-
-    const distance = Math.sqrt(dx * dx + dy * dy);
-
-    me.turn([dx / distance, dy / distance]);
+    const angle = this.calculateAngleWithPlayer(me, closestPlayer);
+    me.turn(angle);
     
     if (me.physique.canAttack(me, closestPlayer)) {
       this.action = "atk";
@@ -43,6 +39,12 @@ export default class EnemyBrain {
     } else {
       this.action = "walk";
     }
+  }
+
+  private calculateAngleWithPlayer(me: EnemyModel, player: PlayerModel): number {
+    const dx = player.x - me.x;
+    const dy = player.y - me.y;
+    return -Math.atan2(dy, dx);
   }
 
   private getClosestPlayer(me: EnemyModel, players: PlayerModel[]): PlayerModel {

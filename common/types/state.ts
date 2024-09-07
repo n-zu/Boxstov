@@ -1,6 +1,5 @@
 // World
 
-import { EncodedMovementDirection } from "../controls/direction";
 import { GunName } from "../guns/gun";
 
 export type WorldState = {
@@ -24,7 +23,7 @@ export type EnemyState = {
     x: number;
     y: number;
   };
-  movementDirection: EncodedMovementDirection;
+  angle: number;
   physique: EnemyPhysiqueState;
   active: boolean;
   visible: boolean;
@@ -60,7 +59,8 @@ export type PlayerState = {
     y: number;
   };
   health: number;
-  movementDirection: EncodedMovementDirection;
+  facing: string;
+  idle: boolean;
   playerArsenal: PlayerArsenalState;
 };
 

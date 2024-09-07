@@ -1,16 +1,18 @@
-import { BulletGroupModel } from "./bulletGroupModel.js";
 import config from "./config.js";
-import MovementDirection from "./controls/direction.js";
 import { GunName } from "./guns/gun";
 import Observer from "./observer/observer";
 import PlayerArsenalModel from "./playerArsenalModel.js";
 import { GameEvents } from "./types/events";
+import { Direction, directionToRadians } from "./types/direction.js";
+import { polarToCartesian } from "./utils.js";
 
 export default class PlayerModel extends Phaser.Physics.Arcade.Sprite {
     id: string;
     scene: Phaser.Scene;
     observer: Observer<GameEvents>;
-    movementDirection: MovementDirection = new MovementDirection();
+    facing: Direction = Direction.Down;
+    idle: boolean = true;
+
     maxHealth: number;
     health: number;
     arsenal: PlayerArsenalModel;
@@ -54,9 +56,14 @@ export default class PlayerModel extends Phaser.Physics.Arcade.Sprite {
         this.arsenal.switchGun(this, gunName);
     }
 
-    public move(direction: MovementDirection) {
-        this.movementDirection = direction;
-        this.setVelocity(...this.movementDirection.getSpeed(config.player.speed));
+    public move(direction?: Direction) {
+        if (!direction) {
+            this.stopMovement();
+        } else {
+            this.facing = direction;
+            this.idle = false;
+            this.setVelocity(...polarToCartesian(directionToRadians(direction), config.player.speed));
+        }
     }
 
     public receiveDamage(damage: number) {
@@ -75,5 +82,10 @@ export default class PlayerModel extends Phaser.Physics.Arcade.Sprite {
                 this.arsenal.addKill(this);
             }
         });
+    }
+
+    public stopMovement() {
+        this.idle = true;
+        this.setVelocity(0, 0);
     }
 }

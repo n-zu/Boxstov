@@ -1,7 +1,6 @@
 import { GameMaster } from "../gameMaster/gameMaster";
 import * as Phaser from "phaser";
 import { Direction, UnitVector } from "../../../common/types/direction";
-import MovementDirection from "../../../common/controls/direction";
 import { PlayerRecentEvent, PlayerState } from "../../../common/types/state";
 import { playAnimation } from "../scenes/mainScene";
 import { AnimationSuffix } from "../types/animation";
@@ -41,24 +40,26 @@ export class Player extends PlayerModel {
         this.observer.notify("playerUpdate", this);
     }
 
-    moveTo(direction: UnitVector) {
-        const previous = this.movementDirection.getUnitVector();
-        this.movementDirection.update(direction);
-        if (this.local && previous !== this.movementDirection.getUnitVector())
-            this.sendMovementMessage(this.movementDirection);
-
-        this.move(this.movementDirection);
-
-        if (!this.movementDirection.isMoving()) {
-            this.doStopMovement();
-            return;
+    move(direction?: Direction) {
+        if (this.local) {
+            if (this.idle) {
+                if (direction) {
+                    this.sendMovementMessage(direction);
+                }
+            } else {
+                if (!direction) {
+                    this.sendMovementMessage();
+                } else if (this.facing !== direction) {
+                    this.sendMovementMessage(direction);
+                }
+            }
         }
-
+        super.move(direction);
         playAnimation(
             this,
             this.arsenal.currentGun.getGunName(),
-            this.movementDirection.getFacingDirection(),
-            AnimationSuffix.Run
+            this.facing,
+            this.idle ? AnimationSuffix.Idle : AnimationSuffix.Run
         );
     }
 
@@ -81,7 +82,7 @@ export class Player extends PlayerModel {
                 id: this.id,
                 type: "switch_gun",
                 gunName
-              });
+            });
         }
     }
 
@@ -98,10 +99,11 @@ export class Player extends PlayerModel {
         if (this.local) {
             this.notifyInconsistencies(state);
         } else {
-            this.movementDirection = MovementDirection.decode(
-                state.movementDirection
-            );
-            this.move(this.movementDirection);
+            if (state.idle) {
+                this.move();
+            } else {
+                this.move(state.facing as Direction);
+            }
         }
         (this.arsenal as PlayerArsenal).sync(this, state.playerArsenal);
     }
@@ -120,8 +122,18 @@ export class Player extends PlayerModel {
     }
 
     private notifyInconsistencies(state: PlayerState) {
-        if (this.movementDirection.encode() !== state.movementDirection) {
-            this.sendMovementMessage(this.movementDirection);
+        if (this.facing !== state.facing) {
+            if (state.idle) {
+                this.sendMovementMessage();
+            } else {
+                this.sendMovementMessage(this.facing);
+            }
+        } else if (this.idle !== state.idle) {
+            if (this.idle) {
+                this.sendMovementMessage();
+            } else {
+                this.sendMovementMessage(this.facing);
+            }
         }
     }
 
@@ -141,12 +153,6 @@ export class Player extends PlayerModel {
         });
     }
 
-    private doStopMovement() {
-        this.setVelocity(0, 0);
-        // TODO: Move this to the view, tie it to the 'playerStoppedMoving' event
-        this.playIdleAnimation();
-    }
-
     private syncPosition(x: number, y: number) {
         const diffX = Math.abs(this.x - x);
         const diffY = Math.abs(this.y - y);
@@ -156,17 +162,11 @@ export class Player extends PlayerModel {
         }
     }
 
-    private playIdleAnimation() {
-        const animationName = `${this.arsenal.currentGun.getGunName()
-            }-${this.movementDirection?.getFacingDirection()}-${AnimationSuffix.Idle}`;
-        this.anims.play(animationName, true);
-    }
-
-    private sendMovementMessage(direction: MovementDirection) {
+    private sendMovementMessage(direction?: Direction) {
         this.gameMaster.send("player", {
             id: this.id,
             type: "move",
-            direction: direction.encode()
+            direction: direction
         });
     }
 }

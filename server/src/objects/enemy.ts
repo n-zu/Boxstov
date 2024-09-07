@@ -15,8 +15,8 @@ export default class Enemy extends EnemyModel {
             active: this.active,
             visible: this.visible,
             bodyEnabled: this.body.enable,
-            movementDirection: this.movementDirection.encode(),
+            angle: this.angle
         };
-        return state;
+        return state; 
     }
 }
