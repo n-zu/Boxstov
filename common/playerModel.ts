@@ -64,6 +64,7 @@ export default class PlayerModel extends Phaser.Physics.Arcade.Sprite {
             this.idle = false;
             this.setVelocity(...polarToCartesian(directionToRadians(direction), config.player.speed));
         }
+        this.observer.notify("playerMoved", this);
     }
 
     public receiveDamage(damage: number) {

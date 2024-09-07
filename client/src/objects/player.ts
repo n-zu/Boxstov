@@ -31,9 +31,6 @@ export class Player extends PlayerModel {
 
         this.gameMaster = gameMaster;
         this.local = local;
-
-        // TODO: Move this to the view
-        playAnimation(this, this.arsenal.currentGun.getGunName(), Direction.Down, AnimationSuffix.Idle);
     }
 
     public update() {
@@ -52,17 +49,6 @@ export class Player extends PlayerModel {
                 this.sendMovementMessage(direction);
             }
         }
-    }
-
-    public move(direction?: Direction) {
-        super.move(direction);
-        // TODO: Move this to the view
-        playAnimation(
-            this,
-            this.arsenal.currentGun.getGunName(),
-            this.facing,
-            this.idle ? AnimationSuffix.Idle : AnimationSuffix.Run
-        );
     }
 
     public shoot(): boolean {

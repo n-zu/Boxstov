@@ -14,7 +14,7 @@ export default class PlayerArsenal extends PlayerArsenalModel {
 
     public sync(player: PlayerModel, state: PlayerArsenalState) {
         if (this.currentGun.getGunName() !== state.currentGun) {
-            playAnimation(player, state.currentGun, player.facing, AnimationSuffix.Idle);
+            this.observer.notify("playerSwitchedGun", player);
             switch (state.currentGun) {
                 case "rifle":
                     this.currentGun = this.guns[0];

@@ -11,6 +11,8 @@ export type BulletInfo = {
 };
 
 export type GameEvents = {
+  /// Some player has moved
+  playerMoved: (player: PlayerModel) => void;
   /// Some player has shot
   playerShoot: (player: PlayerModel) => void;
   /// Some player has joined the game
