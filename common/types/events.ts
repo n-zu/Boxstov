@@ -34,8 +34,12 @@ export type GameEvents = {
   /// Some player has stopped moving
   playerStoppedMoving: (player: PlayerModel) => void;
 
+  /// Some enemy has moved
+  enemyMoved: (enemy: EnemyModel) => void;
   /// Some enemy has received damage
   enemyReceivedDamage: (enemy: EnemyModel) => void;
+  /// Some enemy has died
+  enemyDied: (enemy: EnemyModel) => void;
 
   tick: () => void;
 

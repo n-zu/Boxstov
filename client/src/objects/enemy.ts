@@ -48,52 +48,10 @@ export class Enemy extends EnemyModel {
     this.action = state.action;
   }
 
-  private changeColor() {
-    this.setTint(0xff0000);
-    this.scene.time.delayedCall(100, () => this.setTint(0xff5555));
-    this.scene.time.delayedCall(200, () => this.setTint(0xffaaaa));
-    this.scene.time.delayedCall(300, () => this.setTint(0xffffff));
-  }
-
-  public receiveDamage(damage: number, damager?: PlayerModel): void {
-    super.receiveDamage(damage, damager);
-    this.changeColor();
-    this.observer.notify("enemyReceivedDamage", this);
-  }
-
   private move(state: EnemyState) {
     this.setPosition(state.position.x, state.position.y);
     this.setDepth(state.position.y);
 
     this.setVelocity(...polarToCartesian(state.angle, this.physique.speed));
-
-    const action =
-      this.action === AnimationSuffix.Attack
-        ? AnimationSuffix.Attack
-        : this.physique.speed >= config.enemies.zombieNormal.speed
-          ? AnimationSuffix.Run
-          : AnimationSuffix.Walk;
-
-    if (!this.physique.isDead()) {
-      playAnimation(
-        this,
-        AnimationActor.Zombie,
-        roundAngleToDirection(state.angle),
-        action
-      );
-    }
-  }
-
-  public die(killer?: PlayerModel) {
-    super.die(killer);
-    this.setTint(0xff5555);
-    setTimeout(() => this.setTint(0xffdddd), 1000);
-
-    playAnimation(
-      this,
-      AnimationActor.Zombie,
-      roundAngleToDirection(this.angle),
-      AnimationSuffix.Die
-    );
   }
 }

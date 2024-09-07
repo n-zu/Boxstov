@@ -49,12 +49,14 @@ export class EnemyModel extends Phaser.Physics.Arcade.Sprite {
   public turn(angle: number) {
     this.angle = angle;
     this.physique.setVelocityOf(this);
+    this.observer.notify("enemyMoved", this);
   }
 
   public receiveDamage(damage: number, damager?: PlayerModel) {
     if (this.physique.isDead()) return;
     
     this.physique.receiveDamage(damage);
+    this.observer.notify("enemyReceivedDamage", this);
     if (this.physique.isDead() && damager) {
       this.die(damager);
     }
@@ -68,7 +70,7 @@ export class EnemyModel extends Phaser.Physics.Arcade.Sprite {
     this.body.enable = true;
   }
 
-  protected die(killer?: PlayerModel) {
+  public die(killer?: PlayerModel) {
     this.setVelocity(0, 0);
     this.body.enable = false;
     if (killer) {
@@ -81,5 +83,6 @@ export class EnemyModel extends Phaser.Physics.Arcade.Sprite {
       this.setVisible(false);
       this.setActive(false);
     });
+    this.observer.notify("enemyDied", this);
   }
 }
