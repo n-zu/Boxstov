@@ -5,12 +5,12 @@ import Phaser from "phaser";
 import config from "../../../common/config";
 import { EnemyModel } from "../../../common/enemy/enemyModel.js";
 import EnemyPhysiqueModel from "../../../common/enemy/enemyPhysiqueModel";
-import { GameEvents } from "../types/events";
 import Observer from "../../../common/observer/observer";
 import PlayerModel from "../../../common/playerModel";
 import EnemyPhysique from "./enemyPhysique";
 import { polarToCartesian } from "../../../common/utils";
 import { roundAngleToDirection } from "../../../common/types/direction";
+import { GameEvents } from "../../../common/types/events";
 
 // FIXME: This should not be here 
 const HEALTH = config.enemies.zombieNormal.health;
