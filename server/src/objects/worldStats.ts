@@ -1,32 +1,7 @@
-import Observer from "../../../common/observer/observer.js";
-import { GameEvents } from "../../../common/types/events.js";
 import { WorldStatsState } from "../../../common/types/state.js";
+import WorldStatsModel from "../../../common/worldStatsModel.js";
 
-export default class WorldStats {
-  kills: number;
-  killsPerPlayer: { [playerId: string]: number };
-  rage: number;
-  observer: Observer<GameEvents>;
-
-  constructor(observer: Observer<GameEvents>) {
-    this.kills = 0;
-    this.killsPerPlayer = {};
-    this.rage = 0;
-    this.observer = observer;
-
-    this.observer.subscribe("playerKill", (killer) => this.addKill(killer.id));
-  }
-
-  public update() {
-    this.rage = Math.max(0, this.rage - 0.002);
-  }
-
-  public addKill(playerId: string) {
-    this.kills++;
-    this.killsPerPlayer[playerId] = this.killsPerPlayer[playerId] + 1 || 1;
-    this.rage = Math.ceil(this.rage) + 1;
-  }
-
+export default class WorldStats extends WorldStatsModel {
   public getState(): WorldStatsState {
     return {
       kills: this.kills,
