@@ -41,10 +41,12 @@ export default class GameServer {
     const session = new SessionMaster(id, this.hostMaster);
     let observer = new GameObserver();
     observer.subscribe("gameEnd", () => {
+      console.log(`action: ending_game | game_id: ${id}`);
       game.destroy(false);
       delete this.games[id];
     });
     const game = new MultiplayerGame(session, observer);
+    console.log(`action: starting_game | game_id: ${id}`);
     this.games[id] = {
       game,
       master: session
