@@ -1,7 +1,8 @@
 import { PlayerUI } from "./playerUi.js";
 import Observer from "../../../common/observer/observer";
 import { Player } from "../objects/player";
-import { GameEvents } from "../types/events.js";
+import { GameEvents } from "../../../common/types/events.js";
+import PlayerModel from "../../../common/playerModel.js";
 
 const motivationalMessages = [
   "GIT GUD",
@@ -23,24 +24,25 @@ export default class GameUI {
   }
 
   private subscribeToEvents() {
-    this.observer.subscribe("newPlayer", (player: Player) => {
+    this.observer.subscribe("newPlayer", (player: PlayerModel) => {
       this.playerUis.push(new PlayerUI(this.scene, player.id));
     });
 
     // TODO: there is no entity that notifies about this event
-    this.observer.subscribe("playerLeft", (player: Player) => {
+    this.observer.subscribe("playerLeft", (player: PlayerModel) => {
       this.playerUis = this.playerUis.filter((playerUi) => playerUi.username !== player.id);
     });
 
-    this.observer.subscribe("playerUpdate", (player: Player) => {
+    this.observer.subscribe("playerUpdate", (player: PlayerModel) => {
       const playerUi = this.playerUis.find((playerUi) => playerUi.username === player.id);
       if (playerUi) {
         playerUi.update(player.x, player.y, player.height, player.health, player.maxHealth);
       }
     });
 
-    this.observer.subscribe("playerDied", (player: Player) => {
-      if (player.local && !this.gameOver) {
+    this.observer.subscribe("playerDied", (player: PlayerModel) => {
+      const p = player as Player;
+      if (p.local && !this.gameOver) {
         this.gameOver = true;
         this.scene.scene.start("gameOver");
         this.showMotivationalMessage();

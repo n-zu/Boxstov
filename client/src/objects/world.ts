@@ -5,46 +5,64 @@ import { PlayerControls } from "../controls/playerControls";
 import { EnemyGroup } from "../groups/enemyGroup";
 import { WorldState } from "../../../common/types/state";
 import { SyncUpdate } from "../../../common/types/messages";
-import { ENEMY_GROUP_MAX } from "../../../common/constants";
 import Observer from "../../../common/observer/observer.js";
-import { GameEvents } from "../types/events";
 import WorldStats from "./worldStats.js";
+import { Difficulty } from "../../../common/enemyGroupModel";
+import { WorldModel } from "../../../common/worldModel";
+import PlayerModel from "../../../common/playerModel";
+import { GameEvents } from "../../../common/types/events";
 
-export class World {
-  players!: Player[];
-  enemies: EnemyGroup;
-  observer: Observer<GameEvents>;
+export class World extends WorldModel {
   stats: WorldStats;
-  playerControls!: PlayerControls;
-  bulletGroup!: BulletGroup;
+  playerControls?: PlayerControls;
   gameMaster: GameMaster;
-  scene: Phaser.Scene;
 
   constructor(scene: Phaser.Scene, observer: Observer<GameEvents>, gameMaster: GameMaster, username: string) {
+    super(scene, observer);
     this.gameMaster = gameMaster;
-    this.scene = scene;
-    this.enemies = new EnemyGroup(scene, observer, ENEMY_GROUP_MAX);
     this.stats = new WorldStats(observer);
-    this.observer = observer;
-
+    
     this.setupGameMaster(gameMaster);
     this.setupFirstPlayer(scene, gameMaster, username);
   }
 
   public update() {
-    this.playerControls.update();
-    this.players?.forEach((player) => player.update());
+    if (this.playerControls && this.players.length > 0) {
+      this.playerControls.update(this.players[0] as Player);
+    }
+    super.update();
+  }
+
+  protected newBulletGroup(scene: Phaser.Scene, observer: Observer<GameEvents>) {
+    return new BulletGroup(scene, observer);
+  }
+
+  protected newEnemyGroup(scene: Phaser.Scene, observer: Observer<GameEvents>, difficulty: Difficulty, spawnPoints: { x: number; y: number }[]) {
+    return new EnemyGroup(scene, observer, difficulty, spawnPoints);
+  }
+
+  protected newPlayer(id: string, scene: Phaser.Scene, observer: Observer<GameEvents>, position: { x: number; y: number }, bullets: BulletGroup) {
+    const local = this.players.length === 0;
+    return new Player(id, scene, observer, position, this.gameMaster, bullets, local);
   }
 
   public sync(worldState: WorldState) {
     worldState.players.forEach((playerState) => {
-      const player = this.getOrCreatePlayer(playerState.id);
-      player.sync(playerState);
+      const player = this.getOrCreatePlayer(playerState.id) as Player;
+      player.sync(playerState, this.getRecentEventsOfPlayer(playerState.id, worldState));
     });
-    this.enemies.sync(worldState.enemies);
+    (this.enemies as EnemyGroup).sync(worldState.enemies);
 
-    this.bulletGroup.sync(worldState.bullets);
+    (this.bullets as BulletGroup).sync(worldState.bullets);
     this.stats.sync(worldState.stats);
+  }
+
+  private getRecentEventsOfPlayer(id: string, state: WorldState) {
+    const recentEvents = state.recentEvents.playerRecentEvents[id];
+    if (recentEvents === undefined) {
+      return [];
+    }
+    return recentEvents;
   }
 
   private setupFirstPlayer(
@@ -52,14 +70,13 @@ export class World {
     gameMaster: GameMaster,
     username: string
   ) {
-    this.bulletGroup = new BulletGroup(scene);
-
     const player = new Player(
+      username,
       scene,
       this.observer,
-      username,
+      { x: 0, y: 0 },
       gameMaster,
-      this.bulletGroup,
+      this.bullets,
       true
     );
     this.playerControls = new PlayerControls(this.scene, player, this.observer);
@@ -74,16 +91,10 @@ export class World {
     this.players = [player];
   }
 
-  private getOrCreatePlayer(id: string): Player {
+  public getOrCreatePlayer(id: string): PlayerModel {
     let player = this.players.find((p) => p.id === id);
     if (player === undefined) {
-      player = new Player(
-        this.scene,
-        this.observer,
-        id,
-        this.gameMaster,
-        this.bulletGroup
-      );
+      player = this.newPlayer(id, this.scene, this.observer, { x: 0, y: 0 }, this.bullets as BulletGroup);
       this.players.push(player);
     }
     return player;

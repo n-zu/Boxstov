@@ -1,13 +1,13 @@
 // World
 
-import { EncodedMovementDirection } from "../controls/direction";
-import { GunName } from "../guns";
+import { GunName } from "../guns/gun";
 
 export type WorldState = {
   players: PlayerState[];
   bullets: BulletGroupState;
   enemies: EnemyGroupState;
   stats: WorldStatsState;
+  recentEvents: RecentEventsListenerState;
 };
 
 export type WorldStatsState = {
@@ -23,18 +23,21 @@ export type EnemyState = {
     x: number;
     y: number;
   };
-  movementDirection: EncodedMovementDirection;
-  dead: boolean;
-  health: number;
+  angle: number;
+  physique: EnemyPhysiqueState;
   active: boolean;
   visible: boolean;
   bodyEnabled: boolean;
   action: string;
-  speed: number;
-  events: EnemyRecentEvents[]
 };
 
-export type EnemyRecentEvents = "receive_damage";
+export type EnemyPhysiqueState = {
+  maxHealth: number;
+  health: number;
+  strength: number;
+  speed: number;
+  attackRange: number;
+}
 
 export type EnemyGroupState = {
   enemies: EnemyState[];
@@ -56,12 +59,17 @@ export type PlayerState = {
     y: number;
   };
   health: number;
-  movementDirection: EncodedMovementDirection;
-  gunName: GunName;
-  events: PlayerRecentEvent[];
+  facing: string;
+  idle: boolean;
+  playerArsenal: PlayerArsenalState;
 };
 
-export type PlayerRecentEvent = "shoot" | "receive_damage" | "kill" | "unlocked_gun";
+export type PlayerArsenalState = {
+  kills: number;
+  currentGun: GunName;
+}
+
+export type PlayerRecentEvent = "shoot" | "receive_damage";
 
 
 // Bullet
@@ -75,4 +83,10 @@ export type BulletState = {
   active: boolean;
   visible: boolean;
   gunName: GunName;
+};
+
+// Recent events listener
+
+export type RecentEventsListenerState = {
+  playerRecentEvents: { [playerId: string]: PlayerRecentEvent[] };
 };

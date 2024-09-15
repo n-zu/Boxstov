@@ -1,10 +1,10 @@
 import CursorKeys = Phaser.Types.Input.Keyboard.CursorKeys;
 import InputPlugin = Phaser.Input.InputPlugin;
-import { UnitVector } from "../../../common/types/direction";
-import { numToGunName } from "../../../common/guns";
+import { Direction, UnitVector } from "../../../common/types/direction";
 import Observer from "../../../common/observer/observer.js";
-import { GameEvents } from "../types/events";
 import { Player } from "../objects/player.js";
+import { GunName } from "../../../common/guns/gun";
+import { GameEvents } from "../../../common/types/events";
 
 const diagonalFactor = Math.sqrt(2) / 2;
 
@@ -18,6 +18,8 @@ interface LetterKeys {
   S: Phaser.Input.Keyboard.Key;
   D: Phaser.Input.Keyboard.Key;
 }
+
+const GUN_NAMES = ["rifle", "shotgun", "rpg"] as GunName[];
 
 export class PlayerControls {
   cursorKeys: CursorKeys;
@@ -36,8 +38,8 @@ export class PlayerControls {
     scene.input.keyboard.on("keydown", (event: any) => {
       if (event.keyCode >= 49 && event.keyCode <= 57) {
         const num = event.keyCode - 49;
-        const name = numToGunName(num);
-        this.observer.notify("triggerChangeGun", name);
+        const name = GUN_NAMES[num];
+        localPlayer.switchGun(name);
       }
     });
 
@@ -60,12 +62,13 @@ export class PlayerControls {
     return this.cursorKeys.right.isDown || this.letterKeys.D.isDown;
   }
 
-  update() {
+  update(player: Player) {
     const direction = this.getKeysDirection();
-    this.observer.notify("triggerMove", direction);
+    player.sendMovementMessageIfNecessary(direction);
+    player.move(direction);
 
     if (this.wantsToShoot()) {
-      this.observer.notify("triggerShoot");
+      player.shoot();
     }
   }
 
@@ -84,15 +87,31 @@ export class PlayerControls {
     return this.cursorKeys.space.isDown || this.input.activePointer.isDown;
   }
 
-  private getKeysDirection(): UnitVector {
-    if (!document.hasFocus()) return [0, 0];
+  private getKeysDirection(): Direction | undefined {
+    if (!document.hasFocus()) return undefined;
 
     let horizontal = +this.right() - +this.left();
     let vertical = +this.down() - +this.up();
-    if (horizontal && vertical) {
-      horizontal *= diagonalFactor;
-      vertical *= diagonalFactor;
+    if (horizontal === 0 && vertical === 0) return undefined;
+
+    if (horizontal === 1 && vertical === 1) {
+      return Direction.DownRight;
+    } else if (horizontal === 1 && vertical === -1) {
+      return Direction.UpRight;
+    } else if (horizontal === -1 && vertical === 1) {
+      return Direction.DownLeft;
+    } else if (horizontal === -1 && vertical === -1) {
+      return Direction.UpLeft;
+    } else if (horizontal === 1) {
+      return Direction.Right;
+    } else if (horizontal === -1) {
+      return Direction.Left;
+    } else if (vertical === 1) {
+      return Direction.Down;
+    } else if (vertical === -1) {
+      return Direction.Up;
+    } else {
+      return undefined;
     }
-    return [horizontal, vertical];
   }
 }

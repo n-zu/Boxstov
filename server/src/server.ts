@@ -1,11 +1,11 @@
 import "@geckos.io/phaser-on-nodejs";
 import { ServerChannel } from "@geckos.io/server";
 import http from "http";
+import GameObserver from "../../common/observer/gameObserver.js";
 import { Create, Join } from "../../common/types/packet.js";
 import { MultiplayerGame } from "./game/multiplayerGame.js";
 import { HostMaster } from "./gameMaster/hostMaster.js";
 import { SessionMaster } from "./gameMaster/sessionMaster.js";
-import GameObserver from "../../common/observer/gameObserver.js";
 
 type Session = {
   game: MultiplayerGame;
@@ -41,10 +41,12 @@ export default class GameServer {
     const session = new SessionMaster(id, this.hostMaster);
     let observer = new GameObserver();
     observer.subscribe("gameEnd", () => {
+      console.log(`action: ending_game | game_id: ${id}`);
       game.destroy(false);
       delete this.games[id];
     });
     const game = new MultiplayerGame(session, observer);
+    console.log(`action: starting_game | game_id: ${id}`);
     this.games[id] = {
       game,
       master: session

@@ -3,8 +3,8 @@
 import Phaser from "phaser";
 import { Direction } from "../../../common/types/direction";
 import { GuestMaster } from "../gameMaster/guestMaster";
-import { GunName } from "../../../common/guns";
 import { AnimationActor, AnimationSuffix } from "../types/animation";
+import { GunName } from "../../../common/guns/gun";
 
 // Imports de las escenas, se hacen desde acá para que se carguen durante la
 // pantalla de carga y ya queden cacheadas para después.
@@ -14,15 +14,15 @@ export function loadGameAssets(scene: Phaser.Scene) {
   scene.load.image("bullet", "assets/bullets/strip.png");
   scene.load.image("shell", "assets/bullets/shell.png");
   scene.load.image("rocket", "assets/bullets/rocket.png");
-  scene.load.spritesheet(GunName.Rifle, "assets/Player/rifle_map.png", {
+  scene.load.spritesheet("rifle", "assets/Player/rifle_map.png", {
     frameWidth: 512,
     frameHeight: 512,
   });
-  scene.load.spritesheet(GunName.Shotgun, "assets/Player/shotgun_map.png", {
+  scene.load.spritesheet("shotgun", "assets/Player/shotgun_map.png", {
     frameWidth: 512,
     frameHeight: 512,
   });
-  scene.load.spritesheet(GunName.Rpg, "assets/Player/rpg_map.png", {
+  scene.load.spritesheet("rpg", "assets/Player/rpg_map.png", {
     frameWidth: 512,
     frameHeight: 512,
   });
@@ -162,7 +162,7 @@ export default class LoadScene extends Phaser.Scene {
     ];
 
     directions.forEach((direction, index) => {
-      [GunName.Rifle, GunName.Shotgun, GunName.Rpg].forEach((actor) => {
+      (["rifle", "shotgun", "rpg"] as GunName[]).forEach((actor) => {
         this.createAnimation(
           actor,
           direction,

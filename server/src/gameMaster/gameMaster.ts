@@ -1,8 +1,8 @@
 import {
-  UpdateFor,
   ActionFnFor,
   ClientMessageType,
   ServerMessageType,
+  UpdateFor,
 } from "../../../common/types/messages.js";
 
 export interface GameMaster {

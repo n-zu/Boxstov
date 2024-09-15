@@ -6,13 +6,14 @@ import { loadGameAssets } from "./load";
 import { GameMaster } from "../gameMaster/gameMaster";
 import UI from "./ui";
 import { GAME_HEIGHT, GAME_WIDTH, WORLD_BOUNDS } from "../../../common/constants";
-import { GunName } from "../../../common/guns";
 import GameObserver from "../../../common/observer/gameObserver.js";
 import GameUI from "../controls/gameUi";
-import { GameEvents } from "../types/events";
 import Observer from "../../../common/observer/observer";
 import AudioPlayer from "../audio/audioPlayer";
 import Sprite = Phaser.GameObjects.Sprite;
+import { GunName } from "../../../common/guns/gun";
+import { GameEvents } from "../../../common/types/events";
+import AnimationPlayer from "../animations/animationPlayer";
 
 
 export function playAnimation(
@@ -37,11 +38,13 @@ export default class MainScene extends Phaser.Scene {
   observer: Observer<GameEvents>;
   gameUi?: GameUI;
   audioPlayer: AudioPlayer;
+  animationPlayer: AnimationPlayer;
 
   protected constructor() {
     super({ key: "MainScene" });
     this.observer = new GameObserver();
     this.audioPlayer = new AudioPlayer(this, this.observer);
+    this.animationPlayer = new AnimationPlayer(this, this.observer);
   }
 
   create(data: { gameMaster: GameMaster; username: string }) {

@@ -1,8 +1,7 @@
-import { GameEvents } from "../types/events";
 import Observer from "../../../common/observer/observer.js";
-import { GunName } from "../../../common/guns.js";
 import { Player } from "../objects/player";
 import { Enemy } from "../objects/enemy";
+import { GameEvents } from "../../../common/types/events.js";
 
 const MAX_ATTACK_SOUND_AMOUNT = 3;
 const MAX_DMG_SOUND_AMOUNT = 5;
@@ -22,11 +21,11 @@ export default class AudioPlayer {
   }
 
   private subscribeToEvents() {
-    this.observer.subscribe("playerShoot", (player) => this.playShootSound(player));
-    this.observer.subscribe("playerSwitchedGun", (player) => this.playSwitchGunSound(player));
-    this.observer.subscribe("playerUnlockedGun", (player) => this.playUnlockGunSound(player));
-    this.observer.subscribe("playerReceivedDamage", (player) => this.playPlayerReceivedDamageSound(player));
-    this.observer.subscribe("enemyReceivedDamage", (enemy) => this.playEnemyReceivedDamageSound(enemy));
+    this.observer.subscribe("playerShoot", (player) => this.playShootSound(player as Player));
+    this.observer.subscribe("playerSwitchedGun", (player) => this.playSwitchGunSound(player as Player));
+    this.observer.subscribe("playerUnlockedGun", (player) => this.playUnlockGunSound(player as Player));
+    this.observer.subscribe("playerReceivedDamage", (player) => this.playPlayerReceivedDamageSound(player as Player));
+    this.observer.subscribe("enemyReceivedDamage", (enemy) => this.playEnemyReceivedDamageSound(enemy as Enemy));
   }
 
   private playEnemyReceivedDamageSound(enemy: Enemy) {
@@ -54,6 +53,7 @@ export default class AudioPlayer {
   }
 
   private playPlayerReceivedDamageSound(player: Player) {
+    console.log("play player dmg sound");
     const volume = this.calculatePlayerSoundVolume(player);
     if (volume < MIN_VOLUME) return;
 
@@ -97,14 +97,14 @@ export default class AudioPlayer {
     const volume = this.calculatePlayerSoundVolume(player);
     if (volume < MIN_VOLUME) return;
 
-    switch (player.gunName) {
-      case GunName.Rifle:
+    switch (player.arsenal.currentGun.getGunName()) {
+      case "rifle":
         this.scene.sound.play("rifle", { volume });
         break;
-      case GunName.Shotgun:
+      case "shotgun":
         this.scene.sound.play("shotgun", { volume });
         break;
-      case GunName.Rpg:
+      case "rpg":
         this.scene.sound.play("rpg", { volume });
         break;
     }

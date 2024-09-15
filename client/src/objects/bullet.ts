@@ -1,38 +1,24 @@
-import Sprite = Phaser.GameObjects.Sprite;
 import { BulletState } from "../../../common/types/state";
-import MovementDirection from "../../../common/controls/direction";
-import { GunName, Guns } from "../../../common/guns";
+import Gun, { GunName } from "../../../common/guns/gun";
+import { BulletModel } from "../../../common/bulletModel";
+import PlayerModel from "../../../common/playerModel";
 
-export class Bullet extends Sprite {
-  gunName = GunName.Rifle;
-
-  constructor(scene: Phaser.Scene, x: number, y: number) {
-    super(scene, x, y, "bullet");
-  }
-
-  public fire(
-    x: number,
-    y: number,
-    direction: MovementDirection,
-    gunName: GunName
-  ) {
-    const gun = Guns[gunName];
-    const [velocityX, velocityY] = direction.getFacingSpeed(gun.bulletSpeed);
-    const rotation = Math.atan2(velocityY, velocityX);
-
+export class Bullet extends BulletModel {
+  public fire(x: number, y: number, rotation: number, shooter: PlayerModel, origin: Gun): void {
+    super.fire(x, y, rotation, shooter, origin);
     this.setBase();
-    this.setPosition(x, y);
-    this.setRotation(rotation);
-    this.setActive(true);
-    this.setVisible(true);
-    this.setTexture(Guns[gunName].bulletTexture);
-
-    this.scene.time.addEvent({
-      delay: 3000,
-      callback: () => {
-        this.die();
-      }
-    });
+    // FIXME: This is not very good
+    switch (origin.getGunName()) {
+      case "rifle":
+        this.setTexture("bullet");
+        break;
+      case "shotgun":
+        this.setTexture("shell");
+        break;
+      case "rpg":
+        this.setTexture("rocket");
+        break;
+    }
   }
 
   setBase() {
@@ -45,10 +31,20 @@ export class Bullet extends Sprite {
     this.setVisible(false);
   }
 
-  public setGunName(gunName: GunName) {
-    if (this.gunName !== gunName) {
-      this.gunName = gunName;
-      this.setTexture(Guns[gunName].bulletTexture);
+  private setGunName(gunName: GunName) {
+    if (!this.origin || this.origin.getGunName() !== gunName) {
+      // FIXME
+      switch (gunName) {
+        case "rifle":
+          this.setTexture("bullet");
+          break;
+        case "shotgun":
+          this.setTexture("shell");
+          break;
+        case "rpg":
+          this.setTexture("rocket");
+          break;
+      }
     }
   }
 

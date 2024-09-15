@@ -1,20 +1,7 @@
-import Observer from "../../../common/observer/observer.js";
-import { GameEvents } from "../types/events";
 import { WorldStatsState } from "../../../common/types/state.js";
+import WorldStatsModel from "../../../common/worldStatsModel.js";
 
-export default class WorldStats {
-  kills: number;
-  killsPerPlayer: { [playerId: string]: number };
-  rage: number;
-  observer: Observer<GameEvents>;
-
-  constructor(observer: Observer<GameEvents>) {
-    this.kills = 0;
-    this.killsPerPlayer = {};
-    this.rage = 0;
-    this.observer = observer;
-  }
-
+export default class WorldStats extends WorldStatsModel {
   public sync(state: WorldStatsState) {
     this.kills = state.kills;
     this.killsPerPlayer = state.killsPerPlayer;

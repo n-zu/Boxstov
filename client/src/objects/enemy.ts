@@ -1,41 +1,23 @@
-import { playAnimation } from "../scenes/mainScene";
-import { EnemyRecentEvents, EnemyState } from "../../../common/types/state";
-import { AnimationActor, AnimationSuffix } from "../types/animation";
-import MovementDirection from "../../../common/controls/direction";
+import { EnemyState } from "../../../common/types/state";
 import Phaser from "phaser";
-import { GameEvents } from "../types/events";
+import { EnemyModel } from "../../../common/enemy/enemyModel.js";
+import EnemyPhysiqueModel from "../../../common/enemy/enemyPhysiqueModel";
 import Observer from "../../../common/observer/observer";
-import Sprite = Phaser.Physics.Arcade.Sprite;
-import { ZOMBIE_SIZE, ZOMBIE_SPEED } from "../../../common/constants";
+import EnemyPhysique from "./enemyPhysique";
+import { polarToCartesian } from "../../../common/utils";
+import { GameEvents } from "../../../common/types/events";
 
-const HEALTH = 100;
-
-export class Enemy extends Sprite {
-  id: number;
-  health = HEALTH;
-  movementDirection: MovementDirection = new MovementDirection();
-  action = "";
-  dead = true;
-  speed: number;
-  observer: Observer<GameEvents>;
+export class Enemy extends EnemyModel {
+  action: string = "";
 
   constructor(
+    id: number,
     scene: Phaser.Scene,
+    position: { x: number; y: number },
     observer: Observer<GameEvents>,
-    x: number,
-    y: number,
-    id: number
+    physique: EnemyPhysiqueModel
   ) {
-    super(scene, x, y, "zombie");
-    scene.physics.add.existing(this);
-    scene.add.existing(this);
-    this.setBodySize(...ZOMBIE_SIZE);
-
-    this.observer = observer;
-    this.visible = false;
-    this.active = false;
-    this.speed = ZOMBIE_SPEED.SLOW;
-    this.id = id;
+    super(id, scene, position, observer, physique, "zombie");
   }
 
   public getDistanceToCamera(): number {
@@ -52,95 +34,19 @@ export class Enemy extends Sprite {
   }
 
   public sync(state: EnemyState) {
-    this.syncEvents(state.events);
-
-    if (state.health > 0) {
-      this.updateHealth(state.health);
-    }
+    this.action = state.action;
     this.move(state);
-    if (!this.dead && state.dead) {
-      this.die();
-    }
-    this.dead = state.dead;
+    (this.physique as EnemyPhysique).sync(this, state.physique);
     this.setActive(state.active);
     this.setVisible(state.visible);
     this.active = state.active;
     this.action = state.action;
-    this.speed = state.speed;
-  }
-
-  public receiveDamage(damage: number) {
-    if (this.health <= 0) return;
-
-    this.health -= damage;
-    if (this.health <= 0) {
-      this.die();
-    }
-  }
-
-  private syncEvents(events: EnemyRecentEvents[]) {
-    events.forEach((event) => {
-      switch (event) {
-        case "receive_damage":
-          this.observer.notify("enemyReceivedDamage", this);
-          this.changeColor();
-          break;
-      }
-    });
-  }
-
-  private changeColor() {
-    this.setTint(0xff0000);
-    this.scene.time.delayedCall(100, () => this.setTint(0xff5555));
-    this.scene.time.delayedCall(200, () => this.setTint(0xffaaaa));
-    this.scene.time.delayedCall(300, () => this.setTint(0xffffff));
-  }
-
-  private updateHealth(newHealth: number) {
-    if (newHealth < this.health) this.receiveDamage(this.health - newHealth);
   }
 
   private move(state: EnemyState) {
     this.setPosition(state.position.x, state.position.y);
     this.setDepth(state.position.y);
 
-    this.movementDirection = MovementDirection.decode(state.movementDirection);
-    this.setVelocity(...this.movementDirection.getSpeed(this.speed));
-
-    const action =
-      this.action === AnimationSuffix.Attack
-        ? AnimationSuffix.Attack
-        : this.speed >= ZOMBIE_SPEED.FAST
-        ? AnimationSuffix.Run
-        : AnimationSuffix.Walk;
-
-    if (this.movementDirection.isMoving()) {
-      playAnimation(
-        this,
-        AnimationActor.Zombie,
-        this.movementDirection.getFacingDirection(),
-        action
-      );
-    }
-  }
-
-  private die() {
-    this.health = 0;
-    this.setTint(0xff5555);
-    setTimeout(() => this.setTint(0xffdddd), 1000);
-    this.setDepth(this.y - 100);
-
-    playAnimation(
-      this,
-      AnimationActor.Zombie,
-      this.movementDirection.getFacingDirection(),
-      AnimationSuffix.Die
-    );
-    this.setRotation(Math.random() * 0.4 - 0.2);
-
-    this.scene.time.delayedCall(10000, () => {
-      this.setVisible(false);
-      this.setActive(false);
-    });
+    this.setVelocity(...polarToCartesian(state.angle, this.physique.speed));
   }
 }
