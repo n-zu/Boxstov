@@ -8,6 +8,8 @@ command="npm run start_cheap"
 expected_message="Listening on port"
 
 cd /home/boxstov/server
+
+git pull
 npm ci
 npm run build
 
