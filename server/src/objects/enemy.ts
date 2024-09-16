@@ -12,9 +12,7 @@ export default class Enemy extends EnemyModel {
             physique: (this.physique as EnemyPhysique).getState(),
             dead: this.physique.isDead(),
             action: this.brain.action,
-            active: this.active,
-            visible: this.visible,
-            bodyEnabled: this.body.enable,
+            spawned: this.active,
             angle: this.angle
         };
         return state;

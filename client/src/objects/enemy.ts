@@ -37,10 +37,11 @@ export class Enemy extends EnemyModel {
     this.action = state.action;
     this.move(state);
     (this.physique as EnemyPhysique).sync(this, state.physique);
-    this.setActive(state.active);
-    this.setVisible(state.visible);
-    this.active = state.active;
     this.action = state.action;
+    
+    this.visible = state.spawned;
+    this.active = state.spawned;
+    this.body.enable = state.physique.health > 0;
   }
 
   private move(state: EnemyState) {

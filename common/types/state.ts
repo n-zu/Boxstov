@@ -25,9 +25,7 @@ export type EnemyState = {
   };
   angle: number;
   physique: EnemyPhysiqueState;
-  active: boolean;
-  visible: boolean;
-  bodyEnabled: boolean;
+  spawned: boolean;
   action: string;
 };
 
