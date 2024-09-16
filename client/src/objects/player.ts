@@ -69,7 +69,7 @@ export class Player extends PlayerModel {
     }
 
     public sync(state: PlayerState, recentEvents: PlayerRecentEvent[]) {
-        console.log("Syncing player");
+        console.log("Syncing player");        
         this.syncPosition(state.position.x, state.position.y);
         this.syncEvents(recentEvents);
 

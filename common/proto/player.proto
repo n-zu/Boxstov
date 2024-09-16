@@ -1,0 +1,13 @@
+syntax = "proto3";
+
+package player.v1;
+
+// FIXME: Add remaining fields
+message Player {
+    Position position = 1;
+}
+
+message Position {
+    float x = 1;
+    float y = 2;
+}
