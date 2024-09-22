@@ -37,7 +37,7 @@ export class Player extends PlayerModel {
 
     public sendMovementMessageIfNecessary(direction?: DirectionEnumProto) {
         if (this.idle) {
-            if (direction) {
+            if (direction !== undefined) {
                 this.sendMovementMessage(direction);
             }
         } else {
@@ -154,14 +154,13 @@ export class Player extends PlayerModel {
     }
 
     private sendMovementMessage(direction?: DirectionEnumProto) {
+        console.log(`Player ${this.id} sendMovementMessage - direction: ${direction}`);
         if (direction === undefined) {
-            console.log(`Player ${this.id} sendMovementMessage - undefined`);
             this.gameMaster.send("player", {
                 id: this.id,
                 type: "move"
             });
         } else {
-            console.log(`Player ${this.id} sendMovementMessage - ${direction}`);
             this.gameMaster.send("player", {
                 id: this.id,
                 type: "move",
