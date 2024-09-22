@@ -2,6 +2,9 @@ import { BulletState } from "../../../common/types/state";
 import Gun, { GunName } from "../../../common/guns/gun";
 import { BulletModel } from "../../../common/bulletModel";
 import PlayerModel from "../../../common/playerModel";
+import { Bullet as BulletProto } from "../../../common/generated/bullet";
+import { Buffer } from "buffer";
+import { gunTypeToGunName } from "../../../common/utils";
 
 export class Bullet extends BulletModel {
   public fire(x: number, y: number, rotation: number, shooter: PlayerModel, origin: Gun): void {
@@ -48,13 +51,18 @@ export class Bullet extends BulletModel {
     }
   }
 
-  public sync(bulletState: BulletState) {
+  public sync(bulletStateStr: BulletState) {
+    const bulletState = BulletProto.decode(Buffer.from(bulletStateStr, "base64"));
+    
     this.setBase();
-    this.setDepth(bulletState.y);
-    this.setPosition(bulletState.x, bulletState.y);
+    if (bulletState.position) {
+      this.setDepth(bulletState.position.y);
+      this.setPosition(bulletState.position.x, bulletState.position.y);
+    }
+    
     this.setRotation(bulletState.rotation);
     this.setActive(bulletState.active);
     this.setVisible(bulletState.visible);
-    this.setGunName(bulletState.gunName);
+    this.setGunName(gunTypeToGunName(bulletState.origin));
   }
 }

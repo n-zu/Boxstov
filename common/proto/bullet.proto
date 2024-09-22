@@ -1,0 +1,14 @@
+syntax = "proto3";
+
+package bullet.v1;
+
+import "utils/position.proto";
+import "player/playerArsenal.proto";
+
+message Bullet {
+    position.v1.Position position = 1;
+    float rotation = 2;
+    bool active = 3;
+    bool visible = 4;
+    playerArsenal.v1.GunType origin = 5;
+}
