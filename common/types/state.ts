@@ -1,7 +1,6 @@
 // World
 
 import { GunType } from "../generated/player/playerArsenal";
-import { GunName } from "../guns/gun";
 
 export type WorldState = {
   players: PlayerState[];
@@ -55,9 +54,6 @@ export type PlayerArsenalState = {
   kills: number;
 };
 
-export type PlayerRecentEvent = "shoot" | "receive_damage";
-
-
 // Bullet
 
 export type BulletGroupState = string;
@@ -75,6 +71,4 @@ export type BulletState = {
 
 // Recent events listener
 
-export type RecentEventsListenerState = {
-  playerRecentEvents: { [playerId: string]: PlayerRecentEvent[] };
-};
+export type RecentEventsListenerState = string;

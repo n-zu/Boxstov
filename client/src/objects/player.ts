@@ -4,12 +4,13 @@ import { GunName } from "../../../common/guns/gun";
 import Observer from "../../../common/observer/observer.js";
 import PlayerModel from "../../../common/playerModel";
 import { GameEvents } from "../../../common/types/events";
-import { PlayerRecentEvent, PlayerState } from "../../../common/types/state";
+import { PlayerState } from "../../../common/types/state";
 import { GameMaster } from "../gameMaster/gameMaster";
 import PlayerArsenal from "./playerArsenal";
 import { Direction as DirectionProto, DirectionEnum as DirectionEnumProto } from "../../../common/generated/utils/direction.js";
 import { PlayerArsenal as PlayerArsenalProto } from "../../../common/generated/player/playerArsenal.js";
 import { Player as PlayerProto } from "../../../common/generated/player/player.js";
+import { PlayerRecentEvent as PlayerRecentEventProto } from "../../../common/generated/playerRecentEvent.js";
 import { EncodedDirection } from "../../../common/types/messages";
 import { Buffer } from "buffer";
 
@@ -72,7 +73,7 @@ export class Player extends PlayerModel {
         }
     }
 
-    public sync(playerProto: PlayerProto, recentEvents: PlayerRecentEvent[]) {
+    public sync(playerProto: PlayerProto, recentEvents: PlayerRecentEventProto[]) {
         if (playerProto.position) {
             this.syncPosition(playerProto.position.x, playerProto.position.y);
         }
@@ -127,18 +128,20 @@ export class Player extends PlayerModel {
         }
     }
 
-    private syncEvents(events: PlayerRecentEvent[]) {
+    private syncEvents(events: PlayerRecentEventProto[]) {
         if (this.local) {
             return;
         }
         events.forEach(event => {
             switch (event) {
-                case "shoot":
+                case PlayerRecentEventProto.Shoot:
                     this.observer.notify("playerShoot", this);
                     break;
-                case "receive_damage":
+                case PlayerRecentEventProto.ReceiveDamage:
                     this.observer.notify("playerReceivedDamage", this);
                     break;
+                case PlayerRecentEventProto.UNRECOGNIZED:
+                    throw new Error("function: syncEvents | action: received unrecognized event");
             }
         });
     }

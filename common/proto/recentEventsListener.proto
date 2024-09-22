@@ -1,0 +1,13 @@
+syntax = "proto3";
+
+package recentEventsListener.v1;
+
+import "playerRecentEvent.proto";
+
+message RecentEventsListener {
+    map<string, PlayerRecentEvents> playerRecentEvents = 1;    
+}
+
+message PlayerRecentEvents {
+    repeated playerRecentEvent.v1.PlayerRecentEvent playerRecentEvents = 1;
+}

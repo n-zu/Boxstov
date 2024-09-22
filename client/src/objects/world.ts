@@ -12,6 +12,8 @@ import { WorldModel } from "../../../common/worldModel";
 import PlayerModel from "../../../common/playerModel";
 import { GameEvents } from "../../../common/types/events";
 import { Player as PlayerProto } from "../../../common/generated/player/player.js";
+import { PlayerRecentEvents, RecentEventsListener as RecentEventsListenerProto } from "../../../common/generated/recentEventsListener";
+import { PlayerRecentEvent as PlayerRecentEventProto } from "../../../common/generated/playerRecentEvent";
 import { Buffer } from "buffer";
 
 export class World extends WorldModel {
@@ -49,24 +51,24 @@ export class World extends WorldModel {
   }
 
   public sync(worldState: WorldState) {
+    const recentEvents = RecentEventsListenerProto.decode(Buffer.from(worldState.recentEvents, "base64"));
+
     worldState.players.forEach((playerState) => {
       const playerProto = PlayerProto.decode(Buffer.from(playerState, "base64"));
 
       const player = this.getOrCreatePlayer(playerProto.id) as Player;
-      player.sync(playerProto, this.getRecentEventsOfPlayer(playerProto.id, worldState));
+      var playerRecentEvents: PlayerRecentEventProto[];
+      if (recentEvents.playerRecentEvents[playerProto.id]) {
+        playerRecentEvents = recentEvents.playerRecentEvents[playerProto.id].playerRecentEvents;
+      } else {
+        playerRecentEvents = [];
+      }
+      player.sync(playerProto, playerRecentEvents);
     });
     (this.enemies as EnemyGroup).sync(worldState.enemies);
 
     (this.bullets as BulletGroup).sync(worldState.bullets);
     this.stats.sync(worldState.stats);
-  }
-
-  private getRecentEventsOfPlayer(id: string, state: WorldState) {
-    const recentEvents = state.recentEvents.playerRecentEvents[id];
-    if (recentEvents === undefined) {
-      return [];
-    }
-    return recentEvents;
   }
 
   private setupFirstPlayer(
