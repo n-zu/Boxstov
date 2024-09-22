@@ -51,8 +51,7 @@ export class Bullet extends BulletModel {
     }
   }
 
-  public sync(bulletStateStr: BulletState) {
-    const bulletState = BulletProto.decode(Buffer.from(bulletStateStr, "base64"));
+  public sync(bulletState: BulletProto) {
     
     this.setBase();
     if (bulletState.position) {

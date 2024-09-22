@@ -60,9 +60,18 @@ export type PlayerRecentEvent = "shoot" | "receive_damage";
 
 // Bullet
 
-export type BulletGroupState = BulletState[];
+export type BulletGroupState = string;
 
-export type BulletState = string;
+export type BulletState = {
+  position: {
+    x: number;
+    y: number;
+  };
+  rotation: number;
+  active: boolean;
+  visible: boolean;
+  origin: GunType;
+};
 
 // Recent events listener
 

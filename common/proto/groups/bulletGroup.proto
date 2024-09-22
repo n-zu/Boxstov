@@ -1,0 +1,9 @@
+syntax = "proto3";
+
+package bulletGroup.v1;
+
+import "bullet.proto";
+
+message BulletGroup {
+    repeated bullet.v1.Bullet bullets = 1;
+}

@@ -5,13 +5,17 @@ import PlayerModel from "../../../common/playerModel";
 import { GameEvents } from "../../../common/types/events";
 import { BulletGroupState } from "../../../common/types/state";
 import { Bullet } from "../objects/bullet";
+import { BulletGroup as BulletGroupProto } from "../../../common/generated/groups/bulletGroup";
+import { Buffer } from "buffer";
 
 export class BulletGroup extends BulletGroupModel {
   constructor(scene: Phaser.Scene, observer: Observer<GameEvents>) {
     super(scene, observer, (scene, observer) => new Bullet(scene, observer));
   }
   
-  public sync(bulletGroupState: BulletGroupState) {
+  public sync(bulletGroupStateStr: BulletGroupState) {
+    const bulletGroupState = BulletGroupProto.decode(Buffer.from(bulletGroupStateStr, "base64")).bullets;
+    
     bulletGroupState.forEach((bulletState, i) => {
       const bullet = this.children.entries[i] as Bullet;
       bullet.sync(bulletState);

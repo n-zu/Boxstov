@@ -7,7 +7,7 @@ import { gunNameToGunType } from "../../../common/utils.js";
 
 export class Bullet extends BulletModel {
   public getState(): BulletState {
-    const state = {
+    return {
       position: {
         x: this.x,
         y: this.y
@@ -17,8 +17,5 @@ export class Bullet extends BulletModel {
       visible: this.visible,
       origin: gunNameToGunType(this.origin?.getGunName() || "rifle"),
     };
-
-    const bytes = BulletProto.encode(state).finish();
-    return Buffer.from(bytes).toString("base64");
   }
 }
