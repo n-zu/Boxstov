@@ -10,6 +10,8 @@ import { Player } from "../player/player.js";
 import PlayerArsenal from "../player/playerArsenal.js";
 import RecentEventsListener from "./recentEventsListener.js";
 import WorldStats from "./worldStats.js";
+import { World as WorldProto } from "../../../common/generated/world/world.js";
+import { Buffer } from "buffer";
 
 const INACTIVE_THRESHOLD = 60000; // if 60 seconds pass, the player is considered inactive
 
@@ -51,13 +53,16 @@ export class World extends WorldModel {
   }
 
   public getState(): WorldState {
-    return {
+    const state = {
       players: (this.players as Player[]).map((player) => player.getState()),
       bullets: (this.bullets as BulletGroup).getState(),
       stats: this.stats.getState(),
       enemies: (this.enemies as EnemyGroup).getState(),
       recentEvents: this.recentEvents.getState(),
     };
+
+    const bytes = WorldProto.encode(state).finish();
+    return Buffer.from(bytes).toString("base64");
   }
 
   // Returns false if that id is already taken

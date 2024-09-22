@@ -13,10 +13,8 @@ export class BulletGroup extends BulletGroupModel {
     super(scene, observer, (scene, observer) => new Bullet(scene, observer));
   }
   
-  public sync(bulletGroupStateStr: BulletGroupState) {
-    const bulletGroupState = BulletGroupProto.decode(Buffer.from(bulletGroupStateStr, "base64")).bullets;
-    
-    bulletGroupState.forEach((bulletState, i) => {
+  public sync(bulletGroupState: BulletGroupProto) {    
+    bulletGroupState.bullets.forEach((bulletState, i) => {
       const bullet = this.children.entries[i] as Bullet;
       bullet.sync(bulletState);
     });

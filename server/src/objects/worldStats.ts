@@ -5,13 +5,10 @@ import { Buffer } from "buffer";
 
 export default class WorldStats extends WorldStatsModel {
   public getState(): WorldStatsState {
-    const state = {
+    return {
       kills: this.kills,
       killsPerPlayer: this.killsPerPlayer,
       rage: this.rage
     };
-
-    const bytes = WorldStatsProto.encode(state).finish();
-    return Buffer.from(bytes).toString("base64");
   }
 }

@@ -26,9 +26,7 @@ export class EnemyGroup extends EnemyGroupModel {
   }
 
 
-  public sync(enemyGroupProto: EnemyGroupState) {
-    const enemyGroupState = EnemyGroupProto.decode(Buffer.from(enemyGroupProto, "base64"));
-
+  public sync(enemyGroupState: EnemyGroupProto) {
     enemyGroupState.enemies.forEach((enemyState, i) => {
       const enemy = this.children.entries[i] as Enemy;
       enemy.sync(enemyState);

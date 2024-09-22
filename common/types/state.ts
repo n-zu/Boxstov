@@ -1,16 +1,17 @@
 // World
 
 import { GunType } from "../generated/player/playerArsenal";
+import { RecentEventsListener } from "../generated/recentEventsListener";
+import { DirectionEnum } from "../generated/utils/direction";
+import { Position } from "../generated/utils/position";
 
-export type WorldState = {
-  players: PlayerState[];
-  bullets: BulletGroupState;
-  enemies: EnemyGroupState;
-  stats: WorldStatsState;
-  recentEvents: RecentEventsListenerState;
+export type WorldState = string;
+
+export type WorldStatsState = {
+  kills: number;
+  killsPerPlayer: { [playerId: string]: number };
+  rage: number;
 };
-
-export type WorldStatsState = string;
 
 // Enemy
 
@@ -34,7 +35,11 @@ export type EnemyPhysiqueState = {
   attackRange: number;
 }
 
-export type EnemyGroupState = string;
+export type EnemyGroupState = {
+  enemies: EnemyState[];
+  timeUntilNextHorde: number;
+  spawnPoints: Position[];
+};
 
 export type SpawnPoint = {
   x: number;
@@ -43,7 +48,14 @@ export type SpawnPoint = {
 
 // Player
 
-export type PlayerState = string;
+export type PlayerState = {
+  id: string;
+  position: Position;
+  facing: DirectionEnum;
+  idle: boolean;
+  health: number;
+  arsenal: PlayerArsenalState;
+};
 
 export type PlayerArsenalState = {
   currentGun: GunType;
@@ -52,7 +64,7 @@ export type PlayerArsenalState = {
 
 // Bullet
 
-export type BulletGroupState = string;
+export type BulletGroupState = { bullets: BulletState[] };
 
 export type BulletState = {
   position: {
@@ -67,4 +79,4 @@ export type BulletState = {
 
 // Recent events listener
 
-export type RecentEventsListenerState = string;
+export type RecentEventsListenerState = RecentEventsListener;

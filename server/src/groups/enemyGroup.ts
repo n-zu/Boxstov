@@ -37,7 +37,6 @@ export class EnemyGroup extends EnemyGroupModel {
       spawnPoints: this.spawnPoints
     };
 
-    const bytes = EnemyGroupProto.encode(state).finish();
-    return Buffer.from(bytes).toString("base64");
+    return state;
   }
 }

@@ -12,12 +12,9 @@ export class BulletGroup extends BulletGroupModel {
   }
 
   public getState(): BulletGroupState {
-    const state = this.children.entries.map((bullet) => {
+    return { bullets: this.children.entries.map((bullet) => {
       const b = bullet as Bullet;
       return b.getState();
-    });
-
-    const bytes = BulletGroupProto.encode({ bullets: state }).finish();
-    return Buffer.from(bytes).toString("base64");
+    })}
   }
 }

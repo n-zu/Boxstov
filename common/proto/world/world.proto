@@ -1,0 +1,17 @@
+syntax = "proto3";
+
+package world.v1;
+
+import "player/player.proto";
+import "groups/bulletGroup.proto";
+import "groups/enemyGroup.proto";
+import "world/worldStats.proto";
+import "recentEventsListener.proto";
+
+message World {
+    repeated player.v1.Player players = 1;
+    bulletGroup.v1.BulletGroup bullets = 2;
+    enemyGroup.v1.EnemyGroup enemies = 3;
+    worldStats.v1.WorldStats stats = 4;
+    recentEventsListener.v1.RecentEventsListener recentEvents = 5;
+}

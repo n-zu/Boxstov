@@ -34,9 +34,7 @@ export default class RecentEventsListener {
         }
 
         this.clearRecentEvents();
-
-        const bytes = RecentEventsListenerProto.encode({ playerRecentEvents: state}).finish();
-        return Buffer.from(bytes).toString("base64");
+        return { playerRecentEvents: state};
     }
 
     private clearRecentEvents() {

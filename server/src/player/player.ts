@@ -15,7 +15,7 @@ export class Player extends PlayerModel {
     lastUpdate = Date.now();
 
     public getState(): PlayerState {
-        const state = {
+        return {
             id: this.id,
             position: {
                 x: this.x,
@@ -26,9 +26,6 @@ export class Player extends PlayerModel {
             health: this.health,
             arsenal: (this.arsenal as PlayerArsenal).getState(),
         };
-        const bytes = PlayerProto.encode(state).finish();
-
-        return Buffer.from(bytes).toString("base64");
     }
 
     public handleMessage(message: PlayerUpdate) {

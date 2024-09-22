@@ -14,6 +14,7 @@ import { GameEvents } from "../../../common/types/events";
 import { Player as PlayerProto } from "../../../common/generated/player/player.js";
 import { PlayerRecentEvents, RecentEventsListener as RecentEventsListenerProto } from "../../../common/generated/recentEventsListener";
 import { PlayerRecentEvent as PlayerRecentEventProto } from "../../../common/generated/playerRecentEvent";
+import { World as WorldProto } from "../../../common/generated/world/world";
 import { Buffer } from "buffer";
 
 export class World extends WorldModel {
@@ -50,25 +51,28 @@ export class World extends WorldModel {
     return new Player(id, scene, observer, position, this.gameMaster, bullets, local);
   }
 
-  public sync(worldState: WorldState) {
-    const recentEvents = RecentEventsListenerProto.decode(Buffer.from(worldState.recentEvents, "base64"));
+  public sync(worldStateStr: WorldState) {
+    const worldState = WorldProto.decode(Buffer.from(worldStateStr, "base64"));
 
     worldState.players.forEach((playerState) => {
-      const playerProto = PlayerProto.decode(Buffer.from(playerState, "base64"));
-
-      const player = this.getOrCreatePlayer(playerProto.id) as Player;
+      const player = this.getOrCreatePlayer(playerState.id) as Player;
       var playerRecentEvents: PlayerRecentEventProto[];
-      if (recentEvents.playerRecentEvents[playerProto.id]) {
-        playerRecentEvents = recentEvents.playerRecentEvents[playerProto.id].playerRecentEvents;
+      if (worldState.recentEvents && worldState.recentEvents.playerRecentEvents[playerState.id]) {
+        playerRecentEvents = worldState.recentEvents.playerRecentEvents[playerState.id].playerRecentEvents;
       } else {
         playerRecentEvents = [];
       }
-      player.sync(playerProto, playerRecentEvents);
+      player.sync(playerState, playerRecentEvents);
     });
-    (this.enemies as EnemyGroup).sync(worldState.enemies);
-
-    (this.bullets as BulletGroup).sync(worldState.bullets);
-    this.stats.sync(worldState.stats);
+    if (worldState.enemies) {
+      (this.enemies as EnemyGroup).sync(worldState.enemies);
+    }
+    if (worldState.bullets) {
+      (this.bullets as BulletGroup).sync(worldState.bullets);
+    }
+    if (worldState.stats) {
+      this.stats.sync(worldState.stats);
+    }
   }
 
   private setupFirstPlayer(
