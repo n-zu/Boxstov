@@ -11,5 +11,4 @@ node_modules
 dist
 docs
 build
-key.pem
-cert.pem
+*.pem
