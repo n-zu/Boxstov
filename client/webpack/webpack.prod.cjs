@@ -45,7 +45,7 @@ const prod = {
       ],
     }),
     new DefinePlugin({
-      "process.env.SERVER_URL": JSON.stringify("http://rostov-vps-1.duckdns.org"),
+      "process.env.SERVER_URL": JSON.stringify("https://rostov-vps-1.duckdns.org"),
     }),
   ],
 };
