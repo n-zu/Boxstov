@@ -1,11 +1,9 @@
-import { EnemyGroupState } from "../../../common/types/state";
 import { Enemy } from "../objects/enemy";
 import { Difficulty, EnemyGroupModel } from "../../../common/enemyGroupModel";
 import Observer from "../../../common/observer/observer";
 import { GameEvents } from "../../../common/types/events";
 import EnemyPhysique from "../objects/enemyPhysique";
 import { EnemyGroup as EnemyGroupProto } from "../../../common/generated/groups/enemyGroup.js";
-import { Buffer } from "buffer";
 
 export class EnemyGroup extends EnemyGroupModel {
   constructor(scene: Phaser.Scene, observer: Observer<GameEvents>, difficulty: Difficulty, spawnPoints: { x: number; y: number }[]) {

@@ -1,6 +1,5 @@
 import Observer from "./observer/observer";
 import { GameEvents } from "./types/events";
-import { WorldStatsState } from "./types/state";
 
 export default class WorldStatsModel {
   kills: number;

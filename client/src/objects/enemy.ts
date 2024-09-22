@@ -1,4 +1,3 @@
-import { EnemyState } from "../../../common/types/state";
 import Phaser from "phaser";
 import { EnemyModel } from "../../../common/enemy/enemyModel.js";
 import EnemyPhysiqueModel from "../../../common/enemy/enemyPhysiqueModel";

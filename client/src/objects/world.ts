@@ -11,8 +11,6 @@ import { Difficulty } from "../../../common/enemyGroupModel";
 import { WorldModel } from "../../../common/worldModel";
 import PlayerModel from "../../../common/playerModel";
 import { GameEvents } from "../../../common/types/events";
-import { Player as PlayerProto } from "../../../common/generated/player/player.js";
-import { PlayerRecentEvents, RecentEventsListener as RecentEventsListenerProto } from "../../../common/generated/recentEventsListener";
 import { PlayerRecentEvent as PlayerRecentEventProto } from "../../../common/generated/playerRecentEvent";
 import { PlayerUpdate as PlayerUpdateProto } from "../../../common/generated/messages/playerUpdate";
 import { World as WorldProto } from "../../../common/generated/world/world";

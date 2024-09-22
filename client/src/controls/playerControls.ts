@@ -1,13 +1,10 @@
 import CursorKeys = Phaser.Types.Input.Keyboard.CursorKeys;
 import InputPlugin = Phaser.Input.InputPlugin;
-import { Direction, UnitVector } from "../../../common/types/direction";
 import Observer from "../../../common/observer/observer.js";
 import { Player } from "../objects/player.js";
 import { GunName } from "../../../common/guns/gun";
 import { GameEvents } from "../../../common/types/events";
 import { DirectionEnum as DirectionEnumProto } from "../../../common/generated/utils/direction";
-
-const diagonalFactor = Math.sqrt(2) / 2;
 
 // zoom-in: MAX_ZOOM is closest to player, MIN_ZOOM furthest
 const MIN_ZOOM = 0.5;

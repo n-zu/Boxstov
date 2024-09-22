@@ -1,7 +1,6 @@
 import { Difficulty, EnemyGroupModel } from "../../../common/enemyGroupModel.js";
 import Observer from "../../../common/observer/observer.js";
 import { GameEvents } from "../../../common/types/events.js";
-import { PlayerUpdate } from "../../../common/types/messages.js";
 import { SpawnPoint, WorldState } from "../../../common/types/state.js";
 import { WorldModel } from "../../../common/worldModel.js";
 import { BulletGroup } from "../groups/bulletGroup.js";

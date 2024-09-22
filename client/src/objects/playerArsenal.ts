@@ -4,7 +4,6 @@ import PlayerArsenalModel from "../../../common/playerArsenalModel";
 import PlayerModel from "../../../common/playerModel";
 import { GameEvents } from "../../../common/types/events";
 import { PlayerArsenal as PlayerArsenalProto, GunType } from "../../../common/generated/player/playerArsenal";
-import { Buffer } from "buffer";
 
 export default class PlayerArsenal extends PlayerArsenalModel {
     constructor(bullets: BulletGroupModel, observer: Observer<GameEvents>) {

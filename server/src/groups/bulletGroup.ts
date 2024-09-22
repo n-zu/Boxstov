@@ -3,8 +3,6 @@ import Observer from "../../../common/observer/observer.js";
 import { GameEvents } from "../../../common/types/events.js";
 import { BulletGroupState } from "../../../common/types/state.js";
 import { Bullet } from "../objects/bullet.js";
-import { BulletGroup as BulletGroupProto } from "../../../common/generated/groups/bulletGroup.js";
-import { Buffer } from "buffer";
 
 export class BulletGroup extends BulletGroupModel {
   constructor(scene: Phaser.Scene, observer: Observer<GameEvents>) {

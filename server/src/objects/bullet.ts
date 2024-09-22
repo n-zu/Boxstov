@@ -1,8 +1,6 @@
 import "@geckos.io/phaser-on-nodejs";
 import { BulletModel } from "../../../common/bulletModel.js";
 import { BulletState } from "../../../common/types/state.js";
-import { Bullet as BulletProto } from "../../../common/generated/bullet.js";
-import { Buffer } from "buffer";
 import { gunNameToGunType } from "../../../common/utils.js";
 
 export class Bullet extends BulletModel {
