@@ -10,11 +10,7 @@ export type WorldState = {
   recentEvents: RecentEventsListenerState;
 };
 
-export type WorldStatsState = {
-  rage: number;
-  kills: number;
-  killsPerPlayer: Record<string, number>;
-}
+export type WorldStatsState = string;
 
 // Enemy
 
