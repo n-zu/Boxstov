@@ -1,0 +1,16 @@
+syntax = "proto3";
+
+package player.v1;
+
+import "utils/position.proto";
+import "utils/direction.proto";
+import "player/playerArsenal.proto";
+
+message Player {
+    string id = 1;
+    position.v1.Position position = 2;
+    direction.v1.DirectionEnum facing = 3;
+    bool idle = 4;
+    float health = 5;
+    playerArsenal.v1.PlayerArsenal arsenal = 6;
+}
