@@ -1,0 +1,8 @@
+syntax = "proto3";
+
+package position.v1;
+
+message Position {
+    float x = 1;
+    float y = 2;
+}

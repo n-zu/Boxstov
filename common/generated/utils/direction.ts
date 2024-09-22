@@ -2,7 +2,7 @@
 // versions:
 //   protoc-gen-ts_proto  v2.2.0
 //   protoc               v3.6.1
-// source: direction.proto
+// source: utils/direction.proto
 
 /* eslint-disable */
 import { BinaryReader, BinaryWriter } from "@bufbuild/protobuf/wire";
@@ -10,46 +10,41 @@ import { BinaryReader, BinaryWriter } from "@bufbuild/protobuf/wire";
 export const protobufPackage = "direction.v1";
 
 export enum DirectionEnum {
-  /** None - Hack needed because "up" was being sent as undefined, which was being interpreted as 'stop' by the server */
-  None = 0,
-  Up = 1,
-  Down = 2,
-  Left = 3,
-  Right = 4,
-  UpLeft = 5,
-  UpRight = 6,
-  DownLeft = 7,
-  DownRight = 8,
+  Up = 0,
+  Down = 1,
+  Left = 2,
+  Right = 3,
+  UpLeft = 4,
+  UpRight = 5,
+  DownLeft = 6,
+  DownRight = 7,
   UNRECOGNIZED = -1,
 }
 
 export function directionEnumFromJSON(object: any): DirectionEnum {
   switch (object) {
     case 0:
-    case "None":
-      return DirectionEnum.None;
-    case 1:
     case "Up":
       return DirectionEnum.Up;
-    case 2:
+    case 1:
     case "Down":
       return DirectionEnum.Down;
-    case 3:
+    case 2:
     case "Left":
       return DirectionEnum.Left;
-    case 4:
+    case 3:
     case "Right":
       return DirectionEnum.Right;
-    case 5:
+    case 4:
     case "UpLeft":
       return DirectionEnum.UpLeft;
-    case 6:
+    case 5:
     case "UpRight":
       return DirectionEnum.UpRight;
-    case 7:
+    case 6:
     case "DownLeft":
       return DirectionEnum.DownLeft;
-    case 8:
+    case 7:
     case "DownRight":
       return DirectionEnum.DownRight;
     case -1:
@@ -61,8 +56,6 @@ export function directionEnumFromJSON(object: any): DirectionEnum {
 
 export function directionEnumToJSON(object: DirectionEnum): string {
   switch (object) {
-    case DirectionEnum.None:
-      return "None";
     case DirectionEnum.Up:
       return "Up";
     case DirectionEnum.Down:
