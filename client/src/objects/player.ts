@@ -73,7 +73,6 @@ export class Player extends PlayerModel {
     }
 
     public sync(playerProto: PlayerProto, recentEvents: PlayerRecentEvent[]) {
-        console.log("Syncing player");
         if (playerProto.position) {
             this.syncPosition(playerProto.position.x, playerProto.position.y);
         }
@@ -154,7 +153,6 @@ export class Player extends PlayerModel {
     }
 
     private sendMovementMessage(direction?: DirectionEnumProto) {
-        console.log(`Player ${this.id} sendMovementMessage - direction: ${direction}`);
         if (direction === undefined) {
             this.gameMaster.send("player", {
                 id: this.id,

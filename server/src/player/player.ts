@@ -33,7 +33,6 @@ export class Player extends PlayerModel {
 
     public handleMessage(message: PlayerUpdate) {
         this.lastUpdate = Date.now();
-        console.log(`Player ${this.id} received message: ${JSON.stringify(message)}`);
         switch (message.type) {
             case "move":
                 if (message.direction) {

@@ -59,7 +59,6 @@ export default class PlayerModel extends Phaser.Physics.Arcade.Sprite {
     }
 
     public move(direction?: DirectionEnumProto) {
-        console.log(`Player ${this.id} moving to ${direction}`);
         if (direction === undefined) {
             this.stopMovement();
         } else {
