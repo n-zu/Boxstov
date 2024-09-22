@@ -8,6 +8,9 @@ import { GameEvents } from "../../../common/types/events";
 import { PlayerRecentEvent, PlayerState } from "../../../common/types/state";
 import { GameMaster } from "../gameMaster/gameMaster";
 import PlayerArsenal from "./playerArsenal";
+import { Direction as DirectionProto, DirectionEnum as DirectionEnumProto } from "../../../common/generated/direction.js";
+import { EncodedDirection } from "../../../common/types/messages";
+import { Buffer } from "buffer";
 
 const SYNC_DIFF_TOLERANCE = 0.001;
 
@@ -148,7 +151,43 @@ export class Player extends PlayerModel {
         this.gameMaster.send("player", {
             id: this.id,
             type: "move",
-            direction: direction
+            direction: this.encodeDirection(direction)
         });
+    }
+
+    private encodeDirection(direction?: Direction): EncodedDirection | undefined {
+        if (!direction) {
+            return undefined;
+        }
+
+        var dir: DirectionEnumProto;
+        switch (direction) {
+            case "up":
+                dir = DirectionEnumProto.Up;
+                break;
+            case "down":
+                dir = DirectionEnumProto.Down;
+                break;
+            case "left":
+                dir = DirectionEnumProto.Left;
+                break;
+            case "right":
+                dir = DirectionEnumProto.Right;
+                break;
+            case "upLeft":
+                dir = DirectionEnumProto.UpLeft;
+                break;
+            case "upRight":
+                dir = DirectionEnumProto.UpRight;
+                break;
+            case "downLeft":
+                dir = DirectionEnumProto.DownLeft;
+                break;
+            default:
+                dir = DirectionEnumProto.DownRight;
+                break;
+        }
+        const bytes = DirectionProto.encode({ direction: dir }).finish();
+        return Buffer.from(bytes).toString("base64");
     }
 }

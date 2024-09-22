@@ -34,8 +34,10 @@ export type PlayerUpdateBase<T extends PlayerUpdateType> = {
 };
 
 export type PlayerUpdateMove = {
-  direction?: Direction;
+  direction?: EncodedDirection;
 } & PlayerUpdateBase<"move">;
+
+export type EncodedDirection = string;
 
 export type PlayerUpdateSwitchGun = {
   gunName: string;

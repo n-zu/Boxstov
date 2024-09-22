@@ -1,0 +1,19 @@
+syntax = "proto3";
+
+package direction.v1;
+
+enum DirectionEnum {
+    None = 0; // Hack needed because "up" was being sent as undefined, which was being interpreted as 'stop' by the server
+    Up = 1;
+    Down = 2;
+    Left = 3;
+    Right = 4;
+    UpLeft = 5;
+    UpRight = 6;
+    DownLeft = 7;
+    DownRight = 8;
+}
+
+message Direction {
+    DirectionEnum direction = 1;
+}
