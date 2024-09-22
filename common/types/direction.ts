@@ -1,3 +1,5 @@
+import { DirectionEnum as DirectionEnumProto } from "../generated/utils/direction.js";
+
 export enum Direction {
   Up = "up",
   Down = "down",
@@ -27,6 +29,48 @@ export function directionToRadians(direction: Direction): number {
       return Math.PI * 0.75;
     case Direction.DownRight:
       return Math.PI * 0.25;
+  }
+}
+
+export function directionToProto(direction: Direction): DirectionEnumProto {
+  switch (direction) {
+    case Direction.Up:
+      return DirectionEnumProto.Up;
+    case Direction.Down:
+      return DirectionEnumProto.Down;
+    case Direction.Left:
+      return DirectionEnumProto.Left;
+    case Direction.Right:
+      return DirectionEnumProto.Right;
+    case Direction.UpLeft:
+      return DirectionEnumProto.UpLeft;
+    case Direction.UpRight:
+      return DirectionEnumProto.UpRight;
+    case Direction.DownLeft:
+      return DirectionEnumProto.DownLeft;
+    case Direction.DownRight:
+      return DirectionEnumProto.DownRight;
+  }
+}
+
+export function protoToDirection(direction: DirectionEnumProto): Direction {
+  switch (direction) {
+    case DirectionEnumProto.Up:
+      return Direction.Up;
+    case DirectionEnumProto.Down:
+      return Direction.Down;
+    case DirectionEnumProto.Left:
+      return Direction.Left;
+    case DirectionEnumProto.Right:
+      return Direction.Right;
+    case DirectionEnumProto.UpLeft:
+      return Direction.UpLeft;
+    case DirectionEnumProto.UpRight:
+      return Direction.UpRight;
+    case DirectionEnumProto.DownLeft:
+      return Direction.DownLeft;
+    default:
+      return Direction.DownRight;
   }
 }
 

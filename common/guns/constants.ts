@@ -1,35 +1,38 @@
-import { Direction } from "../types/direction.js";
+import { DirectionEnum as DirectionEnumProto } from "../generated/utils/direction.js";
 
 export const GUN_OFFSETS = {
     "moving": {
-        [Direction.Right]: [200, -95],
-        [Direction.Left]: [-170, -110],
-        [Direction.Up]: [10, -230],
-        [Direction.Down]: [-12, 50],
-        [Direction.UpLeft]: [-135, -185],
-        [Direction.UpRight]: [150, -180],
-        [Direction.DownLeft]: [-175, -10],
-        [Direction.DownRight]: [150, -10]
+        [DirectionEnumProto.Right]: [200, -95],
+        [DirectionEnumProto.Left]: [-170, -110],
+        [DirectionEnumProto.Up]: [10, -230],
+        [DirectionEnumProto.Down]: [-12, 50],
+        [DirectionEnumProto.UpLeft]: [-135, -185],
+        [DirectionEnumProto.UpRight]: [150, -180],
+        [DirectionEnumProto.DownLeft]: [-175, -10],
+        [DirectionEnumProto.DownRight]: [150, -10],
+        [DirectionEnumProto.UNRECOGNIZED]: [0, 0] // Should never be used
     },
     "idle": {
-        [Direction.Right]: [200, -105],
-        [Direction.Left]: [-170, -120],
-        [Direction.Up]: [15, -230],
-        [Direction.Down]: [-20, 40],
-        [Direction.UpLeft]: [-125, -195],
-        [Direction.UpRight]: [150, -180],
-        [Direction.DownLeft]: [-180, -30],
-        [Direction.DownRight]: [150, -20]
+        [DirectionEnumProto.Right]: [200, -105],
+        [DirectionEnumProto.Left]: [-170, -120],
+        [DirectionEnumProto.Up]: [15, -230],
+        [DirectionEnumProto.Down]: [-20, 40],
+        [DirectionEnumProto.UpLeft]: [-125, -195],
+        [DirectionEnumProto.UpRight]: [150, -180],
+        [DirectionEnumProto.DownLeft]: [-180, -30],
+        [DirectionEnumProto.DownRight]: [150, -20],
+        [DirectionEnumProto.UNRECOGNIZED]: [0, 0] // Should never be used
     }
 };
 
 export const GUN_ROTATIONS = {
-    [Direction.Right]: 0,
-    [Direction.Left]: Math.PI,
-    [Direction.Up]: -Math.PI / 2,
-    [Direction.Down]: Math.PI / 2,
-    [Direction.UpLeft]: -3 * Math.PI / 4 - 0.3,
-    [Direction.UpRight]: -Math.PI / 4 + 0.3,
-    [Direction.DownLeft]: 3 * Math.PI / 4 + 0.3,
-    [Direction.DownRight]: Math.PI / 4 - 0.3
+    [DirectionEnumProto.Right]: 0,
+    [DirectionEnumProto.Left]: Math.PI,
+    [DirectionEnumProto.Up]: -Math.PI / 2,
+    [DirectionEnumProto.Down]: Math.PI / 2,
+    [DirectionEnumProto.UpLeft]: -3 * Math.PI / 4 - 0.3,
+    [DirectionEnumProto.UpRight]: -Math.PI / 4 + 0.3,
+    [DirectionEnumProto.DownLeft]: 3 * Math.PI / 4 + 0.3,
+    [DirectionEnumProto.DownRight]: Math.PI / 4 - 0.3,
+    [DirectionEnumProto.UNRECOGNIZED]: 0 // Should never be used
 };

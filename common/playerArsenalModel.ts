@@ -6,7 +6,7 @@ import Rpg from "./guns/rpg.js";
 import Shotgun from "./guns/shotgun.js";
 import Observer from "./observer/observer.js";
 import PlayerModel from "./playerModel.js";
-import { Direction } from "./types/direction";
+import { DirectionEnum as DirectionEnumProto } from "./generated/utils/direction.js";
 import { GameEvents } from "./types/events.js";
 import { GunType } from "./generated/player/playerArsenal.js";
 
@@ -63,7 +63,7 @@ export default class PlayerArsenalModel {
         }
     }
 
-    private getGunOffset(direction: Direction, idle: boolean): [number, number] {
+    private getGunOffset(direction: DirectionEnumProto, idle: boolean): [number, number] {
         if (idle) {
             return GUN_OFFSETS.idle[direction] as [number, number];
         } else {

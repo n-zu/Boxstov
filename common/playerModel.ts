@@ -2,15 +2,17 @@ import config from "./config.js";
 import { GunName } from "./guns/gun";
 import Observer from "./observer/observer";
 import PlayerArsenalModel from "./playerArsenalModel.js";
-import { Direction, directionToRadians } from "./types/direction.js";
+import { directionToProto, directionToRadians, protoToDirection } from "./types/direction.js";
 import { GameEvents } from "./types/events";
+import { EncodedDirection } from "./types/messages.js";
+import { Direction as DirectionProto, DirectionEnum as DirectionEnumProto } from "./generated/utils/direction.js";
 import { polarToCartesian } from "./utils.js";
 
 export default class PlayerModel extends Phaser.Physics.Arcade.Sprite {
     id: string;
     scene: Phaser.Scene;
     observer: Observer<GameEvents>;
-    facing: Direction = Direction.Down;
+    facing: DirectionEnumProto = DirectionEnumProto.Down;
     idle: boolean = true;
 
     maxHealth: number;
@@ -56,13 +58,14 @@ export default class PlayerModel extends Phaser.Physics.Arcade.Sprite {
         this.arsenal.switchGun(this, gunName);
     }
 
-    public move(direction?: Direction) {
-        if (!direction) {
+    public move(direction?: DirectionEnumProto) {
+        console.log(`Player ${this.id} moving to ${direction}`);
+        if (direction === undefined) {
             this.stopMovement();
         } else {
             this.facing = direction;
             this.idle = false;
-            this.setVelocity(...polarToCartesian(directionToRadians(direction), config.player.speed));
+            this.setVelocity(...polarToCartesian(directionToRadians(protoToDirection(direction)), config.player.speed));
         }
         this.observer.notify("playerMoved", this);
     }
@@ -88,5 +91,13 @@ export default class PlayerModel extends Phaser.Physics.Arcade.Sprite {
     public stopMovement() {
         this.idle = true;
         this.setVelocity(0, 0);
+    }
+
+    protected decodeDirection(direction?: EncodedDirection): DirectionEnumProto | undefined {
+        if (direction === undefined) {
+            return undefined;
+        }
+        const dirJson = DirectionProto.decode(Buffer.from(direction, "base64"));
+        return dirJson.direction;
     }
 }

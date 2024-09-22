@@ -1,4 +1,4 @@
-import { Direction } from "./direction.js";
+import { Direction as DirectionProto } from "../generated/utils/direction.js";
 import { WorldState } from "./state.js";
 
 // Messages
@@ -34,7 +34,7 @@ export type PlayerUpdateBase<T extends PlayerUpdateType> = {
 };
 
 export type PlayerUpdateMove = {
-  direction?: EncodedDirection;
+  direction?: DirectionProto;
 } & PlayerUpdateBase<"move">;
 
 export type EncodedDirection = string;

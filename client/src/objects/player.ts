@@ -3,12 +3,13 @@ import { BulletGroupModel } from "../../../common/bulletGroupModel";
 import { GunName } from "../../../common/guns/gun";
 import Observer from "../../../common/observer/observer.js";
 import PlayerModel from "../../../common/playerModel";
-import { Direction } from "../../../common/types/direction";
 import { GameEvents } from "../../../common/types/events";
 import { PlayerRecentEvent, PlayerState } from "../../../common/types/state";
 import { GameMaster } from "../gameMaster/gameMaster";
 import PlayerArsenal from "./playerArsenal";
-import { Direction as DirectionProto, DirectionEnum as DirectionEnumProto } from "../../../common/generated/direction.js";
+import { Direction as DirectionProto, DirectionEnum as DirectionEnumProto } from "../../../common/generated/utils/direction.js";
+import { PlayerArsenal as PlayerArsenalProto } from "../../../common/generated/player/playerArsenal.js";
+import { Player as PlayerProto } from "../../../common/generated/player/player.js";
 import { EncodedDirection } from "../../../common/types/messages";
 import { Buffer } from "buffer";
 
@@ -34,13 +35,13 @@ export class Player extends PlayerModel {
         this.local = local;
     }
 
-    public sendMovementMessageIfNecessary(direction?: Direction) {
+    public sendMovementMessageIfNecessary(direction?: DirectionEnumProto) {
         if (this.idle) {
             if (direction) {
                 this.sendMovementMessage(direction);
             }
         } else {
-            if (!direction) {
+            if (direction === undefined) {
                 this.sendMovementMessage();
             } else if (this.facing !== direction) {
                 this.sendMovementMessage(direction);
@@ -71,26 +72,31 @@ export class Player extends PlayerModel {
         }
     }
 
-    public sync(state: PlayerState, recentEvents: PlayerRecentEvent[]) {
-        console.log("Syncing player");        
-        this.syncPosition(state.position.x, state.position.y);
+    public sync(playerProto: PlayerProto, recentEvents: PlayerRecentEvent[]) {
+        console.log("Syncing player");
+        if (playerProto.position) {
+            this.syncPosition(playerProto.position.x, playerProto.position.y);
+        }
+        
         this.syncEvents(recentEvents);
 
-        this.health = state.health;
+        this.health = playerProto.health;
         if (this.health <= 0) {
             this.observer.notify("playerDied", this);
         }
 
         if (this.local) {
-            this.notifyInconsistencies(state);
+            this.notifyInconsistencies(playerProto);
         } else {
-            if (state.idle) {
+            if (playerProto.idle) {
                 this.move();
             } else {
-                this.move(state.facing as Direction);
+                this.move(playerProto.facing);
             }
         }
-        (this.arsenal as PlayerArsenal).sync(this, state.playerArsenal);
+        if (playerProto.arsenal) {
+            (this.arsenal as PlayerArsenal).sync(this, playerProto.arsenal);
+        }
     }
 
     public getDistanceToCamera(): number {
@@ -106,8 +112,8 @@ export class Player extends PlayerModel {
         return Math.sqrt(Math.pow(camera.width, 2) + Math.pow(camera.height, 2));
     }
 
-    private notifyInconsistencies(state: PlayerState) {
-        if (this.facing !== state.facing) {
+    private notifyInconsistencies(state: PlayerProto) {
+        if (state.facing !== undefined && this.facing !== state.facing) {
             if (state.idle) {
                 this.sendMovementMessage();
             } else {
@@ -147,47 +153,20 @@ export class Player extends PlayerModel {
         }
     }
 
-    private sendMovementMessage(direction?: Direction) {
-        this.gameMaster.send("player", {
-            id: this.id,
-            type: "move",
-            direction: this.encodeDirection(direction)
-        });
-    }
-
-    private encodeDirection(direction?: Direction): EncodedDirection | undefined {
-        if (!direction) {
-            return undefined;
+    private sendMovementMessage(direction?: DirectionEnumProto) {
+        if (direction === undefined) {
+            console.log(`Player ${this.id} sendMovementMessage - undefined`);
+            this.gameMaster.send("player", {
+                id: this.id,
+                type: "move"
+            });
+        } else {
+            console.log(`Player ${this.id} sendMovementMessage - ${direction}`);
+            this.gameMaster.send("player", {
+                id: this.id,
+                type: "move",
+                direction: { direction: direction }
+            });
         }
-
-        var dir: DirectionEnumProto;
-        switch (direction) {
-            case "up":
-                dir = DirectionEnumProto.Up;
-                break;
-            case "down":
-                dir = DirectionEnumProto.Down;
-                break;
-            case "left":
-                dir = DirectionEnumProto.Left;
-                break;
-            case "right":
-                dir = DirectionEnumProto.Right;
-                break;
-            case "upLeft":
-                dir = DirectionEnumProto.UpLeft;
-                break;
-            case "upRight":
-                dir = DirectionEnumProto.UpRight;
-                break;
-            case "downLeft":
-                dir = DirectionEnumProto.DownLeft;
-                break;
-            default:
-                dir = DirectionEnumProto.DownRight;
-                break;
-        }
-        const bytes = DirectionProto.encode({ direction: dir }).finish();
-        return Buffer.from(bytes).toString("base64");
     }
 }

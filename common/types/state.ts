@@ -1,5 +1,6 @@
 // World
 
+import { GunType } from "../generated/player/playerArsenal";
 import { GunName } from "../guns/gun";
 
 export type WorldState = {
@@ -50,19 +51,12 @@ export type SpawnPoint = {
 
 // Player
 
-export type PlayerState = {
-  id: string;
-  position: {
-    x: number;
-    y: number;
-  };
-  health: number;
-  facing: string;
-  idle: boolean;
-  playerArsenal: PlayerArsenalState;
-};
+export type PlayerState = string;
 
-export type PlayerArsenalState = string;
+export type PlayerArsenalState = {
+  currentGun: GunType;
+  kills: number;
+};
 
 export type PlayerRecentEvent = "shoot" | "receive_damage";
 

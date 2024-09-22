@@ -4,8 +4,11 @@ import PlayerModel from "../../../common/playerModel.js";
 import { EncodedDirection, PlayerUpdate } from "../../../common/types/messages.js";
 import { PlayerState } from "../../../common/types/state.js";
 import PlayerArsenal from "./playerArsenal.js";
-import { Direction as DirectionProto, DirectionEnum as DirectionEnumProto } from "../../../common/generated/direction.js";
-import { Direction } from "../../../common/types/direction.js";
+import { Direction as DirectionProto, DirectionEnum as DirectionEnumProto } from "../../../common/generated/utils/direction.js";
+import { Player as PlayerProto } from "../../../common/generated/player/player.js";
+
+import { Direction, directionToProto, protoToDirection } from "../../../common/types/direction.js";
+
 import { Buffer } from "buffer";
 
 export class Player extends PlayerModel {
@@ -21,9 +24,11 @@ export class Player extends PlayerModel {
             facing: this.facing,
             idle: this.idle,
             health: this.health,
-            playerArsenal: (this.arsenal as PlayerArsenal).getState(),
+            arsenal: (this.arsenal as PlayerArsenal).getState(),
         };
-        return state;
+        const bytes = PlayerProto.encode(state).finish();
+
+        return Buffer.from(bytes).toString("base64");
     }
 
     public handleMessage(message: PlayerUpdate) {
@@ -31,7 +36,11 @@ export class Player extends PlayerModel {
         console.log(`Player ${this.id} received message: ${JSON.stringify(message)}`);
         switch (message.type) {
             case "move":
-                this.move(this.decodeDirection(message.direction));
+                if (message.direction) {
+                    this.move(message.direction.direction);
+                } else {
+                    this.move();
+                }
                 break;
             case "shoot":
                 this.shoot();
@@ -42,30 +51,25 @@ export class Player extends PlayerModel {
         }
     }
 
-    private decodeDirection(direction?: EncodedDirection): Direction | undefined {
-        if (!direction) {
-            return undefined;
-        }
-        const dirJson = DirectionProto.decode(Buffer.from(direction, "base64"));
-        switch (dirJson.direction) {
-            case DirectionEnumProto.Up:
-                return Direction.Up;
-            case DirectionEnumProto.Down:
-                return Direction.Down;
-            case DirectionEnumProto.Left:
-                return Direction.Left;
-            case DirectionEnumProto.Right:
-                return Direction.Right;
-            case DirectionEnumProto.UpLeft:
-                return Direction.UpLeft;
-            case DirectionEnumProto.UpRight:
-                return Direction.UpRight;
-            case DirectionEnumProto.DownLeft:
-                return Direction.DownLeft;
-            case DirectionEnumProto.DownRight:
-                return Direction.DownRight;
-            default:
-                return undefined;
+    private directionToProto(direction: Direction): DirectionEnumProto {
+        switch (direction) {
+            case Direction.Up:
+                return DirectionEnumProto.Up;
+            case Direction.Down:
+                return DirectionEnumProto.Down;
+            case Direction.Left:
+                return DirectionEnumProto.Left;
+            case Direction.Right:
+                return DirectionEnumProto.Right;
+            case Direction.UpLeft:
+                return DirectionEnumProto.UpLeft;
+            case Direction.UpRight:
+                return DirectionEnumProto.UpRight;
+            case Direction.DownLeft:
+                return DirectionEnumProto.DownLeft;
+            case Direction.DownRight:
+                return DirectionEnumProto.DownRight;
         }
     }
+
 }

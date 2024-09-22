@@ -11,6 +11,8 @@ import { Difficulty } from "../../../common/enemyGroupModel";
 import { WorldModel } from "../../../common/worldModel";
 import PlayerModel from "../../../common/playerModel";
 import { GameEvents } from "../../../common/types/events";
+import { Player as PlayerProto } from "../../../common/generated/player/player.js";
+import { Buffer } from "buffer";
 
 export class World extends WorldModel {
   stats: WorldStats;
@@ -48,8 +50,10 @@ export class World extends WorldModel {
 
   public sync(worldState: WorldState) {
     worldState.players.forEach((playerState) => {
-      const player = this.getOrCreatePlayer(playerState.id) as Player;
-      player.sync(playerState, this.getRecentEventsOfPlayer(playerState.id, worldState));
+      const playerProto = PlayerProto.decode(Buffer.from(playerState, "base64"));
+
+      const player = this.getOrCreatePlayer(playerProto.id) as Player;
+      player.sync(playerProto, this.getRecentEventsOfPlayer(playerProto.id, worldState));
     });
     (this.enemies as EnemyGroup).sync(worldState.enemies);
 

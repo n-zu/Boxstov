@@ -5,6 +5,7 @@ import Observer from "../../../common/observer/observer.js";
 import { Player } from "../objects/player.js";
 import { GunName } from "../../../common/guns/gun";
 import { GameEvents } from "../../../common/types/events";
+import { DirectionEnum as DirectionEnumProto } from "../../../common/generated/utils/direction";
 
 const diagonalFactor = Math.sqrt(2) / 2;
 
@@ -87,7 +88,7 @@ export class PlayerControls {
     return this.cursorKeys.space.isDown || this.input.activePointer.isDown;
   }
 
-  private getKeysDirection(): Direction | undefined {
+  private getKeysDirection(): DirectionEnumProto | undefined {
     if (!document.hasFocus()) return undefined;
 
     let horizontal = +this.right() - +this.left();
@@ -95,21 +96,21 @@ export class PlayerControls {
     if (horizontal === 0 && vertical === 0) return undefined;
 
     if (horizontal === 1 && vertical === 1) {
-      return Direction.DownRight;
+      return DirectionEnumProto.DownRight;
     } else if (horizontal === 1 && vertical === -1) {
-      return Direction.UpRight;
+      return DirectionEnumProto.UpRight;
     } else if (horizontal === -1 && vertical === 1) {
-      return Direction.DownLeft;
+      return DirectionEnumProto.DownLeft;
     } else if (horizontal === -1 && vertical === -1) {
-      return Direction.UpLeft;
+      return DirectionEnumProto.UpLeft;
     } else if (horizontal === 1) {
-      return Direction.Right;
+      return DirectionEnumProto.Right;
     } else if (horizontal === -1) {
-      return Direction.Left;
+      return DirectionEnumProto.Left;
     } else if (vertical === 1) {
-      return Direction.Down;
+      return DirectionEnumProto.Down;
     } else if (vertical === -1) {
-      return Direction.Up;
+      return DirectionEnumProto.Up;
     } else {
       return undefined;
     }
