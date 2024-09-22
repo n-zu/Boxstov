@@ -62,10 +62,7 @@ export type PlayerState = {
   playerArsenal: PlayerArsenalState;
 };
 
-export type PlayerArsenalState = {
-  kills: number;
-  currentGun: GunName;
-}
+export type PlayerArsenalState = string;
 
 export type PlayerRecentEvent = "shoot" | "receive_damage";
 

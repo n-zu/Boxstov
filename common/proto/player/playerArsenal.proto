@@ -1,0 +1,14 @@
+syntax = "proto3";
+
+package playerArsenal.v1;
+
+enum GunType {
+    Rifle = 0;
+    Shotgun = 1;
+    Rpg = 2;
+}
+
+message PlayerArsenal {
+    GunType currentGun = 1;
+    uint32 kills = 2;
+}

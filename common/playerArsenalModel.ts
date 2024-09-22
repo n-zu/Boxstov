@@ -8,6 +8,7 @@ import Observer from "./observer/observer.js";
 import PlayerModel from "./playerModel.js";
 import { Direction } from "./types/direction";
 import { GameEvents } from "./types/events.js";
+import { GunType } from "./generated/player/playerArsenal.js";
 
 export default class PlayerArsenalModel {
     kills: number;
@@ -76,5 +77,16 @@ export default class PlayerArsenalModel {
 
     private updateLastTimeShoot() {
         this.lastTimeShoot = Date.now();
+    }
+
+    protected getCurrentGunType(): GunType {
+        switch (this.currentGun.getGunName()) {
+            case "rifle":
+                return GunType.Rifle;
+            case "shotgun":
+                return GunType.Shotgun;
+            case "rpg":
+                return GunType.Rpg;
+        }
     }
 }

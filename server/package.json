@@ -19,6 +19,7 @@
     "@bufbuild/protobuf": "^2.0.0",
     "@geckos.io/phaser-on-nodejs": "~1.2.7",
     "@geckos.io/server": "~2.2.3",
+    "buffer": "^6.0.3",
     "dotenv": "~16.0.3",
     "express": "~4.18.2",
     "install": "^0.13.0",

@@ -20,6 +20,7 @@
   "dependencies": {
     "@bufbuild/protobuf": "^2.0.0",
     "@geckos.io/client": "^2.2.3",
+    "buffer": "^6.0.3",
     "copy-webpack-plugin": "^11.0.0",
     "phaser": "^3.55.2"
   },

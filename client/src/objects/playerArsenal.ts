@@ -4,8 +4,8 @@ import PlayerArsenalModel from "../../../common/playerArsenalModel";
 import PlayerModel from "../../../common/playerModel";
 import { GameEvents } from "../../../common/types/events";
 import { PlayerArsenalState } from "../../../common/types/state";
-import { playAnimation } from "../scenes/mainScene";
-import { AnimationSuffix } from "../types/animation";
+import { PlayerArsenal as PlayerArsenalProto, GunType } from "../../../common/generated/player/playerArsenal";
+import { Buffer } from "buffer";
 
 export default class PlayerArsenal extends PlayerArsenalModel {
     constructor(bullets: BulletGroupModel, observer: Observer<GameEvents>) {
@@ -13,20 +13,22 @@ export default class PlayerArsenal extends PlayerArsenalModel {
     }
 
     public sync(player: PlayerModel, state: PlayerArsenalState) {
-        if (this.currentGun.getGunName() !== state.currentGun) {
+        const playerArsenalProto = PlayerArsenalProto.decode(Buffer.from(state, "base64"));
+
+        if (this.getCurrentGunType() !== playerArsenalProto.currentGun) {
             this.observer.notify("playerSwitchedGun", player);
-            switch (state.currentGun) {
-                case "rifle":
+            switch (playerArsenalProto.currentGun) {
+                case GunType.Rifle:
                     this.currentGun = this.guns[0];
                     break;
-                case "shotgun":
+                case GunType.Shotgun:
                     this.currentGun = this.guns[1];
                     break;
-                case "rpg":
+                case GunType.Rpg:
                     this.currentGun = this.guns[2];
                     break;
             }
         }
-        this.kills = state.kills;
+        this.kills = playerArsenalProto.kills;
     }
 }
