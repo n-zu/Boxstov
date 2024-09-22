@@ -1,0 +1,6 @@
+syntax = "proto3";
+
+package messages.v1;
+
+message Stopmessage {
+}

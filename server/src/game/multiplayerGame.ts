@@ -8,6 +8,8 @@ import { GameMaster } from "../gameMaster/gameMaster.js";
 import { World } from "../objects/world.js";
 import { phaserGameConfig } from "../phaserGameConfig.js";
 import MainScene from "../scenes/mainScene.js";
+import { PlayerUpdate as PlayerUpdateProto } from "../../../common/generated/messages/playerUpdate.js";
+import { Buffer } from "buffer";
 
 export class MultiplayerGame extends Phaser.Game {
   mainScene: MainScene;
@@ -45,7 +47,8 @@ export class MultiplayerGame extends Phaser.Game {
 
   private setupGameMaster(gameMaster: GameMaster) {
     gameMaster.addAction("player", (data: PlayerUpdate) => {
-      this.world.updatePlayer(data);
+      const playerUpdate = PlayerUpdateProto.decode(Buffer.from(data, "base64"));
+      this.world.updatePlayer(playerUpdate);
     });
   }
 }

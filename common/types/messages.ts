@@ -55,7 +55,7 @@ export type PlayerUpdateFor<T extends PlayerUpdateType> = T extends "move"
   ? PlayerUpdateShoot
   : PlayerUpdateBase<T>;
 
-export type PlayerUpdate = PlayerUpdateFor<PlayerUpdateType>;
+export type PlayerUpdate = string;
 
 // Enemy
 

@@ -1,0 +1,9 @@
+syntax = "proto3";
+
+package messages.v1;
+
+import "utils/direction.proto";
+
+message MovementMessage {
+    direction.v1.Direction direction = 1;
+}

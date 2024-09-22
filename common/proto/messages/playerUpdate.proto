@@ -1,0 +1,20 @@
+syntax = "proto3";
+
+package messages.v1;
+
+import "messages/movementMessage.proto";
+import "messages/switchGunMessage.proto";
+import "messages/shootMessage.proto";
+import "messages/stopMessage.proto";
+import "messages/pingMessage.proto";
+
+message PlayerUpdate {
+    string playerId = 1;
+    oneof data {
+        MovementMessage movement = 2;
+        SwitchGunMessage switchGun = 3;
+        ShootMessage shoot = 4;
+        Stopmessage stop = 5;
+        PingMessage ping = 6;
+    }
+}

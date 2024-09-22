@@ -14,6 +14,7 @@ import { GameEvents } from "../../../common/types/events";
 import { Player as PlayerProto } from "../../../common/generated/player/player.js";
 import { PlayerRecentEvents, RecentEventsListener as RecentEventsListenerProto } from "../../../common/generated/recentEventsListener";
 import { PlayerRecentEvent as PlayerRecentEventProto } from "../../../common/generated/playerRecentEvent";
+import { PlayerUpdate as PlayerUpdateProto } from "../../../common/generated/messages/playerUpdate";
 import { World as WorldProto } from "../../../common/generated/world/world";
 import { Buffer } from "buffer";
 
@@ -92,10 +93,11 @@ export class World extends WorldModel {
     this.playerControls = new PlayerControls(this.scene, player, this.observer);
 
     setInterval(() => {
-      this.gameMaster.send("player", {
-        id: username,
-        type: "ping"
-      });
+      const message = PlayerUpdateProto.encode({
+        playerId: username,
+        ping: {}
+      }).finish();
+      this.gameMaster.send("player", Buffer.from(message).toString("base64"));
     }, 500);
 
     this.players = [player];

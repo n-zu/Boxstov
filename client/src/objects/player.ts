@@ -8,11 +8,13 @@ import { PlayerState } from "../../../common/types/state";
 import { GameMaster } from "../gameMaster/gameMaster";
 import PlayerArsenal from "./playerArsenal";
 import { Direction as DirectionProto, DirectionEnum as DirectionEnumProto } from "../../../common/generated/utils/direction.js";
-import { PlayerArsenal as PlayerArsenalProto } from "../../../common/generated/player/playerArsenal.js";
+import { GunType } from "../../../common/generated/player/playerArsenal.js";
 import { Player as PlayerProto } from "../../../common/generated/player/player.js";
 import { PlayerRecentEvent as PlayerRecentEventProto } from "../../../common/generated/playerRecentEvent.js";
 import { EncodedDirection } from "../../../common/types/messages";
+import { PlayerUpdate as PlayerUpdateProto } from "../../../common/generated/messages/playerUpdate.js";
 import { Buffer } from "buffer";
+import { gunNameToGunType } from "../../../common/utils";
 
 const SYNC_DIFF_TOLERANCE = 0.001;
 
@@ -52,11 +54,11 @@ export class Player extends PlayerModel {
 
     public shoot(): boolean {
         if (super.shoot()) {
-            this.gameMaster.send("player", {
-                id: this.id,
-                type: "shoot",
-                gunName: this.arsenal.currentGun.getGunName()
-            });
+            const message = PlayerUpdateProto.encode({
+                playerId: this.id,
+                shoot: { gunType: gunNameToGunType(this.arsenal.currentGun.getGunName()) }
+            }).finish();
+            this.gameMaster.send("player", Buffer.from(message).toString("base64"));
             return true;
         }
         return false;
@@ -65,11 +67,12 @@ export class Player extends PlayerModel {
     public switchGun(gunName: GunName): void {
         super.switchGun(gunName);
         if (this.local) {
-            this.gameMaster.send("player", {
-                id: this.id,
-                type: "switch_gun",
-                gunName
-            });
+            const message = PlayerUpdateProto.encode({
+                playerId: this.id,
+                switchGun: { gunType: gunNameToGunType(gunName) }
+            }).finish();
+            
+            this.gameMaster.send("player", Buffer.from(message).toString("base64"));
         }
     }
 
@@ -156,17 +159,18 @@ export class Player extends PlayerModel {
     }
 
     private sendMovementMessage(direction?: DirectionEnumProto) {
+        var message: Uint8Array;
         if (direction === undefined) {
-            this.gameMaster.send("player", {
-                id: this.id,
-                type: "move"
-            });
+            message = PlayerUpdateProto.encode({
+                playerId: this.id,
+                stop: {}
+            }).finish();
         } else {
-            this.gameMaster.send("player", {
-                id: this.id,
-                type: "move",
-                direction: { direction: direction }
-            });
+            message = PlayerUpdateProto.encode({
+                playerId: this.id,
+                movement: { direction: { direction: direction } }
+            }).finish();
         }
+        this.gameMaster.send("player", Buffer.from(message).toString("base64"));
     }
 }

@@ -11,6 +11,7 @@ import PlayerArsenal from "../player/playerArsenal.js";
 import RecentEventsListener from "./recentEventsListener.js";
 import WorldStats from "./worldStats.js";
 import { World as WorldProto } from "../../../common/generated/world/world.js";
+import { PlayerUpdate as PlayerUpdateProto } from "../../../common/generated/messages/playerUpdate.js";
 import { Buffer } from "buffer";
 
 const INACTIVE_THRESHOLD = 60000; // if 60 seconds pass, the player is considered inactive
@@ -79,9 +80,9 @@ export class World extends WorldModel {
     return true;
   }
 
-  public updatePlayer(data: PlayerUpdate) {
-    const player = this.getPlayer(data.id);
-    player?.handleMessage(data);
+  public updatePlayer(playerUpdate: PlayerUpdateProto) {
+    const player = this.getPlayer(playerUpdate.playerId);
+    player?.handleMessage(playerUpdate);
   }
 
   private getPlayer(id: string): Player | undefined {

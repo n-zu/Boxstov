@@ -1,0 +1,9 @@
+syntax = "proto3";
+
+package messages.v1;
+
+import "player/playerArsenal.proto";
+
+message ShootMessage {
+    playerArsenal.v1.GunType gunType = 1;
+}
