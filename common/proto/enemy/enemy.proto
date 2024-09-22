@@ -1,0 +1,15 @@
+syntax = "proto3";
+
+package enemy.v1;
+
+import "enemy/enemyPhysique.proto";
+import "utils/position.proto";
+
+message Enemy {
+    position.v1.Position position = 1;
+    enemyPhysique.v1.EnemyPhysique physique = 2;
+    bool dead = 3;
+    string action = 4;
+    bool spawned = 5;
+    float angle = 6;    
+}

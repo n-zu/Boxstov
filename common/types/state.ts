@@ -19,16 +19,7 @@ export type WorldStatsState = {
 
 // Enemy
 
-export type EnemyState = {
-  position: {
-    x: number;
-    y: number;
-  };
-  angle: number;
-  physique: EnemyPhysiqueState;
-  spawned: boolean;
-  action: string;
-};
+export type EnemyState = string;
 
 export type EnemyPhysiqueState = {
   maxHealth: number;

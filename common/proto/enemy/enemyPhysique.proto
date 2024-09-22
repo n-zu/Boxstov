@@ -1,0 +1,11 @@
+syntax = "proto3";
+
+package enemyPhysique.v1;
+
+message EnemyPhysique {
+    float maxHealth = 1;
+    float health = 2;
+    int32 strength = 3;
+    int32 speed = 4;
+    int32 attackRange = 5;
+}

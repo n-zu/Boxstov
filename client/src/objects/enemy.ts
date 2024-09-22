@@ -6,6 +6,7 @@ import Observer from "../../../common/observer/observer";
 import EnemyPhysique from "./enemyPhysique";
 import { polarToCartesian } from "../../../common/utils";
 import { GameEvents } from "../../../common/types/events";
+import { Enemy as EnemyProto } from "../../../common/generated/enemy/enemy";
 
 export class Enemy extends EnemyModel {
   action: string = "";
@@ -33,18 +34,23 @@ export class Enemy extends EnemyModel {
     return Math.sqrt(Math.pow(camera.width, 2) + Math.pow(camera.height, 2));
   }
 
-  public sync(state: EnemyState) {
+  public sync(state: EnemyProto) {
     this.action = state.action;
     this.move(state);
-    (this.physique as EnemyPhysique).sync(this, state.physique);
     this.action = state.action;
     
     this.visible = state.spawned;
     this.active = state.spawned;
-    this.body.enable = state.physique.health > 0;
+    if (state.physique) {
+      this.body.enable = state.physique.health > 0;
+      (this.physique as EnemyPhysique).sync(this, state.physique);
+    }
   }
 
-  private move(state: EnemyState) {
+  private move(state: EnemyProto) {
+    if (!state.position) {
+      return;
+    }
     this.setPosition(state.position.x, state.position.y);
     this.setDepth(state.position.y);
 

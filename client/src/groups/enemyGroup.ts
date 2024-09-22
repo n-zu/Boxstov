@@ -4,6 +4,7 @@ import { Difficulty, EnemyGroupModel } from "../../../common/enemyGroupModel";
 import Observer from "../../../common/observer/observer";
 import { GameEvents } from "../../../common/types/events";
 import EnemyPhysique from "../objects/enemyPhysique";
+import { Enemy as EnemyProto } from "../../../common/generated/enemy/enemy";
 
 export class EnemyGroup extends EnemyGroupModel {
   constructor(scene: Phaser.Scene, observer: Observer<GameEvents>, difficulty: Difficulty, spawnPoints: { x: number; y: number }[]) {
@@ -25,8 +26,9 @@ export class EnemyGroup extends EnemyGroupModel {
 
 
   public sync(enemyGroupState: EnemyGroupState) {
-    enemyGroupState.enemies.forEach((enemyState, i) => {
+    enemyGroupState.enemies.forEach((enemyStateStr, i) => {
       const enemy = this.children.entries[i] as Enemy;
+      const enemyState = EnemyProto.decode(Buffer.from(enemyStateStr, "base64"));
       enemy.sync(enemyState);
     });
   }
