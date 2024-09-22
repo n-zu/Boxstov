@@ -4,6 +4,8 @@ import { GameEvents } from "../../../common/types/events.js";
 import { EnemyGroupState, EnemyState } from "../../../common/types/state.js";
 import Enemy from "../objects/enemy.js";
 import EnemyPhysique from "../objects/enemyPhysique.js";
+import { EnemyGroup as EnemyGroupProto } from "../../../common/generated/groups/enemyGroup.js";
+import { Buffer } from "buffer";
 
 export class EnemyGroup extends EnemyGroupModel {
   constructor(scene: Phaser.Scene, observer: Observer<GameEvents>, difficulty: Difficulty, spawnPoints: { x: number; y: number }[]) {
@@ -28,10 +30,14 @@ export class EnemyGroup extends EnemyGroupModel {
       const e = enemy as Enemy;
       return e.getState();
     });
-    return {
+
+    const state = {
       enemies: enemyInfo,
       timeUntilNextHorde: this.timeUntilNextHorde,
       spawnPoints: this.spawnPoints
     };
+
+    const bytes = EnemyGroupProto.encode(state).finish();
+    return Buffer.from(bytes).toString("base64");
   }
 }

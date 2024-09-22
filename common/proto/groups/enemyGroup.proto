@@ -1,0 +1,12 @@
+syntax = "proto3";
+
+package enemyGroup.v1;
+
+import "enemy/enemy.proto";
+import "utils/position.proto";
+
+message EnemyGroup {
+    repeated enemy.v1.Enemy enemies = 1;
+    uint32 timeUntilNextHorde = 2;
+    repeated position.v1.Position spawnPoints = 3;
+}

@@ -19,7 +19,17 @@ export type WorldStatsState = {
 
 // Enemy
 
-export type EnemyState = string;
+export type EnemyState = {
+  position: {
+    x: number;
+    y: number;
+  };
+  physique: EnemyPhysiqueState;
+  dead: boolean;
+  action: string;
+  spawned: boolean;
+  angle: number;
+};
 
 export type EnemyPhysiqueState = {
   maxHealth: number;
@@ -29,11 +39,7 @@ export type EnemyPhysiqueState = {
   attackRange: number;
 }
 
-export type EnemyGroupState = {
-  enemies: EnemyState[];
-  timeUntilNextHorde: number;
-  spawnPoints: SpawnPoint[];
-};
+export type EnemyGroupState = string;
 
 export type SpawnPoint = {
   x: number;
