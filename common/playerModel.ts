@@ -2,7 +2,7 @@ import config from "./config.js";
 import { GunName } from "./guns/gun";
 import Observer from "./observer/observer";
 import PlayerArsenalModel from "./playerArsenalModel.js";
-import { directionToRadians, protoToDirection } from "./types/direction.js";
+import { directionToRadians } from "./types/direction.js";
 import { GameEvents } from "./types/events";
 import { EncodedDirection } from "./types/messages.js";
 import { Direction as DirectionProto, DirectionEnum as DirectionEnumProto } from "./generated/utils/direction.js";
@@ -64,7 +64,7 @@ export default class PlayerModel extends Phaser.Physics.Arcade.Sprite {
         } else {
             this.facing = direction;
             this.idle = false;
-            this.setVelocity(...polarToCartesian(directionToRadians(protoToDirection(direction)), config.player.speed));
+            this.setVelocity(...polarToCartesian(directionToRadians(direction), config.player.speed));
         }
         this.observer.notify("playerMoved", this);
     }

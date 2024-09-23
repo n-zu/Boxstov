@@ -2,7 +2,7 @@ import config from "../../../common/config";
 import { EnemyModel } from "../../../common/enemy/enemyModel";
 import Observer from "../../../common/observer/observer";
 import PlayerModel from "../../../common/playerModel";
-import { directionToProto, protoToDirection, roundAngleToDirection } from "../../../common/types/direction";
+import { roundAngleToDirection } from "../../../common/types/direction";
 import { GameEvents } from "../../../common/types/events";
 import { Player } from "../objects/player";
 import { playAnimation } from "../scenes/mainScene";
@@ -31,7 +31,7 @@ export default class AnimationPlayer {
         playAnimation(
             player,
             player.arsenal.currentGun.getGunName(),
-            protoToDirection(player.facing),
+            player.facing,
             player.idle ? AnimationSuffix.Idle : AnimationSuffix.Run
         );
     }

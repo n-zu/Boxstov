@@ -1,4 +1,3 @@
-import { Direction } from "../../../common/types/direction";
 import { AnimationActor, AnimationSuffix } from "../types/animation";
 import { World } from "../objects/world";
 import { loadGameAssets } from "./load";
@@ -13,18 +12,18 @@ import Sprite = Phaser.GameObjects.Sprite;
 import { GunName } from "../../../common/guns/gun";
 import { GameEvents } from "../../../common/types/events";
 import AnimationPlayer from "../animations/animationPlayer";
-import { World as WorldProto } from "../../../common/generated/world/world";
+import { DirectionEnum, directionEnumToJSON } from "../../../common/generated/utils/direction";
 
 export function playAnimation(
   sprite: Sprite,
   actor: AnimationActor | GunName,
-  direction: Direction,
+  direction: DirectionEnum,
   suffix: AnimationSuffix,
   startFrame?: number
 ) {
   sprite.anims.play(
     {
-      key: `${actor}-${direction}-${suffix}`,
+      key: `${actor}-${directionEnumToJSON(direction).toLowerCase()}-${suffix}`,
       startFrame: startFrame || 0
     },
     true

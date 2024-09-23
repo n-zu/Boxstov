@@ -1,10 +1,10 @@
 // No importar otras escenas de manera estática, la idea de este script es que
 // cargue rápido asi se muestra la pantalla de carga rápido
 import Phaser from "phaser";
-import { Direction } from "../../../common/types/direction";
 import { GuestMaster } from "../gameMaster/guestMaster";
 import { AnimationActor, AnimationSuffix } from "../types/animation";
 import { GunName } from "../../../common/guns/gun";
+import { DirectionEnum as DirectionEnumProto, directionEnumToJSON } from "../../../common/generated/utils/direction";
 
 // Imports de las escenas, se hacen desde acá para que se carguen durante la
 // pantalla de carga y ya queden cacheadas para después.
@@ -151,14 +151,14 @@ export default class LoadScene extends Phaser.Scene {
     });
 
     const directions = [
-      Direction.Down,
-      Direction.DownRight,
-      Direction.Right,
-      Direction.UpRight,
-      Direction.Up,
-      Direction.UpLeft,
-      Direction.Left,
-      Direction.DownLeft,
+      DirectionEnumProto.Down,
+      DirectionEnumProto.DownRight,
+      DirectionEnumProto.Right,
+      DirectionEnumProto.UpRight,
+      DirectionEnumProto.Up,
+      DirectionEnumProto.UpLeft,
+      DirectionEnumProto.Left,
+      DirectionEnumProto.DownLeft,
     ];
 
     directions.forEach((direction, index) => {
@@ -206,14 +206,14 @@ export default class LoadScene extends Phaser.Scene {
     });
 
     const directionsDie = [
-      Direction.Left,
-      Direction.DownLeft,
-      Direction.Down,
-      Direction.DownRight,
-      Direction.Right,
-      Direction.UpRight,
-      Direction.Up,
-      Direction.UpLeft,
+      DirectionEnumProto.Left,
+      DirectionEnumProto.DownLeft,
+      DirectionEnumProto.Down,
+      DirectionEnumProto.DownRight,
+      DirectionEnumProto.Right,
+      DirectionEnumProto.UpRight,
+      DirectionEnumProto.Up,
+      DirectionEnumProto.UpLeft,
     ];
 
     directionsDie.forEach((direction, index) => {
@@ -230,7 +230,7 @@ export default class LoadScene extends Phaser.Scene {
 
   private createAnimation(
     actor: AnimationActor | GunName,
-    direction: Direction,
+    direction: DirectionEnumProto,
     suffix: AnimationSuffix,
     startFrame: number,
     endFrame: number,
@@ -255,7 +255,7 @@ export default class LoadScene extends Phaser.Scene {
     }
 
     this.anims.create({
-      key: `${actor}-${direction}-${suffix}`,
+      key: `${actor}-${directionEnumToJSON(direction).toLowerCase()}-${suffix}`,
       frames: this.anims.generateFrameNumbers(actor, {
         start: startFrame,
         end: endFrame,

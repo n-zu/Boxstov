@@ -4,7 +4,6 @@ import PlayerArsenal from "./playerArsenal.js";
 import { DirectionEnum as DirectionEnumProto } from "../../../common/generated/utils/direction.js";
 import { PlayerUpdate as PlayerUpdateProto } from "../../../common/generated/messages/playerUpdate.js";
 import { Player as PlayerProto } from "../../../common/generated/player/player.js";
-import { Direction } from "../../../common/types/direction.js";
 
 import { gunTypeToGunName } from "../../../common/utils.js";
 
@@ -39,26 +38,4 @@ export class Player extends PlayerModel {
             console.error("function: handleMessage | action: unknown message type | message: ", message);
         }
     }
-
-    private directionToProto(direction: Direction): DirectionEnumProto {
-        switch (direction) {
-            case Direction.Up:
-                return DirectionEnumProto.Up;
-            case Direction.Down:
-                return DirectionEnumProto.Down;
-            case Direction.Left:
-                return DirectionEnumProto.Left;
-            case Direction.Right:
-                return DirectionEnumProto.Right;
-            case Direction.UpLeft:
-                return DirectionEnumProto.UpLeft;
-            case Direction.UpRight:
-                return DirectionEnumProto.UpRight;
-            case Direction.DownLeft:
-                return DirectionEnumProto.DownLeft;
-            case Direction.DownRight:
-                return DirectionEnumProto.DownRight;
-        }
-    }
-
 }
