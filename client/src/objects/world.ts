@@ -3,7 +3,6 @@ import { BulletGroup } from "../groups/bulletGroup";
 import { GameMaster } from "../gameMaster/gameMaster";
 import { PlayerControls } from "../controls/playerControls";
 import { EnemyGroup } from "../groups/enemyGroup";
-import { WorldState } from "../../../common/types/state";
 import { SyncUpdate } from "../../../common/types/messages";
 import Observer from "../../../common/observer/observer.js";
 import WorldStats from "./worldStats.js";
@@ -50,9 +49,7 @@ export class World extends WorldModel {
     return new Player(id, scene, observer, position, this.gameMaster, bullets, local);
   }
 
-  public sync(worldStateStr: WorldState) {
-    const worldState = WorldProto.decode(Buffer.from(worldStateStr, "base64"));
-
+  public sync(worldState: WorldProto) {
     worldState.players.forEach((playerState) => {
       const player = this.getOrCreatePlayer(playerState.id) as Player;
       var playerRecentEvents: PlayerRecentEventProto[];
@@ -112,7 +109,9 @@ export class World extends WorldModel {
 
   private setupGameMaster(gameMaster: GameMaster) {
     gameMaster.addAction("sync", (data: SyncUpdate) => {
-      this.sync(data);
+      const worldState = WorldProto.decode(Buffer.from(data, "base64"));
+
+      this.sync(worldState);
     });
   }
 }

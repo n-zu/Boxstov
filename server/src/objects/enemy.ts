@@ -1,9 +1,9 @@
 import { EnemyModel } from "../../../common/enemy/enemyModel.js";
-import { EnemyState } from "../../../common/types/state";
 import EnemyPhysique from "./enemyPhysique.js";
+import { Enemy as EnemyProto } from "../../../common/generated/enemy/enemy.js";
 
 export default class Enemy extends EnemyModel {
-    public getState(): EnemyState {
+    public getState(): EnemyProto {
         const state = {
             position: {
                 x: this.x,

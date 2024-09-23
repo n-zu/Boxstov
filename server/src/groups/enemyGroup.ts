@@ -1,9 +1,11 @@
 import { Difficulty, EnemyGroupModel } from "../../../common/enemyGroupModel.js";
 import Observer from "../../../common/observer/observer.js";
 import { GameEvents } from "../../../common/types/events.js";
-import { EnemyGroupState, EnemyState } from "../../../common/types/state.js";
 import Enemy from "../objects/enemy.js";
 import EnemyPhysique from "../objects/enemyPhysique.js";
+import { EnemyGroup as EnemyGroupProto } from "../../../common/generated/groups/enemyGroup.js";
+import { Enemy as EnemyProto } from "../../../common/generated/enemy/enemy.js";
+
 
 export class EnemyGroup extends EnemyGroupModel {
   constructor(scene: Phaser.Scene, observer: Observer<GameEvents>, difficulty: Difficulty, spawnPoints: { x: number; y: number }[]) {
@@ -23,8 +25,8 @@ export class EnemyGroup extends EnemyGroupModel {
     return new EnemyPhysique(health, strength, speed, attackRange);
   }
 
-  public getState(): EnemyGroupState {
-    const enemyInfo: EnemyState[] = this.children.entries.map((enemy) => {
+  public getState(): EnemyGroupProto {
+    const enemyInfo: EnemyProto[] = this.children.entries.map((enemy) => {
       const e = enemy as Enemy;
       return e.getState();
     });

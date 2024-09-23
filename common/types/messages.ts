@@ -1,5 +1,4 @@
 import { Direction as DirectionProto } from "../generated/utils/direction.js";
-import { WorldState } from "./state.js";
 
 // Messages
 
@@ -66,7 +65,7 @@ export type EnemyUpdate = {
 
 // Sync
 
-export type SyncUpdate = WorldState;
+export type SyncUpdate = string; // WorldProto - base64
 
 // Actions
 

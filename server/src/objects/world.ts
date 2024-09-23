@@ -1,7 +1,6 @@
 import { Difficulty, EnemyGroupModel } from "../../../common/enemyGroupModel.js";
 import Observer from "../../../common/observer/observer.js";
 import { GameEvents } from "../../../common/types/events.js";
-import { SpawnPoint, WorldState } from "../../../common/types/state.js";
 import { WorldModel } from "../../../common/worldModel.js";
 import { BulletGroup } from "../groups/bulletGroup.js";
 import { EnemyGroup } from "../groups/enemyGroup.js";
@@ -12,6 +11,7 @@ import WorldStats from "./worldStats.js";
 import { World as WorldProto } from "../../../common/generated/world/world.js";
 import { PlayerUpdate as PlayerUpdateProto } from "../../../common/generated/messages/playerUpdate.js";
 import { Buffer } from "buffer";
+import { Position } from "../../../common/generated/utils/position.js";
 
 const INACTIVE_THRESHOLD = 60000; // if 60 seconds pass, the player is considered inactive
 
@@ -32,7 +32,7 @@ export class World extends WorldModel {
     return new BulletGroup(scene, observer);
   }
 
-  protected newEnemyGroup(scene: Phaser.Scene, observer: Observer<GameEvents>, difficulty: Difficulty, spawnPoints: SpawnPoint[]): EnemyGroupModel {
+  protected newEnemyGroup(scene: Phaser.Scene, observer: Observer<GameEvents>, difficulty: Difficulty, spawnPoints: Position[]): EnemyGroupModel {
     return new EnemyGroup(scene, observer, difficulty, spawnPoints);
   }
 
@@ -52,7 +52,7 @@ export class World extends WorldModel {
     super.update();
   }
 
-  public getState(): WorldState {
+  public getState(): string {
     const state = {
       players: (this.players as Player[]).map((player) => player.getState()),
       bullets: (this.bullets as BulletGroup).getState(),

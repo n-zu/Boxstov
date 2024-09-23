@@ -2,10 +2,10 @@ import { BulletGroupModel } from "./bulletGroupModel";
 import { BulletModel } from "./bulletModel";
 import { EnemyModel } from "./enemy/enemyModel";
 import { Difficulty, EnemyGroupModel } from "./enemyGroupModel.js";
+import { Position } from "./generated/utils/position";
 import Observer from "./observer/observer";
 import PlayerModel from "./playerModel";
 import { GameEvents } from "./types/events";
-import { SpawnPoint } from "./types/state";
 import { getPrng } from "./utils.js";
 
 const prng = getPrng(42);
@@ -42,7 +42,7 @@ export abstract class WorldModel {
 
     protected abstract newBulletGroup(scene: Phaser.Scene, observer: Observer<GameEvents>): BulletGroupModel;
 
-    protected abstract newEnemyGroup(scene: Phaser.Scene, observer: Observer<GameEvents>, difficulty: Difficulty, spawnPoints: SpawnPoint[]): EnemyGroupModel;
+    protected abstract newEnemyGroup(scene: Phaser.Scene, observer: Observer<GameEvents>, difficulty: Difficulty, spawnPoints: Position[]): EnemyGroupModel;
 
     protected abstract newPlayer(id: string,
         scene: Phaser.Scene,

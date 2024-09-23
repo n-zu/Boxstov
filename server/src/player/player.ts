@@ -1,9 +1,9 @@
 import "@geckos.io/phaser-on-nodejs";
 import PlayerModel from "../../../common/playerModel.js";
-import { PlayerState } from "../../../common/types/state.js";
 import PlayerArsenal from "./playerArsenal.js";
 import { DirectionEnum as DirectionEnumProto } from "../../../common/generated/utils/direction.js";
 import { PlayerUpdate as PlayerUpdateProto } from "../../../common/generated/messages/playerUpdate.js";
+import { Player as PlayerProto } from "../../../common/generated/player/player.js";
 import { Direction } from "../../../common/types/direction.js";
 
 import { gunTypeToGunName } from "../../../common/utils.js";
@@ -11,7 +11,7 @@ import { gunTypeToGunName } from "../../../common/utils.js";
 export class Player extends PlayerModel {
     lastUpdate = Date.now();
 
-    public getState(): PlayerState {
+    public getState(): PlayerProto {
         return {
             id: this.id,
             position: {

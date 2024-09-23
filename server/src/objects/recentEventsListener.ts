@@ -1,9 +1,9 @@
 import Observer from "../../../common/observer/observer.js";
 import PlayerModel from "../../../common/playerModel.js";
 import { GameEvents } from "../../../common/types/events.js";
-import { RecentEventsListenerState } from "../../../common/types/state.js";
 import { PlayerRecentEvents as PlayerRecentEventsProto } from "../../../common/generated/recentEventsListener.js";
 import { PlayerRecentEvent as PlayerRecentEventProto } from "../../../common/generated/playerRecentEvent.js";
+import { RecentEventsListener as RecentEventsListenerProto } from "../../../common/generated/recentEventsListener.js";
 
 export default class RecentEventsListener {
     playerRecentEvents: { [playerId: string]: PlayerRecentEventProto[] } = {};
@@ -25,7 +25,7 @@ export default class RecentEventsListener {
         this.playerRecentEvents[playerId].push(event);
     }
 
-    public getState(): RecentEventsListenerState {
+    public getState(): RecentEventsListenerProto {
         var state: {[playerId: string]: PlayerRecentEventsProto} = {};
 
         for (const playerId in this.playerRecentEvents) {

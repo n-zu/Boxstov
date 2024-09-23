@@ -1,10 +1,10 @@
 import config from "./config.js";
 import { EnemyModel } from "./enemy/enemyModel.js";
 import EnemyPhysiqueModel from "./enemy/enemyPhysiqueModel.js";
+import { Position } from "./generated/utils/position.js";
 import Observer from "./observer/observer.js";
 import PlayerModel from "./playerModel.js";
 import { GameEvents } from "./types/events.js";
-import { SpawnPoint } from "./types/state.js";
 import { getPrng } from "./utils.js";
 
 const TIME_BETWEEN_HORDES = 700;
@@ -19,14 +19,14 @@ export enum Difficulty {
 export abstract class EnemyGroupModel extends Phaser.Physics.Arcade.Group {
   difficulty: Difficulty;
   timeUntilNextHorde = 0;
-  spawnPoints: SpawnPoint[];
+  spawnPoints: Position[];
   observer: Observer<GameEvents>;
 
   constructor(
     scene: Phaser.Scene,
     observer: Observer<GameEvents>,
     difficulty: Difficulty,
-    spawnPoints: SpawnPoint[],
+    spawnPoints: Position[],
     enemyFactory: (id: number, scene: Phaser.Scene, position: { x: number, y: number }, observer: Observer<GameEvents>, physique: EnemyPhysiqueModel) => EnemyModel
   ) {
     super(scene.physics.world, scene);

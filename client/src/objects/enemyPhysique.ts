@@ -1,9 +1,9 @@
 import EnemyPhysiqueModel from "../../../common/enemy/enemyPhysiqueModel";
-import { EnemyPhysiqueState } from "../../../common/types/state";
 import { Enemy } from "./enemy";
+import { EnemyPhysique as EnemyPhysiqueProto } from "../../../common/generated/enemy/enemyPhysique";
 
 export default class EnemyPhysique extends EnemyPhysiqueModel {
-    public sync(enemy: Enemy, state: EnemyPhysiqueState) {
+    public sync(enemy: Enemy, state: EnemyPhysiqueProto) {
         if (state.health > 0) {
             this.updateHealth(enemy, state.health);
         }

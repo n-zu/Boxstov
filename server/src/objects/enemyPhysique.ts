@@ -1,8 +1,8 @@
 import EnemyPhysiqueModel from "../../../common/enemy/enemyPhysiqueModel.js";
-import { EnemyPhysiqueState } from "../../../common/types/state";
+import { EnemyPhysique as EnemyPhysiqueProto } from "../../../common/generated/enemy/enemyPhysique.js";
 
 export default class EnemyPhysique extends EnemyPhysiqueModel {
-    public getState(): EnemyPhysiqueState {
+    public getState(): EnemyPhysiqueProto {
         return {
             maxHealth: this.maxHealth,
             health: this.health,

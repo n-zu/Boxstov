@@ -1,6 +1,5 @@
 import { Direction } from "../../../common/types/direction";
 import { AnimationActor, AnimationSuffix } from "../types/animation";
-import { WorldState } from "../../../common/types/state";
 import { World } from "../objects/world";
 import { loadGameAssets } from "./load";
 import { GameMaster } from "../gameMaster/gameMaster";
@@ -14,7 +13,7 @@ import Sprite = Phaser.GameObjects.Sprite;
 import { GunName } from "../../../common/guns/gun";
 import { GameEvents } from "../../../common/types/events";
 import AnimationPlayer from "../animations/animationPlayer";
-
+import { World as WorldProto } from "../../../common/generated/world/world";
 
 export function playAnimation(
   sprite: Sprite,
@@ -59,10 +58,6 @@ export default class MainScene extends Phaser.Scene {
       gameMaster: data.gameMaster,
       world: this.world
     });
-  }
-
-  public sync(worldState: WorldState) {
-    this.world?.sync(worldState);
   }
 
   update() {

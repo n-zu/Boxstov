@@ -1,8 +1,8 @@
 import PlayerArsenalModel from "../../../common/playerArsenalModel.js";
-import { PlayerArsenalState } from "../../../common/types/state";
+import { PlayerArsenal as PlayerArsenalProto } from "../../../common/generated/player/playerArsenal.js";
 
 export default class PlayerArsenal extends PlayerArsenalModel {
-    public getState(): PlayerArsenalState {
+    public getState(): PlayerArsenalProto {
         return {
             currentGun: this.getCurrentGunType(),
             kills: this.kills,
