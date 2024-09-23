@@ -30,21 +30,21 @@
     "enemies": {
         "zombieNormal": {
             "health": 100,
-            "speed": 0,
+            "speed": 100,
             "strength": 3,
             "attackRange": 150
         },
         "zombieFast": {
             "health": 100,
-            "speed": 0,
+            "speed": 150,
             "strength": 3,
             "attackRange": 150
         }
     },
     "misc": {
-        "maxEnemies": 1,
+        "maxEnemies": 20,
         "zombieFastProbability": 0.2,
-        "timeBetweenHordes": 70,
+        "timeBetweenHordes": 700,
         "enemySize": {
             "width": 80,
             "height": 200
